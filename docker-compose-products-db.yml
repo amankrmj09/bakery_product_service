@@ -1,0 +1,26 @@
+
+services:
+  postgres-products:
+    image: postgres:15-alpine
+    container_name: bakery-products-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"  # Different port to avoid conflict with auth DB
+    environment:
+      POSTGRES_DB: bakery_products
+      POSTGRES_USER: product_user
+      POSTGRES_PASSWORD: product_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres_products_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - bakery-network
+
+volumes:
+  postgres_products_data:
+    driver: local
+
+networks:
+  bakery-network:
+    driver: bridge

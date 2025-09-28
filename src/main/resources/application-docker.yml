@@ -1,0 +1,31 @@
+# Docker-specific configuration
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-products:5432/bakery_products
+    username: product_user
+    password: product_password
+  jpa:
+    show-sql: false
+
+# Eureka Configuration for Docker
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: product-service
+
+# Server Configuration
+server:
+  port: 8083
+
+# Logging for Docker
+logging:
+  level:
+    com.shah_s.bakery_product_service: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    root: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"

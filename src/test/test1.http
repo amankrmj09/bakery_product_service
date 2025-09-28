@@ -1,0 +1,478 @@
+### Test 1: Service Health Check
+
+# Test 1a: Product Service Health
+GET http://localhost:8083/api/health
+Accept: application/json
+
+# Expected Response:
+# {
+#   "status": "UP",
+#   "service": "bakery-product-service",
+#   "timestamp": "2025-09-28T00:40:00",
+#   "version": "1.0.0",
+#   "database": "UP",
+#   "databaseUrl": "jdbc:postgresql://localhost:5433/bakery_products"
+# }
+
+### Test 1b: Service Info
+GET http://localhost:8083/api/info
+Accept: application/json
+
+# Expected Response:
+# {
+#   ...service info fields...
+# }
+
+### Test 1c: Through API Gateway
+GET http://localhost:8080/api/products/health
+Accept: application/json
+
+# Expected Response:
+# Same as Test 1a
+
+### Test 2: Category Operations
+
+# Test 2a: Create Bread Category
+POST http://localhost:8083/api/categories
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "name": "Bread",
+#   ...other fields...
+# }
+
+{
+  "name": "Bread",
+  "description": "Fresh baked breads and loaves",
+  "displayOrder": 1,
+  "active": true,
+  "iconClass": "fas fa-bread-slice"
+}
+
+
+### Test 2b: Create Cakes Category
+POST http://localhost:8083/api/categories
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "name": "Cakes",
+#   ...other fields...
+# }
+
+{
+  "name": "Cakes",
+  "description": "Delicious cakes for all occasions",
+  "displayOrder": 2,
+  "active": true,
+  "iconClass": "fas fa-birthday-cake"
+}
+
+
+### Test 2c: Create Pastries Category
+POST http://localhost:8083/api/categories
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "name": "Pastries",
+#   ...other fields...
+# }
+
+{
+  "name": "Pastries",
+  "description": "Flaky and sweet pastries",
+  "displayOrder": 3,
+  "active": true,
+  "iconClass": "fas fa-cookie"
+}
+
+### Test 2d: Get All Categories
+GET http://localhost:8083/api/categories
+Accept: application/json
+
+# Expected Response:
+# [ { ...category... }, ... ]
+
+### Test 2e: Get Active Categories
+GET http://localhost:8083/api/categories/active
+Accept: application/json
+
+# Expected Response:
+# [ { ...active category... }, ... ]
+
+### Test 2f: Search Categories
+GET http://localhost:8083/api/categories/search?query=bread
+Accept: application/json
+
+# Expected Response:
+# [ { ...category with 'bread'... } ]
+
+### Test 3: Product Operations
+
+# Test 3a: Create Sourdough Bread
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "sku": "BREAD001",
+#   ...other fields...
+# }
+
+{
+  "sku": "BREAD001",
+  "name": "Artisan Sourdough Bread",
+  "description": "Traditional sourdough bread made with wild yeast starter",
+  "shortDescription": "Fresh artisan sourdough",
+  "categoryId": "88282c1f-3d9d-4dee-9617-d39bc51cd0b1",
+  "price": 8.99,
+  "status": "ACTIVE",
+  "isFeatured": true,
+  "preparationTimeMinutes": 30,
+  "shelfLifeHours": 48,
+  "unit": "loaf",
+  "weightGrams": 800,
+  "caloriesPerUnit": 1200,
+  "ingredients": ["flour", "water", "salt", "sourdough starter"],
+  "allergens": ["gluten"],
+  "tags": ["artisan", "organic", "freshly-baked"],
+  "initialStock": 20,
+  "minimumStock": 5,
+  "reorderLevel": 8
+}
+
+### Test 3b: Create Chocolate Cake
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "sku": "CAKE001",
+#   ...other fields...
+# }
+
+{
+  "sku": "CAKE001",
+  "name": "Chocolate Fudge Cake",
+  "description": "Rich chocolate cake with fudge frosting",
+  "shortDescription": "Decadent chocolate cake",
+  "categoryId": "23a51f0e-c1fa-497b-884e-3d167395a164",
+  "price": 25.99,
+  "discountPrice": 22.99,
+  "status": "ACTIVE",
+  "isFeatured": true,
+  "preparationTimeMinutes": 120,
+  "shelfLifeHours": 72,
+  "unit": "cake",
+  "weightGrams": 1200,
+  "caloriesPerUnit": 2800,
+  "ingredients": ["flour", "cocoa", "sugar", "eggs", "butter"],
+  "allergens": ["eggs", "dairy", "gluten"],
+  "tags": ["chocolate", "birthday", "celebration"],
+  "initialStock": 5,
+  "minimumStock": 2,
+  "reorderLevel": 3
+}
+
+### Test 3c: Create Croissant
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "sku": "PASTRY001",
+#   ...other fields...
+# }
+{
+  "sku": "PASTRY001",
+  "name": "Butter Croissant",
+  "description": "Flaky, buttery French croissant",
+  "shortDescription": "Classic butter croissant",
+  "categoryId": "PASTRY_CATEGORY_ID_HERE",
+  "price": 3.50,
+  "status": "ACTIVE",
+  "preparationTimeMinutes": 45,
+  "shelfLifeHours": 24,
+  "unit": "piece",
+  "weightGrams": 80,
+  "caloriesPerUnit": 280,
+  "ingredients": ["flour", "butter", "yeast", "salt"],
+  "allergens": ["gluten", "dairy"],
+  "tags": ["french", "breakfast", "fresh"],
+  "initialStock": 50,
+  "minimumStock": 10,
+  "reorderLevel": 15
+}
+
+### Test 3d: Get All Products
+GET http://localhost:8083/api/products
+Accept: application/json
+
+# Expected Response:
+# [ { ...product... }, ... ]
+
+### Test 3e: Get Active Products
+GET http://localhost:8083/api/products/active
+Accept: application/json
+
+# Expected Response:
+# [ { ...active product... }, ... ]
+
+### Test 3f: Get Available Products
+GET http://localhost:8083/api/products/available
+Accept: application/json
+
+# Expected Response:
+# [ { ...available product... }, ... ]
+
+### Test 3g: Get Featured Products
+GET http://localhost:8083/api/products/featured
+Accept: application/json
+
+# Expected Response:
+# [ { ...featured product... }, ... ]
+
+### Test 3h: Get Products on Sale
+GET http://localhost:8083/api/products/on-sale
+Accept: application/json
+
+# Expected Response:
+# [ { ...on sale product... }, ... ]
+
+### Test 3i: Get Product by SKU
+GET http://localhost:8083/api/products/sku/BREAD001
+Accept: application/json
+
+# Expected Response:
+# { ...product with sku BREAD001... }
+
+### Test 3j: Search Products
+GET http://localhost:8083/api/products/search?query=chocolate
+Accept: application/json
+
+# Expected Response:
+# [ { ...product with 'chocolate'... } ]
+
+### Test 4: Advanced Product Filtering
+
+# Test 4a: Products by Price Range
+GET http://localhost:8083/api/products/price-range?minPrice=5.00&maxPrice=15.00
+Accept: application/json
+
+# Expected Response:
+# [ { ...product in price range... } ]
+
+### Test 4b: Products by Tag
+GET http://localhost:8083/api/products/tag/chocolate
+Accept: application/json
+
+# Expected Response:
+# [ { ...product with tag 'chocolate'... } ]
+
+### Test 4c: Products without Dairy Allergen
+GET http://localhost:8083/api/products/without-allergen/dairy
+Accept: application/json
+
+# Expected Response:
+# [ { ...product without 'dairy' allergen... } ]
+
+### Test 4d: Products by Category
+GET http://localhost:8083/api/products/category/88282c1f-3d9d-4dee-9617-d39bc51cd0b1
+Accept: application/json
+
+# Expected Response:
+# [ { ...product in bread category... } ]
+
+### Test 4e: Advanced Filter Search
+GET http://localhost:8083/api/products/filter?minPrice=5&maxPrice=30&inStock=true
+Accept: application/json
+
+# Expected Response:
+# [ { ...filtered product... } ]
+
+### Test 5: Inventory Operations
+
+# Test 5a: Get All Inventory
+GET http://localhost:8083/api/inventory
+Accept: application/json
+
+# Expected Response:
+# [ { ...inventory... }, ... ]
+
+### Test 5b: Get Inventory by Product ID
+GET http://localhost:8083/api/inventory/product/f9ff42f7-4a43-46c9-b06c-37e92d441ab5
+Accept: application/json
+
+# Expected Response:
+# { ...inventory for product... }
+
+### Test 5c: Get Inventory by SKU
+GET http://localhost:8083/api/inventory/sku/BREAD001
+Accept: application/json
+
+# Expected Response:
+# { ...inventory for sku BREAD001... }
+
+### Test 5d: Get Low Stock Items
+GET http://localhost:8083/api/inventory/low-stock
+Accept: application/json
+
+# Expected Response:
+# [ { ...low stock inventory... } ]
+
+### Test 5e: Get Out of Stock Items
+GET http://localhost:8083/api/inventory/out-of-stock
+Accept: application/json
+
+# Expected Response:
+# [ { ...out of stock inventory... } ]
+
+### Test 5f: Add Stock
+POST http://localhost:8083/api/inventory/product/863cb939-afcc-4d5d-a38d-671d4019bbc2/add-stock
+Content-Type: application/json
+
+
+# Expected Response:
+# { ...updated inventory... }
+{
+  "quantity": 10,
+  "notes": "Morning restock"
+}
+
+### Test 5g: Reserve Stock
+POST http://localhost:8083/api/inventory/product/f9ff42f7-4a43-46c9-b06c-37e92d441ab5/reserve
+Content-Type: application/json
+
+# Expected Response:
+# { ...updated inventory... }
+{
+  "quantity": 2
+}
+
+
+### Test 5h: Check Stock Availability
+GET http://localhost:8083/api/inventory/product/f9ff42f7-4a43-46c9-b06c-37e92d441ab5/availability?quantity=5
+Accept: application/json
+
+# Expected Response:
+# { "available": true }
+
+### Test 5i: Get Available Stock
+GET http://localhost:8083/api/inventory/product/f9ff42f7-4a43-46c9-b06c-37e92d441ab5/available-stock
+Accept: application/json
+
+# Expected Response:
+# { "availableStock": ... }
+
+### Test 6: Through API Gateway
+
+# Test 6a: Categories through Gateway
+GET http://localhost:8080/api/categories
+Accept: application/json
+
+# Expected Response:
+# [ { ...category... }, ... ]
+
+### Test 6b: Products through Gateway
+GET http://localhost:8080/api/products
+Accept: application/json
+
+# Expected Response:
+# [ { ...product... }, ... ]
+
+### Test 6c: Inventory through Gateway
+GET http://localhost:8080/api/inventory
+Accept: application/json
+
+# Expected Response:
+# [ { ...inventory... }, ... ]
+
+### Test 6d: Create Product through Gateway
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+# Expected Response:
+# {
+#   "id": "...",
+#   "sku": "GATEWAY001",
+#   ...other fields...
+# }
+{
+  "sku": "GATEWAY001",
+  "name": "Gateway Test Product",
+  "description": "Product created through gateway",
+  "categoryId": "BREAD_CATEGORY_ID_HERE",
+  "price": 5.99,
+  "initialStock": 15
+}
+
+
+### Test 7: Statistics & Analytics
+
+# Test 7a: Category Statistics
+GET http://localhost:8083/api/categories/statistics
+Accept: application/json
+
+# Expected Response:
+# { ...category statistics... }
+
+### Test 7b: Product Statistics
+GET http://localhost:8083/api/products/statistics
+Accept: application/json
+
+# Expected Response:
+# { ...product statistics... }
+
+### Test 7c: Inventory Statistics
+GET http://localhost:8083/api/inventory/statistics
+Accept: application/json
+
+# Expected Response:
+# { ...inventory statistics... }
+
+### Test 8: Error Handling
+
+# Test 8a: Invalid Category ID
+GET http://localhost:8083/api/categories/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+# Expected Response:
+# 404 Not Found
+# { "error": "Category not found" }
+
+### Test 8b: Invalid Product Data
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+# Expected Response:
+# 400 Bad Request
+# { "error": "Invalid product data" }
+{
+  "sku": "",
+  "name": "",
+  "price": -5.00
+}
+
+
+### Test 8c: Duplicate SKU
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+# Expected Response:
+# 409 Conflict
+# { "error": "SKU already exists" }
+
+{
+  "sku": "BREAD001",
+  "name": "Duplicate SKU Test",
+  "categoryId": "BREAD_CATEGORY_ID_HERE",
+  "price": 10.00
+}

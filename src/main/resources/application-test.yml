@@ -1,0 +1,35 @@
+# Test-specific configuration
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+
+# Disable Eureka for tests
+eureka:
+  client:
+    enabled: false
+
+# Test product configuration
+product:
+  inventory:
+    low-stock-threshold: 5
+    auto-disable-when-zero: false
+  images:
+    base-url: "http://localhost:8080/test-images/"
+    default-image: "test-product.jpg"
+
+# Test logging
+logging:
+  level:
+    com.shah_s.bakery_product_service: DEBUG
+    root: WARN
