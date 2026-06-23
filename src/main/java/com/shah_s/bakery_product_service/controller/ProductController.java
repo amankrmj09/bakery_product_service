@@ -113,6 +113,30 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    // Get multiple products by IDs (Batch)
+    @GetMapping("/batch")
+    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestParam List<UUID> productIds) {
+        logger.info("Get products by IDs request received for {} items", productIds.size());
+        
+        List<ProductResponse> products = productService.getAllProducts().stream()
+                .filter(p -> productIds.contains(p.getId()))
+                .toList();
+                
+        return ResponseEntity.ok(products);
+    }
+
+    // Validate multiple products (Batch)
+    @PostMapping("/batch/validate")
+    public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<UUID> productIds) {
+        logger.info("Validate products request received for {} items", productIds.size());
+        
+        List<ProductResponse> products = productService.getAllProducts().stream()
+                .filter(p -> productIds.contains(p.getId()))
+                .toList();
+                
+        return ResponseEntity.ok(products);
+    }
+
     // Get product by SKU
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
