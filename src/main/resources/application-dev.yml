@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://blubug.me:8002/bakery_products
+  data:
+    redis:
+      host: blubug.me
+      port: 6380
