@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import com.shah_s.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -193,7 +194,7 @@ public class InventoryService {
         logger.info("Adding {} units to inventory for product: {}", quantity, productId);
 
         if (quantity <= 0) {
-            throw new ProductServiceException("Quantity must be positive");
+            throw new InvalidQuantityException("Quantity must be positive");
         }
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -223,7 +224,7 @@ public class InventoryService {
         logger.info("Reserving {} units for product: {}", quantity, productId);
 
         if (quantity <= 0) {
-            throw new ProductServiceException("Quantity must be positive");
+            throw new InvalidQuantityException("Quantity must be positive");
         }
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -250,7 +251,7 @@ public class InventoryService {
         logger.info("Releasing {} reserved units for product: {}", quantity, productId);
 
         if (quantity <= 0) {
-            throw new ProductServiceException("Quantity must be positive");
+            throw new InvalidQuantityException("Quantity must be positive");
         }
 
         Inventory inventory = inventoryRepository.findByProductId(productId)
@@ -272,7 +273,7 @@ public class InventoryService {
         logger.info("Consuming {} units for product: {}", quantity, productId);
 
         if (quantity <= 0) {
-            throw new ProductServiceException("Quantity must be positive");
+            throw new InvalidQuantityException("Quantity must be positive");
         }
 
         Inventory inventory = inventoryRepository.findByProductId(productId)

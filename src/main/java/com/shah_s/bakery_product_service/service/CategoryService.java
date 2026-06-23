@@ -8,7 +8,9 @@ import com.shah_s.bakery_product_service.repository.CategoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.shah_s.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
+import org.devofblue.common.exception.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class CategoryService {
 
         // Check if category name already exists
         if (categoryRepository.existsByName(request.getName())) {
-            throw new ProductServiceException("Category with name '" + request.getName() + "' already exists");
+            throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists");
         }
 
         // Set display order if not provided
@@ -129,7 +131,7 @@ public class CategoryService {
         // Check if new name conflicts with existing category
         if (!category.getName().equals(request.getName()) &&
             categoryRepository.existsByName(request.getName())) {
-            throw new ProductServiceException("Category with name '" + request.getName() + "' already exists");
+            throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists");
         }
 
         category.setName(request.getName());
@@ -243,3 +245,4 @@ public class CategoryService {
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
     }
 }
+

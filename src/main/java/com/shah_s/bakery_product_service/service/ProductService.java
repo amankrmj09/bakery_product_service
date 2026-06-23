@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.shah_s.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
+import org.devofblue.common.exception.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -47,7 +49,7 @@ public class ProductService {
 
         // Check if SKU already exists
         if (productRepository.existsBySku(request.getSku())) {
-            throw new ProductServiceException("Product with SKU '" + request.getSku() + "' already exists");
+            throw new DuplicateResourceException("Product with SKU '" + request.getSku() + "' already exists");
         }
 
         // Validate category exists
@@ -243,7 +245,7 @@ public class ProductService {
         // Check if new SKU conflicts with existing product
         if (!product.getSku().equals(request.getSku()) &&
             productRepository.existsBySku(request.getSku())) {
-            throw new ProductServiceException("Product with SKU '" + request.getSku() + "' already exists");
+            throw new DuplicateResourceException("Product with SKU '" + request.getSku() + "' already exists");
         }
 
         // Validate category exists
@@ -383,3 +385,4 @@ public class ProductService {
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
     }
 }
+
