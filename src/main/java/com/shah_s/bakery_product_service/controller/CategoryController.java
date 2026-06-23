@@ -85,6 +85,7 @@ public class CategoryController {
     }
 
     // Create new category
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
         logger.info("Create category request received: {}", request.getName());
