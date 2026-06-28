@@ -74,6 +74,7 @@ public class ProductService {
         product.setIngredients(request.getIngredients());
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
+        product.setMediaUrls(request.getMediaUrls());
 
         Product savedProduct = productRepository.save(product);
 
@@ -269,6 +270,7 @@ public class ProductService {
         product.setIngredients(request.getIngredients());
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
+        product.setMediaUrls(request.getMediaUrls());
 
         Product updatedProduct = productRepository.save(product);
         logger.info("Product updated successfully: {}", productId);

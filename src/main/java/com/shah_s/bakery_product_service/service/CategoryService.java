@@ -52,7 +52,7 @@ public class CategoryService {
         category.setDescription(request.getDescription());
         category.setDisplayOrder(request.getDisplayOrder());
         category.setActive(request.getActive());
-        category.setImageUrl(request.getImageUrl());
+        category.setMediaUrls(request.getMediaUrls());
         category.setIconClass(request.getIconClass());
 
         Category savedCategory = categoryRepository.save(category);
@@ -138,7 +138,7 @@ public class CategoryService {
         category.setDescription(request.getDescription());
         category.setDisplayOrder(request.getDisplayOrder());
         category.setActive(request.getActive());
-        category.setImageUrl(request.getImageUrl());
+        category.setMediaUrls(request.getMediaUrls());
         category.setIconClass(request.getIconClass());
 
         Category updatedCategory = categoryRepository.save(category);

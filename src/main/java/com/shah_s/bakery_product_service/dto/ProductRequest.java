@@ -66,6 +66,8 @@ public class ProductRequest {
 
     private List<String> tags = new ArrayList<>();
 
+    private List<String> mediaUrls = new ArrayList<>();
+
     // Inventory fields
     @Min(value = 0, message = "Initial stock cannot be negative")
     private Integer initialStock = 0;

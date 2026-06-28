@@ -34,7 +34,7 @@ public class ProductResponse {
     private List<String> allergens;
     private List<String> tags;
     private InventorySummary inventory;
-    private List<ProductImageResponse> images;
+    private List<String> mediaUrls;
     private String primaryImageUrl;
     private Boolean isAvailable;
     private Boolean isOnSale;
@@ -68,9 +68,7 @@ public class ProductResponse {
         response.tags = product.getTags();
         response.inventory = product.getInventory() != null ?
             InventorySummary.from(product.getInventory()) : null;
-        response.images = product.getImages().stream()
-            .map(ProductImageResponse::from)
-            .toList();
+        response.mediaUrls = product.getMediaUrls();
         response.primaryImageUrl = product.getPrimaryImageUrl();
         response.isAvailable = product.isAvailable();
         response.isOnSale = product.isOnSale();

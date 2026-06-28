@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,7 +18,7 @@ public class CategoryResponse {
     private String description;
     private Integer displayOrder;
     private Boolean active;
-    private String imageUrl;
+    private List<String> mediaUrls;
     private String iconClass;
     private Integer productCount;
     private Integer activeProductCount;
@@ -35,7 +36,7 @@ public class CategoryResponse {
         response.description = category.getDescription();
         response.displayOrder = category.getDisplayOrder();
         response.active = category.getActive();
-        response.imageUrl = category.getImageUrl();
+        response.mediaUrls = category.getMediaUrls();
         response.iconClass = category.getIconClass();
         response.productCount = category.getProductCount();
         response.activeProductCount = category.getActiveProductCount();

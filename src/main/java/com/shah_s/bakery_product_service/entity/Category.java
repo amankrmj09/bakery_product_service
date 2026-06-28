@@ -7,11 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Setter
 @Getter
@@ -43,13 +46,15 @@ public class Category {
     @Column(nullable = false)
     private Boolean active = true;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "media_urls", columnDefinition = "text[]")
+    private List<String> mediaUrls = new ArrayList<>();
 
     @Column(name = "icon_class")
     private String iconClass; // For FontAwesome or similar icons
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @BatchSize(size = 50)
     private List<Product> products = new ArrayList<>();
 
     @CreationTimestamp

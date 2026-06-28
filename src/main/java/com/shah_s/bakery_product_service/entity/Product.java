@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Setter
 @Getter
@@ -94,23 +97,27 @@ public class Product {
     @ElementCollection
     @CollectionTable(name = "product_ingredients", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "ingredient")
+    @BatchSize(size = 50)
     private List<String> ingredients = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "product_allergens", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "allergen")
+    @BatchSize(size = 50)
     private List<String> allergens = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tag")
+    @BatchSize(size = 50)
     private List<String> tags = new ArrayList<>();
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Inventory inventory;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductImage> images = new ArrayList<>();
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "media_urls", columnDefinition = "text[]")
+    private List<String> mediaUrls = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -147,11 +154,7 @@ public class Product {
     }
 
     public String getPrimaryImageUrl() {
-        return images.stream()
-                .filter(ProductImage::getIsPrimary)
-                .findFirst()
-                .map(ProductImage::getImageUrl)
-                .orElse(null);
+        return mediaUrls != null && !mediaUrls.isEmpty() ? mediaUrls.get(0) : null;
     }
 
     // Enums

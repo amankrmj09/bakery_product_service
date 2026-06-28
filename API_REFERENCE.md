@@ -24,6 +24,26 @@ None
 
 ---
 
+## UploadController
+
+### `POST` `/api/uploads/media`
+- **API Name:** uploadMedia
+- **Type:** REST / Synchronous
+- **Consumes:** `multipart/form-data`
+
+**Request:**
+- **Part:** `media` (List of MultipartFile)
+
+**Response:**
+```json
+{
+  "message": "String",
+  "urls": ["String"]
+}
+```
+
+---
+
 ### `GET` `/api/info`
 - **API Name:** info
 - **Type:** REST / Synchronous
@@ -80,7 +100,7 @@ None
   "description": "String (Max 500 chars)",
   "displayOrder": "Integer - Default 0",
   "active": "Boolean - Default true",
-  "imageUrl": "String",
+  "mediaUrls": ["String"],
   "iconClass": "String"
 }
 ```
@@ -93,7 +113,7 @@ None
   "description": "String",
   "displayOrder": "Integer",
   "active": "Boolean",
-  "imageUrl": "String",
+  "mediaUrls": ["String"],
   "iconClass": "String",
   "productCount": "Integer",
   "activeProductCount": "Integer",
@@ -638,6 +658,7 @@ None
   "ingredients": ["String"],
   "allergens": ["String"],
   "tags": ["String"],
+  "mediaUrls": ["String"],
   "initialStock": "Integer - Default 0",
   "minimumStock": "Integer - Default 0",
   "reorderLevel": "Integer - Default 0"
@@ -677,19 +698,7 @@ None
     "isOutOfStock": "Boolean",
     "status": "String"
   },
-  "images": [
-    {
-      "id": "UUID",
-      "imageUrl": "String",
-      "altText": "String",
-      "isPrimary": "Boolean",
-      "displayOrder": "Integer",
-      "fileSizeBytes": "Long",
-      "imageWidth": "Integer",
-      "imageHeight": "Integer",
-      "createdAt": "DateTime"
-    }
-  ],
+  "mediaUrls": ["String"],
   "primaryImageUrl": "String",
   "isAvailable": "Boolean",
   "isOnSale": "Boolean",
