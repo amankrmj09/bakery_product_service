@@ -29,6 +29,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductService {
 
+import org.devofblue.common.exception.DuplicateResourceException;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class ProductService {
+
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     final private ProductRepository productRepository;
@@ -36,11 +51,17 @@ public class ProductService {
     final private CategoryService categoryService;
 
     final private InventoryService inventoryService;
+    
+    final private com.shah_s.bakery_product_service.repository.ProductSearchRepository productSearchRepository;
+    
+    final private ProductEventPublisher productEventPublisher;
 
-    public ProductService(ProductRepository productRepository, CategoryService categoryService, InventoryService inventoryService) {
+    public ProductService(ProductRepository productRepository, CategoryService categoryService, InventoryService inventoryService, com.shah_s.bakery_product_service.repository.ProductSearchRepository productSearchRepository, ProductEventPublisher productEventPublisher) {
         this.productRepository = productRepository;
         this.categoryService = categoryService;
         this.inventoryService = inventoryService;
+        this.productSearchRepository = productSearchRepository;
+        this.productEventPublisher = productEventPublisher;
     }
 
     // Create new product
@@ -81,6 +102,9 @@ public class ProductService {
         // Create initial inventory
         inventoryService.createInventoryForProduct(savedProduct, request.getInitialStock(),
                 request.getMinimumStock(), request.getReorderLevel());
+
+        syncToElasticsearch(savedProduct);
+        publishProductEvent(savedProduct, "CREATED");
 
         logger.info("Product created successfully with ID: {}", savedProduct.getId());
         return ProductResponse.from(savedProduct);
@@ -170,7 +194,18 @@ public class ProductService {
     public List<ProductResponse> searchProducts(String searchTerm) {
         logger.debug("Searching products with term: {}", searchTerm);
 
-        return productRepository.searchProducts(searchTerm, Product.ProductStatus.ACTIVE).stream()
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 50);
+        Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
+        
+        // We'll map the ES documents back to ProductResponse, though we miss some DB fields this way,
+        // it's fine for search. Alternatively we could fetch IDs from ES and query DB.
+        // Let's fetch IDs from DB to return complete ProductResponse
+        List<UUID> productIds = results.getContent().stream()
+            .map(doc -> UUID.fromString(doc.getId()))
+            .collect(Collectors.toList());
+            
+        return productRepository.findAllById(productIds).stream()
+                .filter(p -> p.getStatus() == Product.ProductStatus.ACTIVE)
                 .map(ProductResponse::from)
                 .collect(Collectors.toList());
     }
@@ -180,8 +215,17 @@ public class ProductService {
     public Page<ProductResponse> searchProductsWithPagination(String searchTerm, Pageable pageable) {
         logger.debug("Searching products with pagination, term: {}", searchTerm);
 
-        return productRepository.searchProductsWithPagination(searchTerm, Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+        Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
+        List<UUID> productIds = results.getContent().stream()
+            .map(doc -> UUID.fromString(doc.getId()))
+            .collect(Collectors.toList());
+            
+        List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
+                .filter(p -> p.getStatus() == Product.ProductStatus.ACTIVE)
+                .map(ProductResponse::from)
+                .collect(Collectors.toList());
+                
+        return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.getTotalElements());
     }
 
     // Get products by price range
@@ -273,6 +317,10 @@ public class ProductService {
         product.setMediaUrls(request.getMediaUrls());
 
         Product updatedProduct = productRepository.save(product);
+        
+        syncToElasticsearch(updatedProduct);
+        publishProductEvent(updatedProduct, "UPDATED");
+        
         logger.info("Product updated successfully: {}", productId);
 
         return ProductResponse.from(updatedProduct);
@@ -287,6 +335,9 @@ public class ProductService {
 
         product.setStatus(status);
         Product updatedProduct = productRepository.save(product);
+        
+        syncToElasticsearch(updatedProduct);
+        publishProductEvent(updatedProduct, "STATUS_UPDATED");
 
         logger.info("Product status updated successfully: {}", productId);
         return ProductResponse.from(updatedProduct);
@@ -319,6 +370,16 @@ public class ProductService {
         // For now, we'll just delete
 
         productRepository.delete(product);
+        deleteFromElasticsearch(productId);
+        
+        // publish event
+        org.devofblue.common.event.ProductEvent event = org.devofblue.common.event.ProductEvent.builder()
+                .productId(productId)
+                .status("DELETED")
+                .timestamp(LocalDateTime.now())
+                .build();
+        productEventPublisher.publishProductUpdated(event);
+        
         logger.info("Product deleted successfully: {}", productId);
     }
 
@@ -386,5 +447,47 @@ public class ProductService {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
     }
-}
 
+    private void syncToElasticsearch(Product product) {
+        try {
+            com.shah_s.bakery_product_service.document.ProductDocument doc = new com.shah_s.bakery_product_service.document.ProductDocument();
+            doc.setId(product.getId().toString());
+            doc.setSku(product.getSku());
+            doc.setName(product.getName());
+            doc.setDescription(product.getDescription());
+            if (product.getCategory() != null) {
+                doc.setCategoryName(product.getCategory().getName());
+            }
+            doc.setPrice(product.getPrice());
+            doc.setStatus(product.getStatus().name());
+            doc.setTags(product.getTags());
+            doc.setAverageRating(product.getAverageRating());
+            productSearchRepository.save(doc);
+        } catch (Exception e) {
+            logger.error("Failed to sync product {} to Elasticsearch: {}", product.getId(), e.getMessage());
+        }
+    }
+
+    private void deleteFromElasticsearch(UUID productId) {
+        try {
+            productSearchRepository.deleteById(productId.toString());
+        } catch (Exception e) {
+            logger.error("Failed to delete product {} from Elasticsearch: {}", productId, e.getMessage());
+        }
+    }
+
+    private void publishProductEvent(Product product, String action) {
+        try {
+            org.devofblue.common.event.ProductEvent event = org.devofblue.common.event.ProductEvent.builder()
+                    .productId(product.getId())
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .status(action)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            productEventPublisher.publishProductUpdated(event);
+        } catch (Exception e) {
+            logger.error("Failed to publish ProductEvent for {}: {}", product.getId(), e.getMessage());
+        }
+    }
+}
