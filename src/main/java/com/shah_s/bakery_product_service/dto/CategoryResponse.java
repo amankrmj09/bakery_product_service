@@ -6,14 +6,14 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
 
 @Getter
 @Setter
 public class CategoryResponse {
 
     // Getters and Setters
-    private UUID id;
+    private String id;
     private String name;
     private String description;
     private Integer displayOrder;
@@ -38,8 +38,8 @@ public class CategoryResponse {
         response.active = category.getActive();
         response.mediaUrls = category.getMediaUrls();
         response.iconClass = category.getIconClass();
-        response.productCount = category.getProductCount();
-        response.activeProductCount = category.getActiveProductCount();
+        response.productCount = 0;
+        response.activeProductCount = 0;
         response.createdAt = category.getCreatedAt();
         response.updatedAt = category.getUpdatedAt();
         return response;

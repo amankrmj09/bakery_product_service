@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/products")
@@ -104,7 +104,7 @@ public class ProductController {
 
     // Get product by ID
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID productId) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable String productId) {
         logger.info("Get product by ID request received: {}", productId);
 
         ProductResponse product = productService.getProductById(productId);
@@ -115,7 +115,7 @@ public class ProductController {
 
     // Get multiple products by IDs (Batch)
     @GetMapping("/batch")
-    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestParam List<UUID> productIds) {
+    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestParam List<String> productIds) {
         logger.info("Get products by IDs request received for {} items", productIds.size());
         
         List<ProductResponse> products = productService.getAllProducts().stream()
@@ -127,7 +127,7 @@ public class ProductController {
 
     // Validate multiple products (Batch)
     @PostMapping("/batch/validate")
-    public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<UUID> productIds) {
+    public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<String> productIds) {
         logger.info("Validate products request received for {} items", productIds.size());
         
         List<ProductResponse> products = productService.getAllProducts().stream()
@@ -152,7 +152,7 @@ public class ProductController {
 
     // Get products by category
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable UUID categoryId) {
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable String categoryId) {
         logger.info("Get products by category request received: {}", categoryId);
 
         List<ProductResponse> products = productService.getProductsByCategory(categoryId);
@@ -164,7 +164,7 @@ public class ProductController {
     // Get products by category with pagination
     @GetMapping("/category/{categoryId}/paginated")
     public ResponseEntity<Page<ProductResponse>> getProductsByCategoryWithPagination(
-            @PathVariable UUID categoryId,
+            @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -252,7 +252,7 @@ public class ProductController {
     // Advanced search with filters
     @GetMapping("/filter")
     public ResponseEntity<List<ProductResponse>> searchProductsWithFilters(
-            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) Product.ProductStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -281,7 +281,7 @@ public class ProductController {
     // Update product
     @PutMapping("/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @Valid @RequestBody ProductRequest request) {
 
         logger.info("Update product request received: {}", productId);
@@ -295,7 +295,7 @@ public class ProductController {
     // Update product status
     @PatchMapping("/{productId}/status")
     public ResponseEntity<ProductResponse> updateProductStatus(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestBody Map<String, String> request) {
 
         logger.info("Update product status request received: {}", productId);
@@ -311,7 +311,7 @@ public class ProductController {
 
     // Toggle featured status
     @PostMapping("/{productId}/toggle-featured")
-    public ResponseEntity<ProductResponse> toggleFeaturedStatus(@PathVariable UUID productId) {
+    public ResponseEntity<ProductResponse> toggleFeaturedStatus(@PathVariable String productId) {
         logger.info("Toggle featured status request received: {}", productId);
 
         ProductResponse product = productService.toggleFeaturedStatus(productId);
@@ -322,7 +322,7 @@ public class ProductController {
 
     // Delete product
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable UUID productId) {
+    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable String productId) {
         logger.info("Delete product request received: {}", productId);
 
         productService.deleteProduct(productId);
@@ -337,7 +337,7 @@ public class ProductController {
 
     // Check product availability
     @GetMapping("/{productId}/availability")
-    public ResponseEntity<Map<String, Object>> checkProductAvailability(@PathVariable UUID productId) {
+    public ResponseEntity<Map<String, Object>> checkProductAvailability(@PathVariable String productId) {
         logger.info("Check product availability request received: {}", productId);
 
         boolean available = productService.isProductAvailable(productId);

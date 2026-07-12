@@ -1,11 +1,8 @@
 # Docker-specific configuration
 spring:
-  datasource:
-    url: jdbc:postgresql://postgres-products:5432/bakery_products
-    username: product_user
-    password: product_password
-  jpa:
-    show-sql: false
+  data:
+    mongodb:
+      uri: mongodb://product_user:product_password@mongo-products:27017/bakery_products?authSource=admin
 
 # Eureka Configuration for Docker
 eureka:

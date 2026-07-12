@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -41,7 +41,7 @@ public class InventoryController {
 
     // Get inventory by product ID
     @GetMapping("/product/{productId}")
-    public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable UUID productId) {
+    public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable String productId) {
         logger.info("Get inventory by product ID request received: {}", productId);
 
         InventoryResponse inventory = inventoryService.getInventoryByProductId(productId);
@@ -122,7 +122,7 @@ public class InventoryController {
     // Update inventory
     @PutMapping("/product/{productId}")
     public ResponseEntity<InventoryResponse> updateInventory(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @Valid @RequestBody InventoryUpdateRequest request) {
 
         logger.info("Update inventory request received for product: {}", productId);
@@ -136,7 +136,7 @@ public class InventoryController {
     // Add stock (restock)
     @PostMapping("/product/{productId}/add-stock")
     public ResponseEntity<InventoryResponse> addStock(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestBody Map<String, Object> request) {
 
         logger.info("Add stock request received for product: {}", productId);
@@ -153,7 +153,7 @@ public class InventoryController {
     // Reserve stock
     @PostMapping("/product/{productId}/reserve")
     public ResponseEntity<Map<String, Object>> reserveStock(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
         logger.info("Reserve stock request received for product: {}", productId);
@@ -180,7 +180,7 @@ public class InventoryController {
     // Release reserved stock
     @PostMapping("/product/{productId}/release-reserved")
     public ResponseEntity<Map<String, String>> releaseReservedStock(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
         logger.info("Release reserved stock request received for product: {}", productId);
@@ -200,7 +200,7 @@ public class InventoryController {
     // Consume stock
     @PostMapping("/product/{productId}/consume")
     public ResponseEntity<Map<String, String>> consumeStock(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
         logger.info("Consume stock request received for product: {}", productId);
@@ -220,7 +220,7 @@ public class InventoryController {
     // Check stock availability
     @GetMapping("/product/{productId}/availability")
     public ResponseEntity<Map<String, Object>> checkStockAvailability(
-            @PathVariable UUID productId,
+            @PathVariable String productId,
             @RequestParam Integer quantity) {
 
         logger.info("Check stock availability request received for product: {} (quantity: {})",
@@ -240,7 +240,7 @@ public class InventoryController {
 
     // Get available stock for a product
     @GetMapping("/product/{productId}/available-stock")
-    public ResponseEntity<Map<String, Object>> getAvailableStock(@PathVariable UUID productId) {
+    public ResponseEntity<Map<String, Object>> getAvailableStock(@PathVariable String productId) {
         logger.info("Get available stock request received for product: {}", productId);
 
         Integer availableStock = inventoryService.getAvailableStock(productId);
@@ -255,7 +255,7 @@ public class InventoryController {
     // Bulk update minimum stock levels
     @PostMapping("/bulk-update-minimum-stock")
     public ResponseEntity<Map<String, String>> bulkUpdateMinimumStock(
-            @RequestBody Map<UUID, Integer> productMinimumStocks) {
+            @RequestBody Map<String, Integer> productMinimumStocks) {
 
         logger.info("Bulk update minimum stock request received for {} products",
                 productMinimumStocks.size());

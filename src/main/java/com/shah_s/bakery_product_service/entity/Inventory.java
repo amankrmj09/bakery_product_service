@@ -1,95 +1,65 @@
 package com.shah_s.bakery_product_service.entity;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Setter
 @Getter
-@Entity
-@Table(name = "inventory", indexes = {
-    @Index(name = "idx_inventory_product", columnList = "product_id"),
-    @Index(name = "idx_inventory_status", columnList = "status"),
-    @Index(name = "idx_inventory_stock", columnList = "current_stock")
-})
 public class Inventory {
 
-    // Getters and Setters
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
-    @NotNull(message = "Product is required for inventory")
-    private Product product;
-
-    @Column(name = "current_stock", nullable = false)
+    @Field("current_stock")
     @Min(value = 0, message = "Current stock cannot be negative")
     private Integer currentStock = 0;
 
-    @Column(name = "reserved_stock", nullable = false)
+    @Field("reserved_stock")
     @Min(value = 0, message = "Reserved stock cannot be negative")
-    private Integer reservedStock = 0; // Stock reserved for pending orders
+    private Integer reservedStock = 0;
 
-    @Column(name = "minimum_stock", nullable = false)
+    @Field("minimum_stock")
     @Min(value = 0, message = "Minimum stock cannot be negative")
-    private Integer minimumStock = 0; // Low stock threshold
+    private Integer minimumStock = 0;
 
-    @Column(name = "maximum_stock")
+    @Field("maximum_stock")
     @Min(value = 0, message = "Maximum stock cannot be negative")
     private Integer maximumStock;
 
-    @Column(name = "reorder_level")
+    @Field("reorder_level")
     @Min(value = 0, message = "Reorder level cannot be negative")
-    private Integer reorderLevel = 0; // When to reorder
+    private Integer reorderLevel = 0;
 
-    @Column(name = "reorder_quantity")
+    @Field("reorder_quantity")
     @Min(value = 0, message = "Reorder quantity cannot be negative")
-    private Integer reorderQuantity = 0; // How much to reorder
+    private Integer reorderQuantity = 0;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private InventoryStatus status = InventoryStatus.IN_STOCK;
 
-    @Column(name = "last_restocked_at")
+    @Field("last_restocked_at")
     private LocalDateTime lastRestockedAt;
 
-    @Column(name = "last_restocked_quantity")
+    @Field("last_restocked_quantity")
     private Integer lastRestockedQuantity;
 
-    @Column(name = "auto_reorder_enabled")
+    @Field("auto_reorder_enabled")
     private Boolean autoReorderEnabled = false;
 
-    @Column(name = "track_expiry")
+    @Field("track_expiry")
     private Boolean trackExpiry = false;
 
-    @Column(name = "expiry_date")
+    @Field("expiry_date")
     private LocalDateTime expiryDate;
 
-    @Column(name = "supplier_info")
+    @Field("supplier_info")
     private String supplierInfo;
 
-    @Column(name = "storage_location")
+    @Field("storage_location")
     private String storageLocation;
 
-    @Column(columnDefinition = "TEXT")
     private String notes;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @Transient
     private Integer availableStock;
@@ -103,16 +73,13 @@ public class Inventory {
     @Transient
     private Boolean needsReorder;
 
-    // Constructors
     public Inventory() {}
 
-    public Inventory(Product product, Integer currentStock, Integer minimumStock) {
-        this.product = product;
+    public Inventory(Integer currentStock, Integer minimumStock) {
         this.currentStock = currentStock;
         this.minimumStock = minimumStock;
     }
 
-    // Utility Methods
     public Integer getAvailableStock() {
         return Math.max(0, currentStock - reservedStock);
     }
@@ -138,7 +105,6 @@ public class Inventory {
                LocalDateTime.now().plusHours(hours).isAfter(expiryDate);
     }
 
-    // Update inventory status based on stock levels
     public void updateStatus() {
         if (getIsOutOfStock()) {
             this.status = InventoryStatus.OUT_OF_STOCK;
@@ -149,7 +115,6 @@ public class Inventory {
         }
     }
 
-    // Enums
     public enum InventoryStatus {
         IN_STOCK, LOW_STOCK, OUT_OF_STOCK
     }

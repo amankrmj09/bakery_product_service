@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/categories")
@@ -75,7 +75,7 @@ public class CategoryController {
 
     // Get category by ID
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID categoryId) {
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String categoryId) {
         logger.info("Get category by ID request received: {}", categoryId);
 
         CategoryResponse category = categoryService.getCategoryById(categoryId);
@@ -99,7 +99,7 @@ public class CategoryController {
     // Update category
     @PutMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> updateCategory(
-            @PathVariable UUID categoryId,
+            @PathVariable String categoryId,
             @Valid @RequestBody CategoryRequest request) {
 
         logger.info("Update category request received: {}", categoryId);
@@ -112,7 +112,7 @@ public class CategoryController {
 
     // Delete category
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Map<String, String>> deleteCategory(@PathVariable UUID categoryId) {
+    public ResponseEntity<Map<String, String>> deleteCategory(@PathVariable String categoryId) {
         logger.info("Delete category request received: {}", categoryId);
 
         categoryService.deleteCategory(categoryId);
@@ -138,7 +138,7 @@ public class CategoryController {
 
     // Toggle category status
     @PostMapping("/{categoryId}/toggle-status")
-    public ResponseEntity<CategoryResponse> toggleCategoryStatus(@PathVariable UUID categoryId) {
+    public ResponseEntity<CategoryResponse> toggleCategoryStatus(@PathVariable String categoryId) {
         logger.info("Toggle category status request received: {}", categoryId);
 
         CategoryResponse category = categoryService.toggleCategoryStatus(categoryId);
@@ -149,7 +149,7 @@ public class CategoryController {
 
     // Reorder categories
     @PostMapping("/reorder")
-    public ResponseEntity<Map<String, String>> reorderCategories(@RequestBody Map<UUID, Integer> categoryOrders) {
+    public ResponseEntity<Map<String, String>> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
         logger.info("Reorder categories request received for {} categories", categoryOrders.size());
 
         categoryService.reorderCategories(categoryOrders);

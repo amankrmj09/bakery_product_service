@@ -1,24 +1,23 @@
 
 services:
-  postgres-products:
-    image: postgres:18-alpine
+  mongo-products:
+    image: mongo:6.0
     container_name: bakery-products-db
     restart: unless-stopped
     ports:
-      - "5433:5432"  # Different port to avoid conflict with auth DB
+      - "27017:27017"
     environment:
-      POSTGRES_DB: bakery_products
-      POSTGRES_USER: product_user
-      POSTGRES_PASSWORD: product_password
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      MONGO_INITDB_ROOT_USERNAME: product_user
+      MONGO_INITDB_ROOT_PASSWORD: product_password
+      MONGO_INITDB_DATABASE: bakery_products
     volumes:
-      - postgres_products_data:/var/lib/postgresql/data
+      - mongo_products_data:/data/db
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - bakery-network
 
 volumes:
-  postgres_products_data:
+  mongo_products_data:
     driver: local
 
 networks:

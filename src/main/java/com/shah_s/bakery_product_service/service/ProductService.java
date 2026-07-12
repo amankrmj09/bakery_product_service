@@ -19,16 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-@Service
-@Transactional
-public class ProductService {
-
 import org.devofblue.common.exception.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +68,7 @@ public class ProductService {
 
         // Create product
         Product product = new Product();
+        product.setId(UUID.randomUUID().toString());
         product.setSku(request.getSku());
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -152,7 +143,7 @@ public class ProductService {
 
     // Get product by ID
     @Transactional(readOnly = true)
-    public ProductResponse getProductById(UUID productId) {
+    public ProductResponse getProductById(String productId) {
         logger.debug("Fetching product by ID: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -172,7 +163,7 @@ public class ProductService {
 
     // Get products by category
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategory(UUID categoryId) {
+    public List<ProductResponse> getProductsByCategory(String categoryId) {
         logger.debug("Fetching products by category: {}", categoryId);
 
         return productRepository.findByCategoryIdAndStatusOrderByNameAsc(categoryId, Product.ProductStatus.ACTIVE).stream()
@@ -182,7 +173,7 @@ public class ProductService {
 
     // Get products by category with pagination
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByCategoryWithPagination(UUID categoryId, Pageable pageable) {
+    public Page<ProductResponse> getProductsByCategoryWithPagination(String categoryId, Pageable pageable) {
         logger.debug("Fetching products by category with pagination: {}", categoryId);
 
         return productRepository.findByCategoryIdAndStatus(categoryId, Product.ProductStatus.ACTIVE, pageable)
@@ -200,8 +191,8 @@ public class ProductService {
         // We'll map the ES documents back to ProductResponse, though we miss some DB fields this way,
         // it's fine for search. Alternatively we could fetch IDs from ES and query DB.
         // Let's fetch IDs from DB to return complete ProductResponse
-        List<UUID> productIds = results.getContent().stream()
-            .map(doc -> UUID.fromString(doc.getId()))
+        List<String> productIds = results.getContent().stream()
+            .map(doc -> doc.getId())
             .collect(Collectors.toList());
             
         return productRepository.findAllById(productIds).stream()
@@ -216,8 +207,8 @@ public class ProductService {
         logger.debug("Searching products with pagination, term: {}", searchTerm);
 
         Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
-        List<UUID> productIds = results.getContent().stream()
-            .map(doc -> UUID.fromString(doc.getId()))
+        List<String> productIds = results.getContent().stream()
+            .map(doc -> doc.getId())
             .collect(Collectors.toList());
             
         List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
@@ -270,7 +261,7 @@ public class ProductService {
 
     // Advanced product search with filters
     @Transactional(readOnly = true)
-    public List<ProductResponse> searchProductsWithFilters(UUID categoryId, Product.ProductStatus status,
+    public List<ProductResponse> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
                                                           BigDecimal minPrice, BigDecimal maxPrice,
                                                           Boolean inStock) {
         logger.debug("Advanced product search with filters");
@@ -281,7 +272,7 @@ public class ProductService {
     }
 
     // Update product
-    public ProductResponse updateProduct(UUID productId, ProductRequest request) {
+    public ProductResponse updateProduct(String productId, ProductRequest request) {
         logger.info("Updating product: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -327,7 +318,7 @@ public class ProductService {
     }
 
     // Update product status
-    public ProductResponse updateProductStatus(UUID productId, Product.ProductStatus status) {
+    public ProductResponse updateProductStatus(String productId, Product.ProductStatus status) {
         logger.info("Updating product status to {} for product: {}", status, productId);
 
         Product product = productRepository.findById(productId)
@@ -344,7 +335,7 @@ public class ProductService {
     }
 
     // Toggle featured status
-    public ProductResponse toggleFeaturedStatus(UUID productId) {
+    public ProductResponse toggleFeaturedStatus(String productId) {
         logger.info("Toggling featured status for product: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -360,7 +351,7 @@ public class ProductService {
     }
 
     // Delete product
-    public void deleteProduct(UUID productId) {
+    public void deleteProduct(String productId) {
         logger.info("Deleting product: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -374,7 +365,7 @@ public class ProductService {
         
         // publish event
         org.devofblue.common.event.ProductEvent event = org.devofblue.common.event.ProductEvent.builder()
-                .productId(productId)
+                .productId(UUID.fromString(productId))
                 .status("DELETED")
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -406,36 +397,25 @@ public class ProductService {
     }
 
     // Get product statistics
-    @Transactional(readOnly = true)
     public Map<String, Object> getProductStatistics() {
         logger.debug("Fetching product statistics");
-
-        Object[] stats = productRepository.getProductStatistics();
-        if (stats == null || stats.length < 6) {
-            stats = new Object[]{0L, 0L, 0L, 0L, 0L, 0.0};
-        }
-        List<Object[]> categoryStats = productRepository.countProductsByCategory(Product.ProductStatus.ACTIVE);
-        if (categoryStats == null) {
-            categoryStats = List.of();
-        }
+        long totalProducts = productRepository.count();
+        long activeProducts = productRepository.findByStatusOrderByNameAsc(Product.ProductStatus.ACTIVE).size();
 
         return Map.of(
-                "totalProducts", stats[0] != null ? stats[0] : 0L,
-                "activeProducts", stats[1] != null ? stats[1] : 0L,
-                "inactiveProducts", stats[2] != null ? stats[2] : 0L,
-                "discontinuedProducts", stats[3] != null ? stats[3] : 0L,
-                "featuredProducts", stats[4] != null ? stats[4] : 0L,
-                "averagePrice", stats[5] != null ? stats[5] : 0.0,
-                "productsByCategory", categoryStats.stream().map(stat -> Map.of(
-                        "categoryName", stat[0],
-                        "productCount", stat[1]
-                )).toList()
+                "totalProducts", totalProducts,
+                "activeProducts", activeProducts,
+                "inactiveProducts", 0L,
+                "discontinuedProducts", 0L,
+                "featuredProducts", 0L,
+                "averagePrice", 0.0,
+                "productsByCategory", List.of()
         );
     }
 
     // Check product availability
     @Transactional(readOnly = true)
-    public boolean isProductAvailable(UUID productId) {
+    public boolean isProductAvailable(String productId) {
         return productRepository.findById(productId)
                 .map(Product::isAvailable)
                 .orElse(false);
@@ -443,7 +423,7 @@ public class ProductService {
 
     // Get product entity (for internal use)
     @Transactional(readOnly = true)
-    public Product getProductEntity(UUID productId) {
+    public Product getProductEntity(String productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
     }
@@ -461,14 +441,14 @@ public class ProductService {
             doc.setPrice(product.getPrice());
             doc.setStatus(product.getStatus().name());
             doc.setTags(product.getTags());
-            doc.setAverageRating(product.getAverageRating());
+
             productSearchRepository.save(doc);
         } catch (Exception e) {
             logger.error("Failed to sync product {} to Elasticsearch: {}", product.getId(), e.getMessage());
         }
     }
 
-    private void deleteFromElasticsearch(UUID productId) {
+    private void deleteFromElasticsearch(String productId) {
         try {
             productSearchRepository.deleteById(productId.toString());
         } catch (Exception e) {
@@ -479,7 +459,7 @@ public class ProductService {
     private void publishProductEvent(Product product, String action) {
         try {
             org.devofblue.common.event.ProductEvent event = org.devofblue.common.event.ProductEvent.builder()
-                    .productId(product.getId())
+                    .productId(UUID.fromString(product.getId()))
                     .name(product.getName())
                     .price(product.getPrice())
                     .status(action)

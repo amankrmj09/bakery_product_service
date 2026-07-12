@@ -7,14 +7,14 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
 
 @Setter
 @Getter
 public class ProductResponse {
 
     // Getters and Setters
-    private UUID id;
+    private String id;
     private String sku;
     private String name;
     private String description;
@@ -82,7 +82,7 @@ public class ProductResponse {
     @Getter
     public static class CategorySummary {
         // Getters and Setters
-        private UUID id;
+        private String id;
         private String name;
         private String iconClass;
 

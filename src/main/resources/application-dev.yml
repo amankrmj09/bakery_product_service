@@ -1,7 +1,7 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://blubug.me:8002/bakery_products
   data:
+    mongodb:
+      uri: mongodb://product_user:product_password@localhost:27017/bakery_products?authSource=admin
     redis:
       host: blubug.me
       port: 6380
