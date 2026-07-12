@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class InventoryService {
@@ -65,46 +67,34 @@ public class InventoryService {
                 .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getAllInventory() {
-        return productRepository.findAll().stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getAllInventory(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getLowStockItems() {
-        return productRepository.findLowStockProducts().stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getLowStockItems(Pageable pageable) {
+        return productRepository.findLowStockProducts(pageable)
+                .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getOutOfStockItems() {
-        return productRepository.findOutOfStockProducts().stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getOutOfStockItems(Pageable pageable) {
+        return productRepository.findOutOfStockProducts(pageable)
+                .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getItemsNeedingReorder() {
-        return productRepository.findProductsNeedingReorder().stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getItemsNeedingReorder(Pageable pageable) {
+        return productRepository.findProductsNeedingReorder(pageable)
+                .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getExpiredItems() {
-        return productRepository.findProductsExpiringSoon(LocalDateTime.MIN, LocalDateTime.now()).stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getExpiredItems(Pageable pageable) {
+        return productRepository.findProductsExpiringSoon(LocalDateTime.MIN, LocalDateTime.now(), pageable)
+                .map(InventoryResponse::from);
     }
 
-    public List<InventoryResponse> getItemsExpiringSoon(int hours) {
-        return productRepository.findProductsExpiringSoon(LocalDateTime.now(), LocalDateTime.now().plusHours(hours)).stream()
-                .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<InventoryResponse> getItemsExpiringSoon(int hours, Pageable pageable) {
+        return productRepository.findProductsExpiringSoon(LocalDateTime.now(), LocalDateTime.now().plusHours(hours), pageable)
+                .map(InventoryResponse::from);
     }
 
     public InventoryResponse updateInventory(String productId, InventoryUpdateRequest request) {

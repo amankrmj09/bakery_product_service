@@ -21,84 +21,78 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Check if SKU exists
     boolean existsBySku(String sku);
 
-    // Find products by category
-    List<Product> findByCategoryIdAndStatusOrderByNameAsc(String categoryId, Product.ProductStatus status);
+    // Find active products by category with pagination
+    Page<Product> findByCategoryIdAndStatus(String categoryId, Product.ProductStatus status, Pageable pageable);
 
     // Check if category has products
     boolean existsByCategoryId(String categoryId);
 
-    // Find active products by category with pagination
-    Page<Product> findByCategoryIdAndStatus(String categoryId, Product.ProductStatus status, Pageable pageable);
-
     // Find featured products
-    List<Product> findByIsFeaturedTrueAndStatusOrderByCreatedAtDesc(Product.ProductStatus status);
+    Page<Product> findByIsFeaturedTrueAndStatus(Product.ProductStatus status, Pageable pageable);
 
     // Find products by status
-    List<Product> findByStatusOrderByNameAsc(Product.ProductStatus status);
+    Page<Product> findByStatus(Product.ProductStatus status, Pageable pageable);
+
+    // Count products by status
+    long countByStatus(Product.ProductStatus status);
 
     // Find available products (active with stock)
     @Query("{ 'status': 'ACTIVE', $expr: { $gt: [ { $subtract: ['$inventory.current_stock', '$inventory.reserved_stock'] }, 0 ] } }")
-    List<Product> findAvailableProducts();
+    Page<Product> findAvailableProducts(Pageable pageable);
 
     // Search products by name or description
     @Query("{ $and: [ " +
            "{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } }, { 'short_description': { $regex: ?0, $options: 'i' } } ] }, " +
            "{ 'status': ?1 } " +
            "] }")
-    List<Product> searchProducts(String searchTerm, Product.ProductStatus status);
+    Page<Product> searchProducts(String searchTerm, Product.ProductStatus status, Pageable pageable);
 
     // Find products by price range
     @Query("{ 'price': { $gte: ?0, $lte: ?1 }, 'status': ?2 }")
-    List<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Product.ProductStatus status);
+    Page<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Product.ProductStatus status, Pageable pageable);
 
     // Find products on sale
     @Query("{ 'isOnSale': true, 'status': ?0 }")
-    List<Product> findProductsOnSale(Product.ProductStatus status);
+    Page<Product> findProductsOnSale(Product.ProductStatus status, Pageable pageable);
 
-    // Advanced search - approximate since dynamic queries need MongoTemplate
+    // Advanced search
     @Query("{ 'categoryId': ?0, 'status': ?1, 'price': { $gte: ?2, $lte: ?3 } }")
-    List<Product> findProductsWithFilters(String categoryId, Product.ProductStatus status,
-                                          BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
-
-    @Query("{ $and: [ " +
-           "{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } }, { 'short_description': { $regex: ?0, $options: 'i' } } ] }, " +
-           "{ 'status': ?1 } " +
-           "] }")
-    Page<Product> searchProductsWithPagination(String searchTerm, Product.ProductStatus status, Pageable pageable);
+    Page<Product> findProductsWithFilters(String categoryId, Product.ProductStatus status,
+                                          BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock, Pageable pageable);
 
     // Find products by multiple categories
     @Query("{ 'category.id': { $in: ?0 }, 'status': ?1 }")
-    List<Product> findByCategoryIdsAndStatus(List<String> categoryIds, Product.ProductStatus status);
+    Page<Product> findByCategoryIdsAndStatus(List<String> categoryIds, Product.ProductStatus status, Pageable pageable);
 
     // Find products by tags
     @Query("{ 'tags': ?0, 'status': ?1 }")
-    List<Product> findByTag(String tag, Product.ProductStatus status);
+    Page<Product> findByTag(String tag, Product.ProductStatus status, Pageable pageable);
 
     // Find products by allergen (without)
     @Query("{ 'allergens': { $ne: ?0 }, 'status': ?1 }")
-    List<Product> findProductsWithoutAllergen(String allergen, Product.ProductStatus status);
+    Page<Product> findProductsWithoutAllergen(String allergen, Product.ProductStatus status, Pageable pageable);
 
     // Find low stock products
     @Query("{ $expr: { $lte: ['$inventory.current_stock', '$inventory.minimum_stock'] } }")
-    List<Product> findLowStockProducts();
+    Page<Product> findLowStockProducts(Pageable pageable);
 
     // Find out of stock products
     @Query("{ $expr: { $lte: [ { $subtract: ['$inventory.current_stock', '$inventory.reserved_stock'] }, 0 ] } }")
-    List<Product> findOutOfStockProducts();
+    Page<Product> findOutOfStockProducts(Pageable pageable);
 
     // Find products needing reorder
     @Query("{ 'inventory.reorder_level': { $gt: 0 }, $expr: { $lte: ['$inventory.current_stock', '$inventory.reorder_level'] } }")
-    List<Product> findProductsNeedingReorder();
+    Page<Product> findProductsNeedingReorder(Pageable pageable);
 
     // Find recently added products
-    List<Product> findByStatusAndCreatedAtAfterOrderByCreatedAtDesc(Product.ProductStatus status, LocalDateTime since);
+    Page<Product> findByStatusAndCreatedAtAfter(Product.ProductStatus status, LocalDateTime since, Pageable pageable);
 
     // Find products by preparation time range
-    List<Product> findByStatusAndPreparationTimeMinutesBetweenOrderByPreparationTimeMinutesAsc(
-            Product.ProductStatus status, Integer minTime, Integer maxTime);
+    Page<Product> findByStatusAndPreparationTimeMinutesBetween(
+            Product.ProductStatus status, Integer minTime, Integer maxTime, Pageable pageable);
 
     // Find products expiring soon
     @Query("{ 'inventory.track_expiry': true, 'inventory.expiry_date': { $gte: ?0, $lte: ?1 } }")
-    List<Product> findProductsExpiringSoon(LocalDateTime now, LocalDateTime cutoffTime);
+    Page<Product> findProductsExpiringSoon(LocalDateTime now, LocalDateTime cutoffTime, Pageable pageable);
 
 }

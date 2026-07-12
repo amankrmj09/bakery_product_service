@@ -11,6 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,45 +36,73 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        logger.info("Get all categories request received");
+    public ResponseEntity<Page<CategoryResponse>> getAllCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get all categories request received (page {}, size {})", page, size);
 
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        logger.info("Retrieved {} categories", categories.size());
+        Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
+
+        logger.info("Retrieved {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
     }
 
     // Get active categories only
     @GetMapping("/active")
-    public ResponseEntity<List<CategoryResponse>> getActiveCategories() {
-        logger.info("Get active categories request received");
+    public ResponseEntity<Page<CategoryResponse>> getActiveCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get active categories request received (page {}, size {})", page, size);
 
-        List<CategoryResponse> categories = categoryService.getActiveCategories();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        logger.info("Retrieved {} active categories", categories.size());
+        Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
+
+        logger.info("Retrieved {} active categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
     }
 
     // Get categories with products
     @GetMapping("/with-products")
-    public ResponseEntity<List<CategoryResponse>> getCategoriesWithProducts() {
-        logger.info("Get categories with products request received");
+    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get categories with products request received (page {}, size {})", page, size);
 
-        List<CategoryResponse> categories = categoryService.getCategoriesWithProducts();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        logger.info("Retrieved {} categories with products", categories.size());
+        Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
+
+        logger.info("Retrieved {} categories with products", categories.getContent().size());
         return ResponseEntity.ok(categories);
     }
 
     // Get categories with active products
     @GetMapping("/with-active-products")
-    public ResponseEntity<List<CategoryResponse>> getCategoriesWithActiveProducts() {
-        logger.info("Get categories with active products request received");
+    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithActiveProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get categories with active products request received (page {}, size {})", page, size);
 
-        List<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        logger.info("Retrieved {} categories with active products", categories.size());
+        Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
+
+        logger.info("Retrieved {} categories with active products", categories.getContent().size());
         return ResponseEntity.ok(categories);
     }
 
@@ -127,12 +160,20 @@ public class CategoryController {
 
     // Search categories
     @GetMapping("/search")
-    public ResponseEntity<List<CategoryResponse>> searchCategories(@RequestParam String query) {
-        logger.info("Search categories request received with query: {}", query);
+    public ResponseEntity<Page<CategoryResponse>> searchCategories(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Search categories request received with query: {} (page {}, size {})", query, page, size);
 
-        List<CategoryResponse> categories = categoryService.searchCategories(query);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        logger.info("Search returned {} categories", categories.size());
+        Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
+
+        logger.info("Search returned {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
     }
 

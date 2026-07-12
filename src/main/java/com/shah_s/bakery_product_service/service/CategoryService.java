@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.devofblue.common.exception.DuplicateResourceException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -51,24 +53,22 @@ public class CategoryService {
         return CategoryResponse.from(savedCategory);
     }
 
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(CategoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<CategoryResponse> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(CategoryResponse::from);
     }
 
-    public List<CategoryResponse> getActiveCategories() {
-        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc().stream()
-                .map(CategoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
+        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
+                .map(CategoryResponse::from);
     }
 
-    public List<CategoryResponse> getCategoriesWithProducts() {
-        return getActiveCategories();
+    public Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable) {
+        return getActiveCategories(pageable);
     }
 
-    public List<CategoryResponse> getCategoriesWithActiveProducts() {
-        return getActiveCategories();
+    public Page<CategoryResponse> getCategoriesWithActiveProducts(Pageable pageable) {
+        return getActiveCategories(pageable);
     }
 
     public CategoryResponse getCategoryById(String categoryId) {
@@ -113,10 +113,9 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    public List<CategoryResponse> searchCategories(String searchTerm) {
-        return categoryRepository.searchByName(searchTerm).stream()
-                .map(CategoryResponse::from)
-                .collect(Collectors.toList());
+    public Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable) {
+        return categoryRepository.searchByName(searchTerm, pageable)
+                .map(CategoryResponse::from);
     }
 
     public CategoryResponse toggleCategoryStatus(String categoryId) {

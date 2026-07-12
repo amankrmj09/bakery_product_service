@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
@@ -103,42 +105,38 @@ public class ProductService {
 
     // Get all products
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
+    public Page<ProductResponse> getAllProducts(Pageable pageable) {
         logger.debug("Fetching all products");
 
-        return productRepository.findAll().stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findAll(pageable)
+                .map(ProductResponse::from);
     }
 
     // Get active products
     @Transactional(readOnly = true)
-    public List<ProductResponse> getActiveProducts() {
+    public Page<ProductResponse> getActiveProducts(Pageable pageable) {
         logger.debug("Fetching active products");
 
-        return productRepository.findByStatusOrderByNameAsc(Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByStatus(Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get available products (active with stock)
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAvailableProducts() {
+    public Page<ProductResponse> getAvailableProducts(Pageable pageable) {
         logger.debug("Fetching available products");
 
-        return productRepository.findAvailableProducts().stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findAvailableProducts(pageable)
+                .map(ProductResponse::from);
     }
 
     // Get featured products
     @Transactional(readOnly = true)
-    public List<ProductResponse> getFeaturedProducts() {
+    public Page<ProductResponse> getFeaturedProducts(Pageable pageable) {
         logger.debug("Fetching featured products");
 
-        return productRepository.findByIsFeaturedTrueAndStatusOrderByCreatedAtDesc(Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByIsFeaturedTrueAndStatus(Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get product by ID
@@ -163,17 +161,7 @@ public class ProductService {
 
     // Get products by category
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategory(String categoryId) {
-        logger.debug("Fetching products by category: {}", categoryId);
-
-        return productRepository.findByCategoryIdAndStatusOrderByNameAsc(categoryId, Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
-    }
-
-    // Get products by category with pagination
-    @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByCategoryWithPagination(String categoryId, Pageable pageable) {
+    public Page<ProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
         logger.debug("Fetching products by category with pagination: {}", categoryId);
 
         return productRepository.findByCategoryIdAndStatus(categoryId, Product.ProductStatus.ACTIVE, pageable)
@@ -182,28 +170,7 @@ public class ProductService {
 
     // Search products
     @Transactional(readOnly = true)
-    public List<ProductResponse> searchProducts(String searchTerm) {
-        logger.debug("Searching products with term: {}", searchTerm);
-
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 50);
-        Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
-        
-        // We'll map the ES documents back to ProductResponse, though we miss some DB fields this way,
-        // it's fine for search. Alternatively we could fetch IDs from ES and query DB.
-        // Let's fetch IDs from DB to return complete ProductResponse
-        List<String> productIds = results.getContent().stream()
-            .map(doc -> doc.getId())
-            .collect(Collectors.toList());
-            
-        return productRepository.findAllById(productIds).stream()
-                .filter(p -> p.getStatus() == Product.ProductStatus.ACTIVE)
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
-    }
-
-    // Search products with pagination
-    @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProductsWithPagination(String searchTerm, Pageable pageable) {
+    public Page<ProductResponse> searchProducts(String searchTerm, Pageable pageable) {
         logger.debug("Searching products with pagination, term: {}", searchTerm);
 
         Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
@@ -221,54 +188,49 @@ public class ProductService {
 
     // Get products by price range
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+    public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         logger.debug("Fetching products by price range: {} - {}", minPrice, maxPrice);
 
-        return productRepository.findByPriceRange(minPrice, maxPrice, Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByPriceRange(minPrice, maxPrice, Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get products on sale
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsOnSale() {
+    public Page<ProductResponse> getProductsOnSale(Pageable pageable) {
         logger.debug("Fetching products on sale");
 
-        return productRepository.findProductsOnSale(Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findProductsOnSale(Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get products by tag
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByTag(String tag) {
+    public Page<ProductResponse> getProductsByTag(String tag, Pageable pageable) {
         logger.debug("Fetching products by tag: {}", tag);
 
-        return productRepository.findByTag(tag, Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByTag(tag, Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get products without specific allergen
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsWithoutAllergen(String allergen) {
+    public Page<ProductResponse> getProductsWithoutAllergen(String allergen, Pageable pageable) {
         logger.debug("Fetching products without allergen: {}", allergen);
 
-        return productRepository.findProductsWithoutAllergen(allergen, Product.ProductStatus.ACTIVE).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findProductsWithoutAllergen(allergen, Product.ProductStatus.ACTIVE, pageable)
+                .map(ProductResponse::from);
     }
 
     // Advanced product search with filters
     @Transactional(readOnly = true)
-    public List<ProductResponse> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
+    public Page<ProductResponse> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
                                                           BigDecimal minPrice, BigDecimal maxPrice,
-                                                          Boolean inStock) {
+                                                          Boolean inStock, Pageable pageable) {
         logger.debug("Advanced product search with filters");
 
-        return productRepository.findProductsWithFilters(categoryId, status, minPrice, maxPrice, inStock).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findProductsWithFilters(categoryId, status, minPrice, maxPrice, inStock, pageable)
+                .map(ProductResponse::from);
     }
 
     // Update product
@@ -376,31 +338,29 @@ public class ProductService {
 
     // Get recently added products
     @Transactional(readOnly = true)
-    public List<ProductResponse> getRecentlyAddedProducts(int days) {
+    public Page<ProductResponse> getRecentlyAddedProducts(int days, Pageable pageable) {
         logger.debug("Fetching products added in last {} days", days);
 
         LocalDateTime since = LocalDateTime.now().minusDays(days);
-        return productRepository.findByStatusAndCreatedAtAfterOrderByCreatedAtDesc(Product.ProductStatus.ACTIVE, since).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByStatusAndCreatedAtAfter(Product.ProductStatus.ACTIVE, since, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get products by preparation time range
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes) {
+    public Page<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable) {
         logger.debug("Fetching products by preparation time: {} - {} minutes", minMinutes, maxMinutes);
 
-        return productRepository.findByStatusAndPreparationTimeMinutesBetweenOrderByPreparationTimeMinutesAsc(
-                Product.ProductStatus.ACTIVE, minMinutes, maxMinutes).stream()
-                .map(ProductResponse::from)
-                .collect(Collectors.toList());
+        return productRepository.findByStatusAndPreparationTimeMinutesBetween(
+                Product.ProductStatus.ACTIVE, minMinutes, maxMinutes, pageable)
+                .map(ProductResponse::from);
     }
 
     // Get product statistics
     public Map<String, Object> getProductStatistics() {
         logger.debug("Fetching product statistics");
         long totalProducts = productRepository.count();
-        long activeProducts = productRepository.findByStatusOrderByNameAsc(Product.ProductStatus.ACTIVE).size();
+        long activeProducts = productRepository.countByStatus(Product.ProductStatus.ACTIVE);
 
         return Map.of(
                 "totalProducts", totalProducts,

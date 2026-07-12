@@ -10,6 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +35,18 @@ public class InventoryController {
 
     // Get all inventory items
     @GetMapping
-    public ResponseEntity<List<InventoryResponse>> getAllInventory() {
-        logger.info("Get all inventory request received");
+    public ResponseEntity<Page<InventoryResponse>> getAllInventory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get all inventory request received (page {}, size {})", page, size);
 
-        List<InventoryResponse> inventory = inventoryService.getAllInventory();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> inventory = inventoryService.getAllInventory(pageable);
 
-        logger.info("Retrieved {} inventory items", inventory.size());
+        logger.info("Retrieved {} inventory items", inventory.getContent().size());
         return ResponseEntity.ok(inventory);
     }
 
@@ -65,57 +76,87 @@ public class InventoryController {
 
     // Get low stock items
     @GetMapping("/low-stock")
-    public ResponseEntity<List<InventoryResponse>> getLowStockItems() {
-        logger.info("Get low stock items request received");
+    public ResponseEntity<Page<InventoryResponse>> getLowStockItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get low stock items request received (page {}, size {})", page, size);
 
-        List<InventoryResponse> lowStockItems = inventoryService.getLowStockItems();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> lowStockItems = inventoryService.getLowStockItems(pageable);
 
-        logger.info("Retrieved {} low stock items", lowStockItems.size());
+        logger.info("Retrieved {} low stock items", lowStockItems.getContent().size());
         return ResponseEntity.ok(lowStockItems);
     }
 
     // Get out of stock items
     @GetMapping("/out-of-stock")
-    public ResponseEntity<List<InventoryResponse>> getOutOfStockItems() {
-        logger.info("Get out of stock items request received");
+    public ResponseEntity<Page<InventoryResponse>> getOutOfStockItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get out of stock items request received (page {}, size {})", page, size);
 
-        List<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
 
-        logger.info("Retrieved {} out of stock items", outOfStockItems.size());
+        logger.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
         return ResponseEntity.ok(outOfStockItems);
     }
 
     // Get items needing reorder
     @GetMapping("/needs-reorder")
-    public ResponseEntity<List<InventoryResponse>> getItemsNeedingReorder() {
-        logger.info("Get items needing reorder request received");
+    public ResponseEntity<Page<InventoryResponse>> getItemsNeedingReorder(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get items needing reorder request received (page {}, size {})", page, size);
 
-        List<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
 
-        logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.size());
+        logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
         return ResponseEntity.ok(itemsNeedingReorder);
     }
 
     // Get expired items
     @GetMapping("/expired")
-    public ResponseEntity<List<InventoryResponse>> getExpiredItems() {
-        logger.info("Get expired items request received");
+    public ResponseEntity<Page<InventoryResponse>> getExpiredItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get expired items request received (page {}, size {})", page, size);
 
-        List<InventoryResponse> expiredItems = inventoryService.getExpiredItems();
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> expiredItems = inventoryService.getExpiredItems(pageable);
 
-        logger.info("Retrieved {} expired items", expiredItems.size());
+        logger.info("Retrieved {} expired items", expiredItems.getContent().size());
         return ResponseEntity.ok(expiredItems);
     }
 
     // Get items expiring soon
     @GetMapping("/expiring-soon")
-    public ResponseEntity<List<InventoryResponse>> getItemsExpiringSoon(
-            @RequestParam(defaultValue = "24") int hours) {
-        logger.info("Get items expiring soon request received (within {} hours)", hours);
+    public ResponseEntity<Page<InventoryResponse>> getItemsExpiringSoon(
+            @RequestParam(defaultValue = "24") int hours,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get items expiring soon request received (within {} hours, page {}, size {})", hours, page, size);
 
-        List<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
 
-        logger.info("Retrieved {} items expiring soon", expiringSoonItems.size());
+        logger.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
         return ResponseEntity.ok(expiringSoonItems);
     }
 
