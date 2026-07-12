@@ -2,7 +2,7 @@ spring:
   application:
     name: bakery-product-service
   config:
-    import: "optional:configserver:http://localhost:8021"
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8021}"
 
 aws:
   credentials:
@@ -13,3 +13,4 @@ aws:
     bucket-name: bakery
     endpoint: ${AWS_S3_ENDPOINT:https://59ff51457eb45453daa57ffa1f4a20bd.r2.cloudflarestorage.com}
     public-url: ${AWS_S3_PUBLIC_URL:https://pub-49a69af59fc44431a21809176dd88bb8.r2.dev}
+
