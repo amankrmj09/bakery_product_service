@@ -1,7 +1,22 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://blubug.me:8002/bakery_products
+    username: product_user
+    password: product_password
+  kafka:
+    bootstrap-servers: localhost:9092
+  elasticsearch:
+    uris: http://localhost:9200
   data:
-    mongodb:
-      uri: mongodb://product_user:product_password@localhost:27017/bakery_products?authSource=admin
     redis:
       host: blubug.me
       port: 6380
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+r2:
+  endpoint: https://59ff51457eb45453daa57ffa1f4a20bd.r2.cloudflarestorage.com
+  cdn-base-url: https://pub-49a69af59fc44431a21809176dd88bb8.r2.dev
+  access-key: ad4653738654f9f0e8baf193fd9af2a3
+  secret-key: a64f372de305f1e9bc8f94c84209ee8098383f81bf333dbb21e7b534d554935b
