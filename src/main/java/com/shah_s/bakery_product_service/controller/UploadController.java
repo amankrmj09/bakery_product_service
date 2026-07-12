@@ -1,6 +1,6 @@
 package com.shah_s.bakery_product_service.controller;
 
-import com.shah_s.bakery_product_service.service.AwsS3Service;
+import com.shah_s.bakery_product_service.service.R2StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -18,10 +18,10 @@ public class UploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-    private final AwsS3Service awsS3Service;
+    private final R2StorageService r2StorageService;
 
-    public UploadController(AwsS3Service awsS3Service) {
-        this.awsS3Service = awsS3Service;
+    public UploadController(R2StorageService r2StorageService) {
+        this.r2StorageService = r2StorageService;
     }
 
     @PostMapping(value = "/media", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -30,7 +30,7 @@ public class UploadController {
         
         logger.info("Upload media request received, count: {}", media.size());
 
-        List<String> urls = awsS3Service.uploadFiles(media);
+        List<String> urls = r2StorageService.uploadFiles(media);
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Files uploaded successfully");
@@ -42,7 +42,7 @@ public class UploadController {
 
     @GetMapping(value = "/media/{fileName}")
     public ResponseEntity<byte[]> getMedia(@PathVariable String fileName) {
-        byte[] data = awsS3Service.getFile(fileName);
+        byte[] data = r2StorageService.getFile(fileName);
         org.springframework.http.MediaType mediaType = org.springframework.http.MediaTypeFactory
             .getMediaType(fileName).orElse(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM);
         return ResponseEntity.ok()

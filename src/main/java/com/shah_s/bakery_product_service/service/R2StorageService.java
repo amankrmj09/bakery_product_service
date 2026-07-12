@@ -11,9 +11,9 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,43 +23,52 @@ import java.util.UUID;
 
 @Service
 @RefreshScope
-public class AwsS3Service {
+public class R2StorageService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AwsS3Service.class);
+    private static final Logger LOG = LoggerFactory.getLogger(R2StorageService.class);
 
     private final S3Client s3Client;
     private final String bucketName;
-    private final String regionStr;
-    private final String publicDomainUrl;
+    private final String cdnBaseUrl;
 
-    public AwsS3Service(
-            @Value("${aws.credentials.access-key:mock-access-key}") String accessKey,
-            @Value("${aws.credentials.secret-key:mock-secret-key}") String secretKey,
-            @Value("${aws.region:us-east-1}") String region,
-            @Value("${aws.s3.bucket-name:mock-bucket}") String bucketName,
-            @Value("${aws.s3.endpoint:#{null}}") String endpoint,
-            @Value("${aws.s3.public-url:#{null}}") String publicDomainUrl) {
+    public R2StorageService(
+            @Value("${r2.access-key:mock-access-key}") String accessKey,
+            @Value("${r2.secret-key:mock-secret-key}") String secretKey,
+            @Value("${r2.bucket:mock-bucket}") String bucketName,
+            @Value("${r2.endpoint:#{null}}") String endpoint,
+            @Value("${r2.cdn-base-url:#{null}}") String cdnBaseUrl) {
         
         this.bucketName = bucketName;
-        this.regionStr = region;
-        this.publicDomainUrl = publicDomainUrl;
+        this.cdnBaseUrl = (cdnBaseUrl != null && cdnBaseUrl.endsWith("/")) ? cdnBaseUrl : cdnBaseUrl + "/";
         
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         
         S3ClientBuilder builder = S3Client.builder()
-                .region(Region.of(region))
+                .region(Region.of("auto"))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials));
 
         if (endpoint != null && !endpoint.isEmpty()) {
             builder.endpointOverride(URI.create(endpoint));
-            // For custom S3 implementations like Garage or MinIO, path style access is usually required
-            builder.forcePathStyle(true);
+            // R2 usually supports virtual hosted style, but some S3 compatible storage requires path style
+            // Cloudflare R2 works well with the default virtual hosted style in AWS SDK v2, 
+            // but we can leave path style off or on depending on standard R2 usage. 
+            // We'll leave it as default (virtual hosted style).
         }
 
         this.s3Client = builder.build();
     }
 
+    public String resolveUrl(String key) {
+        if (key == null || key.isBlank()) return null;
+        if (key.startsWith("http://") || key.startsWith("https://")) return key;
+        return cdnBaseUrl + key;
+    }
+
     public String uploadFile(MultipartFile file) {
+        return uploadFile(file, "");
+    }
+    
+    public String uploadFile(MultipartFile file, String folder) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Cannot upload empty file");
         }
@@ -70,33 +79,25 @@ public class AwsS3Service {
                 : "";
         
         String fileName = UUID.randomUUID().toString() + extension;
+        String key = (folder == null || folder.isEmpty()) ? fileName : folder + "/" + fileName;
         
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileName)
-                    .contentType(file.getContentType())
+                    .key(key)
+                    .contentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                     .build();
 
             s3Client.putObject(putObjectRequest, 
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-            String url;
-            if (publicDomainUrl != null && !publicDomainUrl.isEmpty()) {
-                String baseUrl = publicDomainUrl.endsWith("/") ? publicDomainUrl : publicDomainUrl + "/";
-                url = baseUrl + fileName;
-            } else {
-                url = s3Client.utilities().getUrl(GetUrlRequest.builder()
-                        .bucket(bucketName)
-                        .key(fileName)
-                        .build()).toExternalForm();
-            }
-            logger.info("Successfully uploaded file to S3, returning URL: {}", url);
+            String url = cdnBaseUrl + key;
+            LOG.info("Successfully uploaded file to R2, returning URL: {}", url);
             return url;
             
         } catch (IOException e) {
-            logger.error("Failed to upload file to S3", e);
-            throw new RuntimeException("Failed to upload file to S3", e);
+            LOG.error("Failed to upload file to R2", e);
+            throw new RuntimeException("Failed to upload file to R2", e);
         }
     }
 
@@ -110,6 +111,25 @@ public class AwsS3Service {
         return urls;
     }
 
+    public void delete(String url) {
+        if (url == null || url.isBlank() || !url.startsWith(cdnBaseUrl)) {
+            return;
+        }
+        try {
+            String key = url.substring(cdnBaseUrl.length());
+            
+            DeleteObjectRequest request = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            
+            s3Client.deleteObject(request);
+            LOG.info("Successfully deleted file from R2: {}", key);
+        } catch (Exception e) {
+            LOG.error("Failed to delete file from R2: {}", url, e);
+        }
+    }
+
     public byte[] getFile(String fileName) {
         try (var inputStream = s3Client.getObject(
                 software.amazon.awssdk.services.s3.model.GetObjectRequest.builder()
@@ -119,7 +139,7 @@ public class AwsS3Service {
         )) {
             return inputStream.readAllBytes();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching file from S3", e);
+            throw new RuntimeException("Error fetching file from R2", e);
         }
     }
 }
