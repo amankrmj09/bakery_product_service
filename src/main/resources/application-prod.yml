@@ -1,16 +1,17 @@
 spring:
-  datasource:
-    url: ${PRODUCT_DB_URL}
-    username: ${PRODUCT_DB_USER}
-    password: ${PRODUCT_DB_PASSWORD}
+  data:
+    mongodb:
+      uri: ${PRODUCT_DB_URL}
+      username: ${PRODUCT_DB_USER}
+      password: ${PRODUCT_DB_PASSWORD}
+      database: bakery_products
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT_PRODUCT}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
   elasticsearch:
     uris: ${ELASTICSEARCH_URIS}
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT_PRODUCT}
 eureka:
   client:
     service-url:

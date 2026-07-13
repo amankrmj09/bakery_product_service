@@ -1,16 +1,14 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://blubug.me:8002/bakery_products
-    username: product_user
-    password: product_password
+  data:
+    mongodb:
+      uri: mongodb://product_user:product_password@blubug.me:27017/bakery_products?authSource=admin
+    redis:
+      host: blubug.me
+      port: 6380
   kafka:
     bootstrap-servers: localhost:9092
   elasticsearch:
     uris: http://localhost:9200
-  data:
-    redis:
-      host: blubug.me
-      port: 6380
 eureka:
   client:
     service-url:
