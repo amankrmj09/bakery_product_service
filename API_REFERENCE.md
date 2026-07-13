@@ -1,1050 +1,529 @@
-# bakery_product_service API Report
+# Bakery Product Service - API Reference
 
-## HealthController
+This document provides a comprehensive reference to the Bakery Product Service REST API, reflecting the current Java controllers and their associated request/response DTOs.
 
-### `GET` `/api/health`
-- **API Name:** health
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-```json
-{
-  "status": "String - UP",
-  "service": "String - bakery-product-service",
-  "timestamp": "DateTime",
-  "version": "String - 1.0.0",
-  "database": "String - UP or DOWN",
-  "databaseUrl": "String",
-  "databaseError": "String"
-}
-```
+## Table of Contents
+1. [Health & System](#1-health--system)
+2. [Categories](#2-categories)
+3. [Products](#3-products)
+4. [Inventory](#4-inventory)
+5. [Site Configuration](#5-site-configuration)
+6. [Uploads](#6-uploads)
 
 ---
 
-## UploadController
+## 1. Health & System
 
-### `POST` `/api/uploads/media`
-- **API Name:** uploadMedia
-- **Type:** REST / Synchronous
-- **Consumes:** `multipart/form-data`
+Endpoints for monitoring the health and status of the service.
 
-**Request:**
-- **Part:** `media` (List of MultipartFile)
-
+### `GET /api/health`
+Main service and database health check.
 **Response:**
 ```json
 {
-  "message": "String",
-  "urls": ["String"]
+  "status": "UP",
+  "service": "bakery-product-service",
+  "timestamp": "2023-10-10T12:00:00",
+  "version": "1.0.0",
+  "database": "UP",
+  "databaseName": "bakery_products"
 }
 ```
 
----
-
-### `GET` `/api/info`
-- **API Name:** info
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
+### `GET /api/info`
+Service information and available features/endpoints.
 **Response:**
 ```json
 {
-  "serviceName": "String",
-  "description": "String",
-  "version": "String",
-  "features": {},
-  "endpoints": {}
+  "serviceName": "Bakery Product Service",
+  "description": "Product catalog and inventory management service",
+  "version": "1.0.0",
+  "features": {
+    "categories": "Product category management",
+    "products": "Product catalog management",
+    "inventory": "Stock and inventory tracking",
+    "search": "Advanced product search and filtering"
+  },
+  "endpoints": {
+    "categories": "/api/categories",
+    "products": "/api/products",
+    "inventory": "/api/inventory"
+  }
 }
 ```
 
----
-
-### `GET` `/api/metrics`
-- **API Name:** metrics
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
+### `GET /api/metrics`
+Service metrics including uptime and memory usage.
 **Response:**
 ```json
 {
-  "uptime": "String",
-  "timestamp": "DateTime",
+  "uptime": "1 days, 2 hours, 30 minutes, 15 seconds",
+  "timestamp": "2023-10-10T12:00:00",
   "memory": {
-    "maxMemory": "String",
-    "totalMemory": "String",
-    "freeMemory": "String",
-    "usedMemory": "String"
+    "maxMemory": "512 MB",
+    "totalMemory": "256 MB",
+    "freeMemory": "128 MB",
+    "usedMemory": "128 MB"
   }
 }
 ```
 
 ---
 
-## CategoryController
+## 2. Categories
 
-### `POST` `/api/categories`
-- **API Name:** createCategory
-- **Type:** REST / Synchronous
+Base Path: `/api/categories`
 
-**Request:**
+### Models
+
+**CategoryRequestDto**
 ```json
 {
-  "name": "String - Required (2-100 chars)",
-  "description": "String (Max 500 chars)",
-  "displayOrder": "Integer - Default 0",
-  "active": "Boolean - Default true",
-  "mediaUrls": ["String"],
-  "iconClass": "String"
+  "name": "string",
+  "description": "string",
+  "displayOrder": 0,
+  "active": true,
+  "mediaUrls": ["string"],
+  "iconClass": "string"
 }
 ```
 
-**Response:**
+**CategoryResponseDto**
 ```json
 {
-  "id": "UUID",
-  "name": "String",
-  "description": "String",
-  "displayOrder": "Integer",
-  "active": "Boolean",
-  "mediaUrls": ["String"],
-  "iconClass": "String",
-  "productCount": "Integer",
-  "activeProductCount": "Integer",
-  "createdAt": "DateTime",
-  "updatedAt": "DateTime"
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "displayOrder": 0,
+  "active": true,
+  "mediaUrls": ["string"],
+  "iconClass": "string",
+  "productCount": 0,
+  "activeProductCount": 0,
+  "createdAt": "2023-10-10T12:00:00",
+  "updatedAt": "2023-10-10T12:00:00"
 }
 ```
 
----
+### Endpoints
 
-### `GET` `/api/categories`
-- **API Name:** getAllCategories
-- **Type:** REST / Synchronous
+- **`GET /api/categories`**: Get all categories (paginated).
+  - *Params:* `page` (default 0), `size` (default 20), `sortBy` (default "displayOrder"), `sortDir` (default "ASC")
+  - *Response:* `Page<CategoryResponseDto>`
 
-**Request:**
-None
+- **`GET /api/categories/active`**: Get active categories only.
+  - *Params:* `page`, `size`, `sortBy`, `sortDir`
+  - *Response:* `Page<CategoryResponseDto>`
 
-**Response:**
-*(List of CategoryResponse)*
+- **`GET /api/categories/with-products`**: Get categories with products.
+  - *Params:* `page`, `size`, `sortBy`, `sortDir`
+  - *Response:* `Page<CategoryResponseDto>`
 
----
+- **`GET /api/categories/with-active-products`**: Get categories with active products.
+  - *Params:* `page`, `size`, `sortBy`, `sortDir`
+  - *Response:* `Page<CategoryResponseDto>`
 
-### `GET` `/api/categories/active`
-- **API Name:** getActiveCategories
-- **Type:** REST / Synchronous
+- **`GET /api/categories/{categoryId}`**: Get category by ID.
+  - *Response:* `CategoryResponseDto`
 
-**Request:**
-None
+- **`POST /api/categories`**: Create a new category (Requires `ADMIN` role).
+  - *Request Body:* `CategoryRequestDto`
+  - *Response:* `CategoryResponseDto`
 
-**Response:**
-*(List of CategoryResponse)*
+- **`PUT /api/categories/{categoryId}`**: Update a category.
+  - *Request Body:* `CategoryRequestDto`
+  - *Response:* `CategoryResponseDto`
 
----
+- **`DELETE /api/categories/{categoryId}`**: Delete a category.
+  - *Response:* `{"message": "Category deleted successfully", "categoryId": "string"}`
 
-### `GET` `/api/categories/with-products`
-- **API Name:** getCategoriesWithProducts
-- **Type:** REST / Synchronous
+- **`GET /api/categories/search`**: Search categories by query.
+  - *Params:* `query`, `page`, `size`, `sortBy`, `sortDir`
+  - *Response:* `Page<CategoryResponseDto>`
 
-**Request:**
-None
+- **`POST /api/categories/{categoryId}/toggle-status`**: Toggle a category's active status.
+  - *Response:* `CategoryResponseDto`
 
-**Response:**
-*(List of CategoryResponse)*
+- **`POST /api/categories/reorder`**: Reorder multiple categories.
+  - *Request Body:* `{"categoryId1": 1, "categoryId2": 2}`
+  - *Response:* `{"message": "Categories reordered successfully"}`
 
----
+- **`GET /api/categories/statistics`**: Get category statistics.
+  - *Response:* `Map<String, Object>`
 
-### `GET` `/api/categories/with-active-products`
-- **API Name:** getCategoriesWithActiveProducts
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(List of CategoryResponse)*
-
----
-
-### `GET` `/api/categories/{categoryId}`
-- **API Name:** getCategoryById
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(CategoryResponse)*
+- **`GET /api/categories/health`**: Category controller health check.
+  - *Response:* `{"status": "UP", "service": "product-service-categories", "timestamp": "..."}`
 
 ---
 
-### `PUT` `/api/categories/{categoryId}`
-- **API Name:** updateCategory
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
+## 3. Products
 
-**Request:**
-*(Same as createCategory CategoryRequest)*
+Base Path: `/api/products`
 
-**Response:**
-*(CategoryResponse)*
+### Models
 
----
-
-### `DELETE` `/api/categories/{categoryId}`
-- **API Name:** deleteCategory
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
-
-**Request:**
-None
-
-**Response:**
+**ProductRequestDto**
 ```json
 {
-  "message": "String - Category deleted successfully",
-  "categoryId": "String"
+  "sku": "string",
+  "name": "string",
+  "description": "string",
+  "shortDescription": "string",
+  "categoryId": "string",
+  "price": 0.00,
+  "discountPrice": 0.00,
+  "status": "ACTIVE",
+  "isFeatured": false,
+  "preparationTimeMinutes": 0,
+  "shelfLifeHours": 0,
+  "unit": "piece",
+  "weightGrams": 0,
+  "caloriesPerUnit": 0,
+  "ingredients": ["string"],
+  "allergens": ["string"],
+  "tags": ["string"],
+  "mediaUrls": ["string"],
+  "initialStock": 0,
+  "minimumStock": 0,
+  "reorderLevel": 0
 }
 ```
+*Note: Status can be `ACTIVE`, `INACTIVE`, `DRAFT`, or `ARCHIVED`.*
 
----
-
-### `GET` `/api/categories/search`
-- **API Name:** searchCategories
-- **Type:** REST / Synchronous
-- **Query Parameters:** `query` (String)
-
-**Request:**
-None
-
-**Response:**
-*(List of CategoryResponse)*
-
----
-
-### `POST` `/api/categories/{categoryId}/toggle-status`
-- **API Name:** toggleCategoryStatus
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(CategoryResponse)*
-
----
-
-### `POST` `/api/categories/reorder`
-- **API Name:** reorderCategories
-- **Type:** REST / Synchronous
-
-**Request:**
+**ProductResponseDto**
 ```json
 {
-  "UUID (CategoryId)": "Integer (New Order)"
-}
-```
-*(Map of UUID to Integer)*
-
-**Response:**
-```json
-{
-  "message": "String - Categories reordered successfully"
-}
-```
-
----
-
-### `GET` `/api/categories/statistics`
-- **API Name:** getCategoryStatistics
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(Map of statistics)*
-
----
-
-### `GET` `/api/categories/health`
-- **API Name:** health
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-```json
-{
-  "status": "String - UP",
-  "service": "String - product-service-categories",
-  "timestamp": "DateTime"
-}
-```
-
----
-
-## InventoryController
-
-### `GET` `/api/inventory`
-- **API Name:** getAllInventory
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-```json
-[
-  {
-    "id": "UUID",
-    "productId": "UUID",
-    "productName": "String",
-    "productSku": "String",
-    "currentStock": "Integer",
-    "reservedStock": "Integer",
-    "availableStock": "Integer",
-    "minimumStock": "Integer",
-    "maximumStock": "Integer",
-    "reorderLevel": "Integer",
-    "reorderQuantity": "Integer",
-    "status": "String (IN_STOCK, LOW_STOCK, OUT_OF_STOCK)",
-    "isLowStock": "Boolean",
-    "isOutOfStock": "Boolean",
-    "needsReorder": "Boolean",
-    "lastRestockedAt": "DateTime",
-    "lastRestockedQuantity": "Integer",
-    "autoReorderEnabled": "Boolean",
-    "trackExpiry": "Boolean",
-    "expiryDate": "DateTime",
-    "isExpired": "Boolean",
-    "supplierInfo": "String",
-    "storageLocation": "String",
-    "notes": "String",
-    "createdAt": "DateTime",
-    "updatedAt": "DateTime"
-  }
-]
-```
-*(List of InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/product/{productId}`
-- **API Name:** getInventoryByProductId
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/sku/{sku}`
-- **API Name:** getInventoryByProductSku
-- **Type:** REST / Synchronous
-- **Path Variable:** `sku` (String)
-
-**Request:**
-None
-
-**Response:**
-*(InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/low-stock`
-- **API Name:** getLowStockItems
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(List of InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/out-of-stock`
-- **API Name:** getOutOfStockItems
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(List of InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/needs-reorder`
-- **API Name:** getItemsNeedingReorder
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(List of InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/expired`
-- **API Name:** getExpiredItems
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(List of InventoryResponse)*
-
----
-
-### `GET` `/api/inventory/expiring-soon`
-- **API Name:** getItemsExpiringSoon
-- **Type:** REST / Synchronous
-- **Query Parameters:** `hours` (int, default 24)
-
-**Request:**
-None
-
-**Response:**
-*(List of InventoryResponse)*
-
----
-
-### `PUT` `/api/inventory/product/{productId}`
-- **API Name:** updateInventory
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-```json
-{
-  "currentStock": "Integer - Required (Min 0)",
-  "reservedStock": "Integer (Min 0)",
-  "minimumStock": "Integer (Min 0)",
-  "maximumStock": "Integer (Min 0)",
-  "reorderLevel": "Integer (Min 0)",
-  "reorderQuantity": "Integer (Min 0)",
-  "autoReorderEnabled": "Boolean",
-  "trackExpiry": "Boolean",
-  "expiryDate": "DateTime",
-  "supplierInfo": "String",
-  "storageLocation": "String",
-  "notes": "String"
-}
-```
-
-**Response:**
-*(InventoryResponse)*
-
----
-
-### `POST` `/api/inventory/product/{productId}/add-stock`
-- **API Name:** addStock
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-```json
-{
-  "quantity": "Integer",
-  "notes": "String"
-}
-```
-
-**Response:**
-*(InventoryResponse)*
-
----
-
-### `POST` `/api/inventory/product/{productId}/reserve`
-- **API Name:** reserveStock
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-```json
-{
-  "quantity": "Integer"
-}
-```
-
-**Response:**
-```json
-{
-  "success": "Boolean",
-  "productId": "UUID",
-  "quantity": "Integer",
-  "message": "String"
-}
-```
-
----
-
-### `POST` `/api/inventory/product/{productId}/release-reserved`
-- **API Name:** releaseReservedStock
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-```json
-{
-  "quantity": "Integer"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "String",
-  "productId": "String",
-  "quantity": "String"
-}
-```
-
----
-
-### `POST` `/api/inventory/product/{productId}/consume`
-- **API Name:** consumeStock
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-```json
-{
-  "quantity": "Integer"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "String",
-  "productId": "String",
-  "quantity": "String"
-}
-```
-
----
-
-### `GET` `/api/inventory/product/{productId}/availability`
-- **API Name:** checkStockAvailability
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-- **Query Parameters:** `quantity` (Integer)
-
-**Request:**
-None
-
-**Response:**
-```json
-{
-  "productId": "UUID",
-  "requestedQuantity": "Integer",
-  "availableStock": "Integer",
-  "sufficient": "Boolean"
-}
-```
-
----
-
-### `GET` `/api/inventory/product/{productId}/available-stock`
-- **API Name:** getAvailableStock
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-```json
-{
-  "productId": "UUID",
-  "availableStock": "Integer"
-}
-```
-
----
-
-### `POST` `/api/inventory/bulk-update-minimum-stock`
-- **API Name:** bulkUpdateMinimumStock
-- **Type:** REST / Synchronous
-
-**Request:**
-```json
-{
-  "UUID (ProductId)": "Integer (Minimum Stock)"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "String",
-  "updatedProducts": "String"
-}
-```
-
----
-
-### `GET` `/api/inventory/statistics`
-- **API Name:** getInventoryStatistics
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-*(Map of statistics)*
-
----
-
-### `GET` `/api/inventory/health`
-- **API Name:** health
-- **Type:** REST / Synchronous
-
-**Request:**
-None
-
-**Response:**
-```json
-{
-  "status": "String - UP",
-  "service": "String - product-service-inventory",
-  "timestamp": "DateTime"
-}
-```
-
----
-
-## ProductController
-
-### `POST` `/api/products`
-- **API Name:** createProduct
-- **Type:** REST / Synchronous
-
-**Request:**
-```json
-{
-  "sku": "String - Required (3-50 chars)",
-  "name": "String - Required (2-200 chars)",
-  "description": "String (Max 1000 chars)",
-  "shortDescription": "String (Max 255 chars)",
-  "categoryId": "UUID - Required",
-  "price": "BigDecimal - Required (Min 0.01)",
-  "discountPrice": "BigDecimal (Min 0.00)",
-  "status": "String - Default ACTIVE",
-  "isFeatured": "Boolean - Default false",
-  "preparationTimeMinutes": "Integer (Min 0)",
-  "shelfLifeHours": "Integer (Min 0)",
-  "unit": "String - Default 'piece'",
-  "weightGrams": "Integer (Min 0)",
-  "caloriesPerUnit": "Integer (Min 0)",
-  "ingredients": ["String"],
-  "allergens": ["String"],
-  "tags": ["String"],
-  "mediaUrls": ["String"],
-  "initialStock": "Integer - Default 0",
-  "minimumStock": "Integer - Default 0",
-  "reorderLevel": "Integer - Default 0"
-}
-```
-
-**Response:**
-```json
-{
-  "id": "UUID",
-  "sku": "String",
-  "name": "String",
-  "description": "String",
-  "shortDescription": "String",
+  "id": "string",
+  "sku": "string",
+  "name": "string",
+  "description": "string",
+  "shortDescription": "string",
   "category": {
-    "id": "UUID",
-    "name": "String",
-    "iconClass": "String"
+    "id": "string",
+    "name": "string",
+    "iconClass": "string"
   },
-  "price": "BigDecimal",
-  "discountPrice": "BigDecimal",
-  "effectivePrice": "BigDecimal",
-  "status": "String (ACTIVE, INACTIVE, DISCONTINUED)",
-  "isFeatured": "Boolean",
-  "preparationTimeMinutes": "Integer",
-  "shelfLifeHours": "Integer",
-  "unit": "String",
-  "weightGrams": "Integer",
-  "caloriesPerUnit": "Integer",
-  "ingredients": ["String"],
-  "allergens": ["String"],
-  "tags": ["String"],
+  "price": 0.00,
+  "discountPrice": 0.00,
+  "effectivePrice": 0.00,
+  "status": "ACTIVE",
+  "isFeatured": false,
+  "preparationTimeMinutes": 0,
+  "shelfLifeHours": 0,
+  "unit": "piece",
+  "weightGrams": 0,
+  "caloriesPerUnit": 0,
+  "ingredients": ["string"],
+  "allergens": ["string"],
+  "tags": ["string"],
   "inventory": {
-    "currentStock": "Integer",
-    "availableStock": "Integer",
-    "isLowStock": "Boolean",
-    "isOutOfStock": "Boolean",
-    "status": "String"
+    "currentStock": 0,
+    "availableStock": 0,
+    "isLowStock": false,
+    "isOutOfStock": false,
+    "status": "IN_STOCK"
   },
-  "mediaUrls": ["String"],
-  "primaryImageUrl": "String",
-  "isAvailable": "Boolean",
-  "isOnSale": "Boolean",
-  "createdAt": "DateTime",
-  "updatedAt": "DateTime"
+  "mediaUrls": ["string"],
+  "primaryImageUrl": "string",
+  "isAvailable": true,
+  "isOnSale": false,
+  "createdAt": "2023-10-10T12:00:00",
+  "updatedAt": "2023-10-10T12:00:00"
 }
 ```
 
----
+### Endpoints
 
-### `GET` `/api/products`
-- **API Name:** getAllProducts
-- **Type:** REST / Synchronous
+- **`GET /api/products`**: Get all products (paginated).
+  - *Params:* `page` (default 0), `size` (default 20), `sortBy` (default "name"), `sortDir` (default "ASC")
+  - *Response:* `Page<ProductResponseDto>`
 
-**Request:**
-None
+- **`GET /api/products/active`**: Get active products.
+  - *Response:* `Page<ProductResponseDto>`
 
-**Response:**
-*(List of ProductResponse)*
+- **`GET /api/products/available`**: Get available products (active with stock).
+  - *Response:* `Page<ProductResponseDto>`
 
----
+- **`GET /api/products/featured`**: Get featured products.
+  - *Response:* `Page<ProductResponseDto>`
 
-### `GET` `/api/products/active`
-- **API Name:** getActiveProducts
-- **Type:** REST / Synchronous
+- **`GET /api/products/on-sale`**: Get products on sale.
+  - *Response:* `Page<ProductResponseDto>`
 
-**Request:**
-None
+- **`GET /api/products/recent`**: Get recently added products.
+  - *Params:* `days` (default 7)
+  - *Response:* `Page<ProductResponseDto>`
 
-**Response:**
-*(List of ProductResponse)*
+- **`GET /api/products/{productId}`**: Get product by ID.
+  - *Response:* `ProductResponseDto`
 
----
+- **`GET /api/products/batch`**: Get multiple products by IDs.
+  - *Params:* `productIds` (List)
+  - *Response:* `List<ProductResponseDto>`
 
-### `GET` `/api/products/available`
-- **API Name:** getAvailableProducts
-- **Type:** REST / Synchronous
+- **`POST /api/products/batch/validate`**: Validate multiple products.
+  - *Request Body:* `["productId1", "productId2"]`
+  - *Response:* `List<ProductResponseDto>`
 
-**Request:**
-None
+- **`GET /api/products/sku/{sku}`**: Get product by SKU.
+  - *Response:* `ProductResponseDto`
 
-**Response:**
-*(List of ProductResponse)*
+- **`GET /api/products/category/{categoryId}`**: Get products by category.
+  - *Response:* `Page<ProductResponseDto>`
 
----
+- **`GET /api/products/search`**: Search products by query.
+  - *Params:* `query`
+  - *Response:* `Page<ProductResponseDto>`
 
-### `GET` `/api/products/featured`
-- **API Name:** getFeaturedProducts
-- **Type:** REST / Synchronous
+- **`GET /api/products/price-range`**: Get products by price range.
+  - *Params:* `minPrice`, `maxPrice`
+  - *Response:* `Page<ProductResponseDto>`
 
-**Request:**
-None
+- **`GET /api/products/tag/{tag}`**: Get products by tag.
+  - *Response:* `Page<ProductResponseDto>`
 
-**Response:**
-*(List of ProductResponse)*
+- **`GET /api/products/without-allergen/{allergen}`**: Get products without specific allergen.
+  - *Response:* `Page<ProductResponseDto>`
 
----
+- **`GET /api/products/filter`**: Advanced search with filters.
+  - *Params:* `categoryId`, `status`, `minPrice`, `maxPrice`, `inStock`
+  - *Response:* `Page<ProductResponseDto>`
 
-### `GET` `/api/products/on-sale`
-- **API Name:** getProductsOnSale
-- **Type:** REST / Synchronous
+- **`POST /api/products`**: Create a new product.
+  - *Request Body:* `ProductRequestDto`
+  - *Response:* `ProductResponseDto`
 
-**Request:**
-None
+- **`PUT /api/products/{productId}`**: Update a product.
+  - *Request Body:* `ProductRequestDto`
+  - *Response:* `ProductResponseDto`
 
-**Response:**
-*(List of ProductResponse)*
+- **`PATCH /api/products/{productId}/status`**: Update a product's status.
+  - *Request Body:* `{"status": "INACTIVE"}`
+  - *Response:* `ProductResponseDto`
 
----
+- **`POST /api/products/{productId}/toggle-featured`**: Toggle product's featured status.
+  - *Response:* `ProductResponseDto`
 
-### `GET` `/api/products/recent`
-- **API Name:** getRecentlyAddedProducts
-- **Type:** REST / Synchronous
-- **Query Parameters:** `days` (int, default 7)
+- **`DELETE /api/products/{productId}`**: Delete a product.
+  - *Response:* `{"message": "Product deleted successfully", "productId": "string"}`
 
-**Request:**
-None
+- **`GET /api/products/{productId}/availability`**: Check if product is available.
+  - *Response:* `{"productId": "string", "available": true}`
 
-**Response:**
-*(List of ProductResponse)*
+- **`GET /api/products/statistics`**: Get product statistics.
+  - *Response:* `Map<String, Object>`
 
----
-
-### `GET` `/api/products/{productId}`
-- **API Name:** getProductById
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(ProductResponse)*
+- **`GET /api/products/health`**: Product controller health check.
+  - *Response:* `{"status": "UP", "service": "product-service-products", "timestamp": "..."}`
 
 ---
 
-### `GET` `/api/products/batch`
-- **API Name:** getProductsByIds
-- **Type:** REST / Synchronous
-- **Query Parameters:** `productIds` (List<UUID>)
+## 4. Inventory
 
-**Request:**
-None
+Base Path: `/api/inventory`
 
-**Response:**
-*(List of ProductResponse)*
+### Models
 
----
-
-### `POST` `/api/products/batch/validate`
-- **API Name:** validateProducts
-- **Type:** REST / Synchronous
-
-**Request:**
-```json
-[
-  "UUID"
-]
-```
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/sku/{sku}`
-- **API Name:** getProductBySku
-- **Type:** REST / Synchronous
-- **Path Variable:** `sku` (String)
-
-**Request:**
-None
-
-**Response:**
-*(ProductResponse)*
-
----
-
-### `GET` `/api/products/category/{categoryId}`
-- **API Name:** getProductsByCategory
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/category/{categoryId}/paginated`
-- **API Name:** getProductsByCategoryWithPagination
-- **Type:** REST / Synchronous
-- **Path Variable:** `categoryId` (UUID)
-- **Query Parameters:** `page` (int), `size` (int), `sortBy` (String), `sortDir` (String)
-
-**Request:**
-None
-
-**Response:**
-*(Page of ProductResponse)*
-
----
-
-### `GET` `/api/products/search`
-- **API Name:** searchProducts
-- **Type:** REST / Synchronous
-- **Query Parameters:** `query` (String)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/search/paginated`
-- **API Name:** searchProductsWithPagination
-- **Type:** REST / Synchronous
-- **Query Parameters:** `query` (String), `page` (int), `size` (int), `sortBy` (String), `sortDir` (String)
-
-**Request:**
-None
-
-**Response:**
-*(Page of ProductResponse)*
-
----
-
-### `GET` `/api/products/price-range`
-- **API Name:** getProductsByPriceRange
-- **Type:** REST / Synchronous
-- **Query Parameters:** `minPrice` (BigDecimal), `maxPrice` (BigDecimal)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/tag/{tag}`
-- **API Name:** getProductsByTag
-- **Type:** REST / Synchronous
-- **Path Variable:** `tag` (String)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/without-allergen/{allergen}`
-- **API Name:** getProductsWithoutAllergen
-- **Type:** REST / Synchronous
-- **Path Variable:** `allergen` (String)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `GET` `/api/products/filter`
-- **API Name:** searchProductsWithFilters
-- **Type:** REST / Synchronous
-- **Query Parameters:** `categoryId` (UUID), `status` (String), `minPrice` (BigDecimal), `maxPrice` (BigDecimal), `inStock` (Boolean)
-
-**Request:**
-None
-
-**Response:**
-*(List of ProductResponse)*
-
----
-
-### `PUT` `/api/products/{productId}`
-- **API Name:** updateProduct
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-*(Same as createProduct ProductRequest)*
-
-**Response:**
-*(ProductResponse)*
-
----
-
-### `PATCH` `/api/products/{productId}/status`
-- **API Name:** updateProductStatus
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
+**InventoryUpdateRequestDto**
 ```json
 {
-  "status": "String (e.g., ACTIVE, INACTIVE, DISCONTINUED)"
+  "currentStock": 0,
+  "reservedStock": 0,
+  "minimumStock": 0,
+  "maximumStock": 0,
+  "reorderLevel": 0,
+  "reorderQuantity": 0,
+  "autoReorderEnabled": false,
+  "trackExpiry": false,
+  "expiryDate": "2023-10-10T12:00:00",
+  "supplierInfo": "string",
+  "storageLocation": "string",
+  "notes": "string"
 }
 ```
 
-**Response:**
-*(ProductResponse)*
-
----
-
-### `POST` `/api/products/{productId}/toggle-featured`
-- **API Name:** toggleFeaturedStatus
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-None
-
-**Response:**
-*(ProductResponse)*
-
----
-
-### `DELETE` `/api/products/{productId}`
-- **API Name:** deleteProduct
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
-
-**Request:**
-None
-
-**Response:**
+**InventoryResponseDto**
 ```json
 {
-  "message": "String - Product deleted successfully",
-  "productId": "String"
+  "id": "string",
+  "productId": "string",
+  "productName": "string",
+  "productSku": "string",
+  "currentStock": 0,
+  "reservedStock": 0,
+  "availableStock": 0,
+  "minimumStock": 0,
+  "maximumStock": 0,
+  "reorderLevel": 0,
+  "reorderQuantity": 0,
+  "status": "IN_STOCK",
+  "isLowStock": false,
+  "isOutOfStock": false,
+  "needsReorder": false,
+  "lastRestockedAt": "2023-10-10T12:00:00",
+  "lastRestockedQuantity": 0,
+  "autoReorderEnabled": false,
+  "trackExpiry": false,
+  "expiryDate": "2023-10-10T12:00:00",
+  "supplierInfo": "string",
+  "storageLocation": "string",
+  "notes": "string",
+  "createdAt": "2023-10-10T12:00:00",
+  "updatedAt": "2023-10-10T12:00:00"
 }
 ```
 
+### Endpoints
+
+- **`GET /api/inventory`**: Get all inventory items (paginated).
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`GET /api/inventory/product/{productId}`**: Get inventory for a specific product ID.
+  - *Response:* `InventoryResponseDto`
+
+- **`GET /api/inventory/sku/{sku}`**: Get inventory by product SKU.
+  - *Response:* `InventoryResponseDto`
+
+- **`GET /api/inventory/low-stock`**: Get low stock inventory items.
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`GET /api/inventory/out-of-stock`**: Get out of stock inventory items.
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`GET /api/inventory/needs-reorder`**: Get items needing reorder.
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`GET /api/inventory/expired`**: Get expired inventory items.
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`GET /api/inventory/expiring-soon`**: Get items expiring soon.
+  - *Params:* `hours` (default 24)
+  - *Response:* `Page<InventoryResponseDto>`
+
+- **`PUT /api/inventory/product/{productId}`**: Update inventory details.
+  - *Request Body:* `InventoryUpdateRequestDto`
+  - *Response:* `InventoryResponseDto`
+
+- **`POST /api/inventory/product/{productId}/add-stock`**: Add stock (restock).
+  - *Request Body:* `{"quantity": 10, "notes": "string"}`
+  - *Response:* `InventoryResponseDto`
+
+- **`POST /api/inventory/product/{productId}/reserve`**: Reserve stock for orders.
+  - *Request Body:* `{"quantity": 5}`
+  - *Response:* `{"success": true, "productId": "string", "quantity": 5, "message": "Stock reserved successfully"}`
+
+- **`POST /api/inventory/product/{productId}/release-reserved`**: Release reserved stock back to available.
+  - *Request Body:* `{"quantity": 5}`
+  - *Response:* `{"message": "Reserved stock released successfully", "productId": "string", "quantity": "5"}`
+
+- **`POST /api/inventory/product/{productId}/consume`**: Consume stock (reduce current and reserved).
+  - *Request Body:* `{"quantity": 5}`
+  - *Response:* `{"message": "Stock consumed successfully", "productId": "string", "quantity": "5"}`
+
+- **`GET /api/inventory/product/{productId}/availability`**: Check if requested quantity is available.
+  - *Params:* `quantity`
+  - *Response:* `{"productId": "string", "requestedQuantity": 5, "availableStock": 10, "sufficient": true}`
+
+- **`GET /api/inventory/product/{productId}/available-stock`**: Get just the available stock number.
+  - *Response:* `{"productId": "string", "availableStock": 10}`
+
+- **`POST /api/inventory/bulk-update-minimum-stock`**: Update minimum stock levels in bulk.
+  - *Request Body:* `{"productId1": 10, "productId2": 20}` (Map of ID to min stock)
+  - *Response:* `{"message": "Minimum stock levels updated successfully", "updatedProducts": "2"}`
+
+- **`GET /api/inventory/statistics`**: Get inventory statistics.
+  - *Response:* `Map<String, Object>`
+
+- **`GET /api/inventory/health`**: Inventory controller health check.
+  - *Response:* `{"status": "UP", "service": "product-service-inventory", "timestamp": "..."}`
+
 ---
 
-### `GET` `/api/products/{productId}/availability`
-- **API Name:** checkProductAvailability
-- **Type:** REST / Synchronous
-- **Path Variable:** `productId` (UUID)
+## 5. Site Configuration
 
-**Request:**
-None
+Base Path: `/api/site-config`
 
-**Response:**
+### Models
+
+**SiteConfig**
 ```json
 {
-  "productId": "UUID",
-  "available": "Boolean"
+  "id": "string",
+  "heroSection": {
+    "tag": "string",
+    "headline": "string",
+    "subtitle": "string",
+    "heroImageUrl": "string",
+    "sideCard1": {
+      "subtitle": "string",
+      "title": "string",
+      "price": "string",
+      "imageUrl": "string"
+    },
+    "sideCard2": {
+      "subtitle": "string",
+      "title": "string",
+      "price": "string",
+      "imageUrl": "string"
+    }
+  },
+  "aboutSection": {
+    "tag": "string",
+    "title": "string",
+    "description": "string",
+    "image1Url": "string",
+    "image2Url": "string",
+    "image3Url": "string"
+  },
+  "howWeWorkSection": [
+    {
+      "title": "string",
+      "description": "string",
+      "iconName": "string"
+    }
+  ],
+  "specialOfferSection": {
+    "tag": "string",
+    "headline": "string",
+    "description": "string",
+    "imageUrl": "string"
+  },
+  "testimonialSection": {
+    "quote": "string",
+    "author": "string",
+    "rating": 5,
+    "authorImageUrl": "string"
+  }
 }
 ```
 
----
+### Endpoints
 
-### `GET` `/api/products/statistics`
-- **API Name:** getProductStatistics
-- **Type:** REST / Synchronous
+- **`GET /api/site-config/frontpage`**: Fetch the current site configuration.
+  - *Response:* `SiteConfig`
 
-**Request:**
-None
-
-**Response:**
-*(Map of statistics)*
+- **`PUT /api/site-config/frontpage`**: Update the site configuration.
+  - *Request Body:* `SiteConfig`
+  - *Response:* `SiteConfig`
 
 ---
 
-### `GET` `/api/products/health`
-- **API Name:** health
-- **Type:** REST / Synchronous
+## 6. Uploads
 
-**Request:**
-None
+Base Path: `/api/uploads`
 
-**Response:**
-```json
-{
-  "status": "String - UP",
-  "service": "String - product-service-products",
-  "timestamp": "DateTime"
-}
-```
+### Endpoints
+
+- **`POST /api/uploads/media`**: Upload one or more media files.
+  - *Consumes:* `multipart/form-data`
+  - *Params:* `media` (List of MultipartFile)
+  - *Response:*
+    ```json
+    {
+      "message": "Files uploaded successfully",
+      "urls": ["string", "string"]
+    }
+    ```
+
+- **`GET /api/uploads/media/{fileName}`**: Get an uploaded media file.
+  - *Response:* Binary file content (`byte[]` with correct content type)
