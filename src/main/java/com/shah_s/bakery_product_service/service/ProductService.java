@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.service;
 
-import com.shah_s.bakery_product_service.dto.ProductRequest;
-import com.shah_s.bakery_product_service.dto.ProductResponse;
+import com.shah_s.bakery_product_service.dto.ProductRequestDto;
+import com.shah_s.bakery_product_service.dto.ProductResponseDto;
 import com.shah_s.bakery_product_service.entity.Category;
 import com.shah_s.bakery_product_service.entity.Inventory;
 import com.shah_s.bakery_product_service.entity.Product;
@@ -57,7 +57,7 @@ public class ProductService {
     }
 
     // Create new product
-    public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponseDto createProduct(ProductRequestDto request) {
         logger.info("Creating new product: {} (SKU: {})", request.getName(), request.getSku());
 
         // Check if SKU already exists
@@ -100,77 +100,77 @@ public class ProductService {
         publishProductEvent(savedProduct, "CREATED");
 
         logger.info("Product created successfully with ID: {}", savedProduct.getId());
-        return ProductResponse.from(savedProduct);
+        return ProductResponseDto.from(savedProduct);
     }
 
     // Get all products
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getAllProducts(Pageable pageable) {
+    public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
         logger.debug("Fetching all products");
 
         return productRepository.findAll(pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get active products
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getActiveProducts(Pageable pageable) {
+    public Page<ProductResponseDto> getActiveProducts(Pageable pageable) {
         logger.debug("Fetching active products");
 
         return productRepository.findByStatus(Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get available products (active with stock)
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getAvailableProducts(Pageable pageable) {
+    public Page<ProductResponseDto> getAvailableProducts(Pageable pageable) {
         logger.debug("Fetching available products");
 
         return productRepository.findAvailableProducts(pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get featured products
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getFeaturedProducts(Pageable pageable) {
+    public Page<ProductResponseDto> getFeaturedProducts(Pageable pageable) {
         logger.debug("Fetching featured products");
 
         return productRepository.findByIsFeaturedTrueAndStatus(Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get product by ID
     @Transactional(readOnly = true)
-    public ProductResponse getProductById(String productId) {
+    public ProductResponseDto getProductById(String productId) {
         logger.debug("Fetching product by ID: {}", productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
 
-        return ProductResponse.from(product);
+        return ProductResponseDto.from(product);
     }
 
     // Get product by SKU
     @Transactional(readOnly = true)
-    public Optional<ProductResponse> getProductBySku(String sku) {
+    public Optional<ProductResponseDto> getProductBySku(String sku) {
         logger.debug("Fetching product by SKU: {}", sku);
 
         return productRepository.findBySku(sku)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get products by category
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
+    public Page<ProductResponseDto> getProductsByCategory(String categoryId, Pageable pageable) {
         logger.debug("Fetching products by category with pagination: {}", categoryId);
 
         return productRepository.findByCategoryIdAndStatus(categoryId, Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Search products
     @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProducts(String searchTerm, Pageable pageable) {
+    public Page<ProductResponseDto> searchProducts(String searchTerm, Pageable pageable) {
         logger.debug("Searching products with pagination, term: {}", searchTerm);
 
         Page<com.shah_s.bakery_product_service.document.ProductDocument> results = productSearchRepository.findByNameOrDescriptionOrTags(searchTerm, searchTerm, searchTerm, pageable);
@@ -178,9 +178,9 @@ public class ProductService {
             .map(doc -> doc.getId())
             .collect(Collectors.toList());
             
-        List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
+        List<ProductResponseDto> productResponses = productRepository.findAllById(productIds).stream()
                 .filter(p -> p.getStatus() == Product.ProductStatus.ACTIVE)
-                .map(ProductResponse::from)
+                .map(ProductResponseDto::from)
                 .collect(Collectors.toList());
                 
         return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.getTotalElements());
@@ -188,53 +188,53 @@ public class ProductService {
 
     // Get products by price range
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+    public Page<ProductResponseDto> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         logger.debug("Fetching products by price range: {} - {}", minPrice, maxPrice);
 
         return productRepository.findByPriceRange(minPrice, maxPrice, Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get products on sale
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsOnSale(Pageable pageable) {
+    public Page<ProductResponseDto> getProductsOnSale(Pageable pageable) {
         logger.debug("Fetching products on sale");
 
         return productRepository.findProductsOnSale(Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get products by tag
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByTag(String tag, Pageable pageable) {
+    public Page<ProductResponseDto> getProductsByTag(String tag, Pageable pageable) {
         logger.debug("Fetching products by tag: {}", tag);
 
         return productRepository.findByTag(tag, Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get products without specific allergen
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsWithoutAllergen(String allergen, Pageable pageable) {
+    public Page<ProductResponseDto> getProductsWithoutAllergen(String allergen, Pageable pageable) {
         logger.debug("Fetching products without allergen: {}", allergen);
 
         return productRepository.findProductsWithoutAllergen(allergen, Product.ProductStatus.ACTIVE, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Advanced product search with filters
     @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
+    public Page<ProductResponseDto> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
                                                           BigDecimal minPrice, BigDecimal maxPrice,
                                                           Boolean inStock, Pageable pageable) {
         logger.debug("Advanced product search with filters");
 
         return productRepository.findProductsWithFilters(categoryId, status, minPrice, maxPrice, inStock, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Update product
-    public ProductResponse updateProduct(String productId, ProductRequest request) {
+    public ProductResponseDto updateProduct(String productId, ProductRequestDto request) {
         logger.info("Updating product: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -276,11 +276,11 @@ public class ProductService {
         
         logger.info("Product updated successfully: {}", productId);
 
-        return ProductResponse.from(updatedProduct);
+        return ProductResponseDto.from(updatedProduct);
     }
 
     // Update product status
-    public ProductResponse updateProductStatus(String productId, Product.ProductStatus status) {
+    public ProductResponseDto updateProductStatus(String productId, Product.ProductStatus status) {
         logger.info("Updating product status to {} for product: {}", status, productId);
 
         Product product = productRepository.findById(productId)
@@ -293,11 +293,11 @@ public class ProductService {
         publishProductEvent(updatedProduct, "STATUS_UPDATED");
 
         logger.info("Product status updated successfully: {}", productId);
-        return ProductResponse.from(updatedProduct);
+        return ProductResponseDto.from(updatedProduct);
     }
 
     // Toggle featured status
-    public ProductResponse toggleFeaturedStatus(String productId) {
+    public ProductResponseDto toggleFeaturedStatus(String productId) {
         logger.info("Toggling featured status for product: {}", productId);
 
         Product product = productRepository.findById(productId)
@@ -309,7 +309,7 @@ public class ProductService {
         logger.info("Product featured status toggled to {} for product: {}",
                    updatedProduct.getIsFeatured(), productId);
 
-        return ProductResponse.from(updatedProduct);
+        return ProductResponseDto.from(updatedProduct);
     }
 
     // Delete product
@@ -338,22 +338,22 @@ public class ProductService {
 
     // Get recently added products
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getRecentlyAddedProducts(int days, Pageable pageable) {
+    public Page<ProductResponseDto> getRecentlyAddedProducts(int days, Pageable pageable) {
         logger.debug("Fetching products added in last {} days", days);
 
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         return productRepository.findByStatusAndCreatedAtAfter(Product.ProductStatus.ACTIVE, since, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get products by preparation time range
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable) {
+    public Page<ProductResponseDto> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable) {
         logger.debug("Fetching products by preparation time: {} - {} minutes", minMinutes, maxMinutes);
 
         return productRepository.findByStatusAndPreparationTimeMinutesBetween(
                 Product.ProductStatus.ACTIVE, minMinutes, maxMinutes, pageable)
-                .map(ProductResponse::from);
+                .map(ProductResponseDto::from);
     }
 
     // Get product statistics

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProductRequest {
+public class ProductRequestDto {
 
     // Getters and Setters
     @NotBlank(message = "SKU is required")
@@ -79,6 +79,6 @@ public class ProductRequest {
     private Integer reorderLevel = 0;
 
     // Constructors
-    public ProductRequest() {}
+    public ProductRequestDto() {}
 
 }

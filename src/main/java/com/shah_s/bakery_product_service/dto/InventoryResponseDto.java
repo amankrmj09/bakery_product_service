@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryResponse {
+public class InventoryResponseDto {
 
     private String id; // This can just be the product id since 1:1
     private String productId;
@@ -46,13 +46,13 @@ public class InventoryResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static InventoryResponse from(Product product) {
+    public static InventoryResponseDto from(Product product) {
         if (product == null || product.getInventory() == null) {
             return null;
         }
         
         Inventory inventory = product.getInventory();
-        InventoryResponse response = new InventoryResponse();
+        InventoryResponseDto response = new InventoryResponseDto();
         
         response.id = product.getId();
         response.productId = product.getId();

@@ -5,9 +5,7 @@ plugins {
 	// id("org.asciidoctor.jvm.convert") version "4.0.3"
 }
 
-group = "com.dev_of_blue"
-version = "1.0.0"
-description = "bakery_product_service for products management"
+description = "Product Catalog and Inventory Management Service"
 
 java {
 	toolchain {

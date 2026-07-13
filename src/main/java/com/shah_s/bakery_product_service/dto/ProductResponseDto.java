@@ -11,7 +11,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ProductResponse {
+public class ProductResponseDto {
 
     // Getters and Setters
     private String id;
@@ -42,11 +42,11 @@ public class ProductResponse {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public ProductResponse() {}
+    public ProductResponseDto() {}
 
     // Static factory method
-    public static ProductResponse from(Product product) {
-        ProductResponse response = new ProductResponse();
+    public static ProductResponseDto from(Product product) {
+        ProductResponseDto response = new ProductResponseDto();
         response.id = product.getId();
         response.sku = product.getSku();
         response.name = product.getName();

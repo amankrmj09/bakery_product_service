@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.controller;
 
-import com.shah_s.bakery_product_service.dto.InventoryResponse;
-import com.shah_s.bakery_product_service.dto.InventoryUpdateRequest;
+import com.shah_s.bakery_product_service.dto.InventoryResponseDto;
+import com.shah_s.bakery_product_service.dto.InventoryUpdateRequestDto;
 import com.shah_s.bakery_product_service.service.InventoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class InventoryController {
 
     // Get all inventory items
     @GetMapping
-    public ResponseEntity<Page<InventoryResponse>> getAllInventory(
+    public ResponseEntity<Page<InventoryResponseDto>> getAllInventory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -44,7 +44,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> inventory = inventoryService.getAllInventory(pageable);
+        Page<InventoryResponseDto> inventory = inventoryService.getAllInventory(pageable);
 
         logger.info("Retrieved {} inventory items", inventory.getContent().size());
         return ResponseEntity.ok(inventory);
@@ -52,10 +52,10 @@ public class InventoryController {
 
     // Get inventory by product ID
     @GetMapping("/product/{productId}")
-    public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable String productId) {
+    public ResponseEntity<InventoryResponseDto> getInventoryByProductId(@PathVariable String productId) {
         logger.info("Get inventory by product ID request received: {}", productId);
 
-        InventoryResponse inventory = inventoryService.getInventoryByProductId(productId);
+        InventoryResponseDto inventory = inventoryService.getInventoryByProductId(productId);
 
         logger.info("Inventory retrieved for product: {}", productId);
         return ResponseEntity.ok(inventory);
@@ -63,7 +63,7 @@ public class InventoryController {
 
     // Get inventory by product SKU
     @GetMapping("/sku/{sku}")
-    public ResponseEntity<InventoryResponse> getInventoryByProductSku(@PathVariable String sku) {
+    public ResponseEntity<InventoryResponseDto> getInventoryByProductSku(@PathVariable String sku) {
         logger.info("Get inventory by product SKU request received: {}", sku);
 
         return inventoryService.getInventoryByProductSku(sku)
@@ -76,7 +76,7 @@ public class InventoryController {
 
     // Get low stock items
     @GetMapping("/low-stock")
-    public ResponseEntity<Page<InventoryResponse>> getLowStockItems(
+    public ResponseEntity<Page<InventoryResponseDto>> getLowStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -85,7 +85,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> lowStockItems = inventoryService.getLowStockItems(pageable);
+        Page<InventoryResponseDto> lowStockItems = inventoryService.getLowStockItems(pageable);
 
         logger.info("Retrieved {} low stock items", lowStockItems.getContent().size());
         return ResponseEntity.ok(lowStockItems);
@@ -93,7 +93,7 @@ public class InventoryController {
 
     // Get out of stock items
     @GetMapping("/out-of-stock")
-    public ResponseEntity<Page<InventoryResponse>> getOutOfStockItems(
+    public ResponseEntity<Page<InventoryResponseDto>> getOutOfStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -102,7 +102,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
+        Page<InventoryResponseDto> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
 
         logger.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
         return ResponseEntity.ok(outOfStockItems);
@@ -110,7 +110,7 @@ public class InventoryController {
 
     // Get items needing reorder
     @GetMapping("/needs-reorder")
-    public ResponseEntity<Page<InventoryResponse>> getItemsNeedingReorder(
+    public ResponseEntity<Page<InventoryResponseDto>> getItemsNeedingReorder(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -119,7 +119,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
+        Page<InventoryResponseDto> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
 
         logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
         return ResponseEntity.ok(itemsNeedingReorder);
@@ -127,7 +127,7 @@ public class InventoryController {
 
     // Get expired items
     @GetMapping("/expired")
-    public ResponseEntity<Page<InventoryResponse>> getExpiredItems(
+    public ResponseEntity<Page<InventoryResponseDto>> getExpiredItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -136,7 +136,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> expiredItems = inventoryService.getExpiredItems(pageable);
+        Page<InventoryResponseDto> expiredItems = inventoryService.getExpiredItems(pageable);
 
         logger.info("Retrieved {} expired items", expiredItems.getContent().size());
         return ResponseEntity.ok(expiredItems);
@@ -144,7 +144,7 @@ public class InventoryController {
 
     // Get items expiring soon
     @GetMapping("/expiring-soon")
-    public ResponseEntity<Page<InventoryResponse>> getItemsExpiringSoon(
+    public ResponseEntity<Page<InventoryResponseDto>> getItemsExpiringSoon(
             @RequestParam(defaultValue = "24") int hours,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -154,7 +154,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
+        Page<InventoryResponseDto> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
 
         logger.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
         return ResponseEntity.ok(expiringSoonItems);
@@ -162,13 +162,13 @@ public class InventoryController {
 
     // Update inventory
     @PutMapping("/product/{productId}")
-    public ResponseEntity<InventoryResponse> updateInventory(
+    public ResponseEntity<InventoryResponseDto> updateInventory(
             @PathVariable String productId,
-            @Valid @RequestBody InventoryUpdateRequest request) {
+            @Valid @RequestBody InventoryUpdateRequestDto request) {
 
         logger.info("Update inventory request received for product: {}", productId);
 
-        InventoryResponse inventory = inventoryService.updateInventory(productId, request);
+        InventoryResponseDto inventory = inventoryService.updateInventory(productId, request);
 
         logger.info("Inventory updated successfully for product: {}", productId);
         return ResponseEntity.ok(inventory);
@@ -176,7 +176,7 @@ public class InventoryController {
 
     // Add stock (restock)
     @PostMapping("/product/{productId}/add-stock")
-    public ResponseEntity<InventoryResponse> addStock(
+    public ResponseEntity<InventoryResponseDto> addStock(
             @PathVariable String productId,
             @RequestBody Map<String, Object> request) {
 
@@ -185,7 +185,7 @@ public class InventoryController {
         Integer quantity = (Integer) request.get("quantity");
         String notes = (String) request.get("notes");
 
-        InventoryResponse inventory = inventoryService.addStock(productId, quantity, notes);
+        InventoryResponseDto inventory = inventoryService.addStock(productId, quantity, notes);
 
         logger.info("Stock added successfully: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(inventory);

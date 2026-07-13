@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CategoryResponse {
+public class CategoryResponseDto {
 
     // Getters and Setters
     private String id;
@@ -26,11 +26,11 @@ public class CategoryResponse {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public CategoryResponse() {}
+    public CategoryResponseDto() {}
 
     // Static factory method
-    public static CategoryResponse from(Category category) {
-        CategoryResponse response = new CategoryResponse();
+    public static CategoryResponseDto from(Category category) {
+        CategoryResponseDto response = new CategoryResponseDto();
         response.id = category.getId();
         response.name = category.getName();
         response.description = category.getDescription();

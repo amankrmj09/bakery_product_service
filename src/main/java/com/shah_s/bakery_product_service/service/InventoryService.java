@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.service;
 
-import com.shah_s.bakery_product_service.dto.InventoryResponse;
-import com.shah_s.bakery_product_service.dto.InventoryUpdateRequest;
+import com.shah_s.bakery_product_service.dto.InventoryResponseDto;
+import com.shah_s.bakery_product_service.dto.InventoryUpdateRequestDto;
 import com.shah_s.bakery_product_service.entity.Inventory;
 import com.shah_s.bakery_product_service.entity.Product;
 import com.shah_s.bakery_product_service.exception.ProductServiceException;
@@ -52,52 +52,52 @@ public class InventoryService {
         return inventory;
     }
 
-    public InventoryResponse getInventoryByProductId(String productId) {
+    public InventoryResponseDto getInventoryByProductId(String productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         if (product.getInventory() == null) {
             throw new ProductServiceException("Inventory not found for product: " + productId);
         }
-        return InventoryResponse.from(product);
+        return InventoryResponseDto.from(product);
     }
 
-    public Optional<InventoryResponse> getInventoryByProductSku(String sku) {
+    public Optional<InventoryResponseDto> getInventoryByProductSku(String sku) {
         return productRepository.findBySku(sku)
                 .filter(p -> p.getInventory() != null)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getAllInventory(Pageable pageable) {
+    public Page<InventoryResponseDto> getAllInventory(Pageable pageable) {
         return productRepository.findAll(pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getLowStockItems(Pageable pageable) {
+    public Page<InventoryResponseDto> getLowStockItems(Pageable pageable) {
         return productRepository.findLowStockProducts(pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getOutOfStockItems(Pageable pageable) {
+    public Page<InventoryResponseDto> getOutOfStockItems(Pageable pageable) {
         return productRepository.findOutOfStockProducts(pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getItemsNeedingReorder(Pageable pageable) {
+    public Page<InventoryResponseDto> getItemsNeedingReorder(Pageable pageable) {
         return productRepository.findProductsNeedingReorder(pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getExpiredItems(Pageable pageable) {
+    public Page<InventoryResponseDto> getExpiredItems(Pageable pageable) {
         return productRepository.findProductsExpiringSoon(LocalDateTime.MIN, LocalDateTime.now(), pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public Page<InventoryResponse> getItemsExpiringSoon(int hours, Pageable pageable) {
+    public Page<InventoryResponseDto> getItemsExpiringSoon(int hours, Pageable pageable) {
         return productRepository.findProductsExpiringSoon(LocalDateTime.now(), LocalDateTime.now().plusHours(hours), pageable)
-                .map(InventoryResponse::from);
+                .map(InventoryResponseDto::from);
     }
 
-    public InventoryResponse updateInventory(String productId, InventoryUpdateRequest request) {
+    public InventoryResponseDto updateInventory(String productId, InventoryUpdateRequestDto request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
@@ -123,10 +123,10 @@ public class InventoryService {
         inventory.updateStatus();
         productRepository.save(product);
 
-        return InventoryResponse.from(product);
+        return InventoryResponseDto.from(product);
     }
 
-    public InventoryResponse addStock(String productId, Integer quantity, String notes) {
+    public InventoryResponseDto addStock(String productId, Integer quantity, String notes) {
         if (quantity <= 0) throw new InvalidQuantityException("Quantity must be positive");
 
         Product product = productRepository.findById(productId)
@@ -147,7 +147,7 @@ public class InventoryService {
         inventory.updateStatus();
         productRepository.save(product);
 
-        return InventoryResponse.from(product);
+        return InventoryResponseDto.from(product);
     }
 
     public boolean reserveStock(String productId, Integer quantity) {

@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.controller;
 
-import com.shah_s.bakery_product_service.dto.CategoryRequest;
-import com.shah_s.bakery_product_service.dto.CategoryResponse;
+import com.shah_s.bakery_product_service.dto.CategoryRequestDto;
+import com.shah_s.bakery_product_service.dto.CategoryResponseDto;
 import com.shah_s.bakery_product_service.service.CategoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<Page<CategoryResponse>> getAllCategories(
+    public ResponseEntity<Page<CategoryResponseDto>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -46,7 +46,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
+        Page<CategoryResponseDto> categories = categoryService.getAllCategories(pageable);
 
         logger.info("Retrieved {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -54,7 +54,7 @@ public class CategoryController {
 
     // Get active categories only
     @GetMapping("/active")
-    public ResponseEntity<Page<CategoryResponse>> getActiveCategories(
+    public ResponseEntity<Page<CategoryResponseDto>> getActiveCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -64,7 +64,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
+        Page<CategoryResponseDto> categories = categoryService.getActiveCategories(pageable);
 
         logger.info("Retrieved {} active categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -72,7 +72,7 @@ public class CategoryController {
 
     // Get categories with products
     @GetMapping("/with-products")
-    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithProducts(
+    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -82,7 +82,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
+        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithProducts(pageable);
 
         logger.info("Retrieved {} categories with products", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -90,7 +90,7 @@ public class CategoryController {
 
     // Get categories with active products
     @GetMapping("/with-active-products")
-    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithActiveProducts(
+    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -100,7 +100,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
+        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithActiveProducts(pageable);
 
         logger.info("Retrieved {} categories with active products", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -108,10 +108,10 @@ public class CategoryController {
 
     // Get category by ID
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String categoryId) {
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable String categoryId) {
         logger.info("Get category by ID request received: {}", categoryId);
 
-        CategoryResponse category = categoryService.getCategoryById(categoryId);
+        CategoryResponseDto category = categoryService.getCategoryById(categoryId);
 
         logger.info("Category retrieved: {}", category.getName());
         return ResponseEntity.ok(category);
@@ -120,10 +120,10 @@ public class CategoryController {
     // Create new category
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
+    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto request) {
         logger.info("Create category request received: {}", request.getName());
 
-        CategoryResponse category = categoryService.createCategory(request);
+        CategoryResponseDto category = categoryService.createCategory(request);
 
         logger.info("Category created successfully: {}", category.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
@@ -131,13 +131,13 @@ public class CategoryController {
 
     // Update category
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponse> updateCategory(
+    public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable String categoryId,
-            @Valid @RequestBody CategoryRequest request) {
+            @Valid @RequestBody CategoryRequestDto request) {
 
         logger.info("Update category request received: {}", categoryId);
 
-        CategoryResponse category = categoryService.updateCategory(categoryId, request);
+        CategoryResponseDto category = categoryService.updateCategory(categoryId, request);
 
         logger.info("Category updated successfully: {}", categoryId);
         return ResponseEntity.ok(category);
@@ -160,7 +160,7 @@ public class CategoryController {
 
     // Search categories
     @GetMapping("/search")
-    public ResponseEntity<Page<CategoryResponse>> searchCategories(
+    public ResponseEntity<Page<CategoryResponseDto>> searchCategories(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -171,7 +171,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
+        Page<CategoryResponseDto> categories = categoryService.searchCategories(query, pageable);
 
         logger.info("Search returned {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -179,10 +179,10 @@ public class CategoryController {
 
     // Toggle category status
     @PostMapping("/{categoryId}/toggle-status")
-    public ResponseEntity<CategoryResponse> toggleCategoryStatus(@PathVariable String categoryId) {
+    public ResponseEntity<CategoryResponseDto> toggleCategoryStatus(@PathVariable String categoryId) {
         logger.info("Toggle category status request received: {}", categoryId);
 
-        CategoryResponse category = categoryService.toggleCategoryStatus(categoryId);
+        CategoryResponseDto category = categoryService.toggleCategoryStatus(categoryId);
 
         logger.info("Category status toggled to {}: {}", category.getActive(), categoryId);
         return ResponseEntity.ok(category);

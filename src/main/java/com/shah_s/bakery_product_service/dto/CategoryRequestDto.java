@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CategoryRequest {
+public class CategoryRequestDto {
 
     // Getters and Setters
     @NotBlank(message = "Category name is required")
@@ -29,9 +29,9 @@ public class CategoryRequest {
     private String iconClass;
 
     // Constructors
-    public CategoryRequest() {}
+    public CategoryRequestDto() {}
 
-    public CategoryRequest(String name, String description, Integer displayOrder) {
+    public CategoryRequestDto(String name, String description, Integer displayOrder) {
         this.name = name;
         this.description = description;
         this.displayOrder = displayOrder;

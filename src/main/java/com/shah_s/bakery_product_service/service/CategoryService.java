@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.service;
 
-import com.shah_s.bakery_product_service.dto.CategoryRequest;
-import com.shah_s.bakery_product_service.dto.CategoryResponse;
+import com.shah_s.bakery_product_service.dto.CategoryRequestDto;
+import com.shah_s.bakery_product_service.dto.CategoryResponseDto;
 import com.shah_s.bakery_product_service.entity.Category;
 import com.shah_s.bakery_product_service.exception.ProductServiceException;
 import com.shah_s.bakery_product_service.repository.CategoryRepository;
@@ -31,7 +31,7 @@ public class CategoryService {
         this.productRepository = productRepository;
     }
 
-    public CategoryResponse createCategory(CategoryRequest request) {
+    public CategoryResponseDto createCategory(CategoryRequestDto request) {
         if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists");
         }
@@ -50,39 +50,39 @@ public class CategoryService {
         category.setIconClass(request.getIconClass());
 
         Category savedCategory = categoryRepository.save(category);
-        return CategoryResponse.from(savedCategory);
+        return CategoryResponseDto.from(savedCategory);
     }
 
-    public Page<CategoryResponse> getAllCategories(Pageable pageable) {
+    public Page<CategoryResponseDto> getAllCategories(Pageable pageable) {
         return categoryRepository.findAll(pageable)
-                .map(CategoryResponse::from);
+                .map(CategoryResponseDto::from);
     }
 
-    public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
+    public Page<CategoryResponseDto> getActiveCategories(Pageable pageable) {
         return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
-                .map(CategoryResponse::from);
+                .map(CategoryResponseDto::from);
     }
 
-    public Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable) {
+    public Page<CategoryResponseDto> getCategoriesWithProducts(Pageable pageable) {
         return getActiveCategories(pageable);
     }
 
-    public Page<CategoryResponse> getCategoriesWithActiveProducts(Pageable pageable) {
+    public Page<CategoryResponseDto> getCategoriesWithActiveProducts(Pageable pageable) {
         return getActiveCategories(pageable);
     }
 
-    public CategoryResponse getCategoryById(String categoryId) {
+    public CategoryResponseDto getCategoryById(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
-        return CategoryResponse.from(category);
+        return CategoryResponseDto.from(category);
     }
 
-    public Optional<CategoryResponse> getCategoryByName(String name) {
+    public Optional<CategoryResponseDto> getCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .map(CategoryResponse::from);
+                .map(CategoryResponseDto::from);
     }
 
-    public CategoryResponse updateCategory(String categoryId, CategoryRequest request) {
+    public CategoryResponseDto updateCategory(String categoryId, CategoryRequestDto request) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
 
@@ -99,7 +99,7 @@ public class CategoryService {
         category.setIconClass(request.getIconClass());
 
         Category updatedCategory = categoryRepository.save(category);
-        return CategoryResponse.from(updatedCategory);
+        return CategoryResponseDto.from(updatedCategory);
     }
 
     public void deleteCategory(String categoryId) {
@@ -113,19 +113,19 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    public Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable) {
+    public Page<CategoryResponseDto> searchCategories(String searchTerm, Pageable pageable) {
         return categoryRepository.searchByName(searchTerm, pageable)
-                .map(CategoryResponse::from);
+                .map(CategoryResponseDto::from);
     }
 
-    public CategoryResponse toggleCategoryStatus(String categoryId) {
+    public CategoryResponseDto toggleCategoryStatus(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
 
         category.setActive(!category.getActive());
         Category updatedCategory = categoryRepository.save(category);
 
-        return CategoryResponse.from(updatedCategory);
+        return CategoryResponseDto.from(updatedCategory);
     }
 
     public void reorderCategories(Map<String, Integer> categoryOrders) {

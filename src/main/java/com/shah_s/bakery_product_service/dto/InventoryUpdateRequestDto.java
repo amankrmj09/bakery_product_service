@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class InventoryUpdateRequest {
+public class InventoryUpdateRequestDto {
 
     // Getters and Setters
     @NotNull(message = "Current stock is required")
@@ -44,6 +44,6 @@ public class InventoryUpdateRequest {
     private String notes;
 
     // Constructors
-    public InventoryUpdateRequest() {}
+    public InventoryUpdateRequestDto() {}
 
 }

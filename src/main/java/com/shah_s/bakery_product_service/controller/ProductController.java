@@ -1,7 +1,7 @@
 package com.shah_s.bakery_product_service.controller;
 
-import com.shah_s.bakery_product_service.dto.ProductRequest;
-import com.shah_s.bakery_product_service.dto.ProductResponse;
+import com.shah_s.bakery_product_service.dto.ProductRequestDto;
+import com.shah_s.bakery_product_service.dto.ProductResponseDto;
 import com.shah_s.bakery_product_service.entity.Product;
 import com.shah_s.bakery_product_service.service.ProductService;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class ProductController {
 
     // Get all products
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getAllProducts(
+    public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -45,7 +45,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getAllProducts(pageable);
+        Page<ProductResponseDto> products = productService.getAllProducts(pageable);
 
         logger.info("Retrieved {} products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -53,7 +53,7 @@ public class ProductController {
 
     // Get active products
     @GetMapping("/active")
-    public ResponseEntity<Page<ProductResponse>> getActiveProducts(
+    public ResponseEntity<Page<ProductResponseDto>> getActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -62,7 +62,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getActiveProducts(pageable);
+        Page<ProductResponseDto> products = productService.getActiveProducts(pageable);
 
         logger.info("Retrieved {} active products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -70,7 +70,7 @@ public class ProductController {
 
     // Get available products (active with stock)
     @GetMapping("/available")
-    public ResponseEntity<Page<ProductResponse>> getAvailableProducts(
+    public ResponseEntity<Page<ProductResponseDto>> getAvailableProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -79,7 +79,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getAvailableProducts(pageable);
+        Page<ProductResponseDto> products = productService.getAvailableProducts(pageable);
 
         logger.info("Retrieved {} available products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -87,7 +87,7 @@ public class ProductController {
 
     // Get featured products
     @GetMapping("/featured")
-    public ResponseEntity<Page<ProductResponse>> getFeaturedProducts(
+    public ResponseEntity<Page<ProductResponseDto>> getFeaturedProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -96,7 +96,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getFeaturedProducts(pageable);
+        Page<ProductResponseDto> products = productService.getFeaturedProducts(pageable);
 
         logger.info("Retrieved {} featured products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -104,7 +104,7 @@ public class ProductController {
 
     // Get products on sale
     @GetMapping("/on-sale")
-    public ResponseEntity<Page<ProductResponse>> getProductsOnSale(
+    public ResponseEntity<Page<ProductResponseDto>> getProductsOnSale(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -113,7 +113,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getProductsOnSale(pageable);
+        Page<ProductResponseDto> products = productService.getProductsOnSale(pageable);
 
         logger.info("Retrieved {} products on sale", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -121,7 +121,7 @@ public class ProductController {
 
     // Get recently added products
     @GetMapping("/recent")
-    public ResponseEntity<Page<ProductResponse>> getRecentlyAddedProducts(
+    public ResponseEntity<Page<ProductResponseDto>> getRecentlyAddedProducts(
             @RequestParam(defaultValue = "7") int days,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -131,7 +131,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getRecentlyAddedProducts(days, pageable);
+        Page<ProductResponseDto> products = productService.getRecentlyAddedProducts(days, pageable);
 
         logger.info("Retrieved {} recently added products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -139,10 +139,10 @@ public class ProductController {
 
     // Get product by ID
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable String productId) {
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable String productId) {
         logger.info("Get product by ID request received: {}", productId);
 
-        ProductResponse product = productService.getProductById(productId);
+        ProductResponseDto product = productService.getProductById(productId);
 
         logger.info("Product retrieved: {}", product.getName());
         return ResponseEntity.ok(product);
@@ -150,7 +150,7 @@ public class ProductController {
 
     // Get multiple products by IDs (Batch)
     @GetMapping("/batch")
-    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestParam List<String> productIds) {
+    public ResponseEntity<List<ProductResponseDto>> getProductsByIds(@RequestParam List<String> productIds) {
         logger.info("Get products by IDs request received for {} items", productIds.size());
         
         // This is highly inefficient now, let's fix this for MongoDB (should be handled in service, but keeping as is for backward compatibility or we can just fetch properly)
@@ -162,7 +162,7 @@ public class ProductController {
 
     // Validate multiple products (Batch)
     @PostMapping("/batch/validate")
-    public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<String> productIds) {
+    public ResponseEntity<List<ProductResponseDto>> validateProducts(@RequestBody List<String> productIds) {
         logger.info("Validate products request received for {} items", productIds.size());
         
         throw new UnsupportedOperationException("Needs service update for validateProducts");
@@ -170,7 +170,7 @@ public class ProductController {
 
     // Get product by SKU
     @GetMapping("/sku/{sku}")
-    public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
+    public ResponseEntity<ProductResponseDto> getProductBySku(@PathVariable String sku) {
         logger.info("Get product by SKU request received: {}", sku);
 
         return productService.getProductBySku(sku)
@@ -183,7 +183,7 @@ public class ProductController {
 
     // Get products by category
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<Page<ProductResponse>> getProductsByCategory(
+    public ResponseEntity<Page<ProductResponseDto>> getProductsByCategory(
             @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -193,7 +193,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getProductsByCategory(categoryId, pageable);
+        Page<ProductResponseDto> products = productService.getProductsByCategory(categoryId, pageable);
 
         logger.info("Retrieved {} products for category", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -201,7 +201,7 @@ public class ProductController {
 
     // Search products
     @GetMapping("/search")
-    public ResponseEntity<Page<ProductResponse>> searchProducts(
+    public ResponseEntity<Page<ProductResponseDto>> searchProducts(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -211,7 +211,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.searchProducts(query, pageable);
+        Page<ProductResponseDto> products = productService.searchProducts(query, pageable);
 
         logger.info("Search returned {} products", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -219,7 +219,7 @@ public class ProductController {
 
     // Get products by price range
     @GetMapping("/price-range")
-    public ResponseEntity<Page<ProductResponse>> getProductsByPriceRange(
+    public ResponseEntity<Page<ProductResponseDto>> getProductsByPriceRange(
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
@@ -230,7 +230,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getProductsByPriceRange(minPrice, maxPrice, pageable);
+        Page<ProductResponseDto> products = productService.getProductsByPriceRange(minPrice, maxPrice, pageable);
 
         logger.info("Retrieved {} products in price range", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -238,7 +238,7 @@ public class ProductController {
 
     // Get products by tag
     @GetMapping("/tag/{tag}")
-    public ResponseEntity<Page<ProductResponse>> getProductsByTag(
+    public ResponseEntity<Page<ProductResponseDto>> getProductsByTag(
             @PathVariable String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -248,7 +248,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getProductsByTag(tag, pageable);
+        Page<ProductResponseDto> products = productService.getProductsByTag(tag, pageable);
 
         logger.info("Retrieved {} products with tag", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -256,7 +256,7 @@ public class ProductController {
 
     // Get products without allergen
     @GetMapping("/without-allergen/{allergen}")
-    public ResponseEntity<Page<ProductResponse>> getProductsWithoutAllergen(
+    public ResponseEntity<Page<ProductResponseDto>> getProductsWithoutAllergen(
             @PathVariable String allergen,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -266,7 +266,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.getProductsWithoutAllergen(allergen, pageable);
+        Page<ProductResponseDto> products = productService.getProductsWithoutAllergen(allergen, pageable);
 
         logger.info("Retrieved {} products without allergen", products.getContent().size());
         return ResponseEntity.ok(products);
@@ -274,7 +274,7 @@ public class ProductController {
 
     // Advanced search with filters
     @GetMapping("/filter")
-    public ResponseEntity<Page<ProductResponse>> searchProductsWithFilters(
+    public ResponseEntity<Page<ProductResponseDto>> searchProductsWithFilters(
             @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) Product.ProductStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -289,7 +289,7 @@ public class ProductController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductResponse> products = productService.searchProductsWithFilters(
+        Page<ProductResponseDto> products = productService.searchProductsWithFilters(
                 categoryId, status, minPrice, maxPrice, inStock, pageable);
 
         logger.info("Filter search returned {} products", products.getContent().size());
@@ -298,10 +298,10 @@ public class ProductController {
 
     // Create new product
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
+    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody ProductRequestDto request) {
         logger.info("Create product request received: {} (SKU: {})", request.getName(), request.getSku());
 
-        ProductResponse product = productService.createProduct(request);
+        ProductResponseDto product = productService.createProduct(request);
 
         logger.info("Product created successfully: {}", product.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
@@ -309,13 +309,13 @@ public class ProductController {
 
     // Update product
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable String productId,
-            @Valid @RequestBody ProductRequest request) {
+            @Valid @RequestBody ProductRequestDto request) {
 
         logger.info("Update product request received: {}", productId);
 
-        ProductResponse product = productService.updateProduct(productId, request);
+        ProductResponseDto product = productService.updateProduct(productId, request);
 
         logger.info("Product updated successfully: {}", productId);
         return ResponseEntity.ok(product);
@@ -323,7 +323,7 @@ public class ProductController {
 
     // Update product status
     @PatchMapping("/{productId}/status")
-    public ResponseEntity<ProductResponse> updateProductStatus(
+    public ResponseEntity<ProductResponseDto> updateProductStatus(
             @PathVariable String productId,
             @RequestBody Map<String, String> request) {
 
@@ -332,7 +332,7 @@ public class ProductController {
         String statusStr = request.get("status");
         Product.ProductStatus status = Product.ProductStatus.valueOf(statusStr.toUpperCase());
 
-        ProductResponse product = productService.updateProductStatus(productId, status);
+        ProductResponseDto product = productService.updateProductStatus(productId, status);
 
         logger.info("Product status updated to {}: {}", status, productId);
         return ResponseEntity.ok(product);
@@ -340,10 +340,10 @@ public class ProductController {
 
     // Toggle featured status
     @PostMapping("/{productId}/toggle-featured")
-    public ResponseEntity<ProductResponse> toggleFeaturedStatus(@PathVariable String productId) {
+    public ResponseEntity<ProductResponseDto> toggleFeaturedStatus(@PathVariable String productId) {
         logger.info("Toggle featured status request received: {}", productId);
 
-        ProductResponse product = productService.toggleFeaturedStatus(productId);
+        ProductResponseDto product = productService.toggleFeaturedStatus(productId);
 
         logger.info("Product featured status toggled: {}", productId);
         return ResponseEntity.ok(product);
