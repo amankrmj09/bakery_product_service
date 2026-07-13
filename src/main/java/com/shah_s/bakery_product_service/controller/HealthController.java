@@ -1,24 +1,22 @@
 package com.shah_s.bakery_product_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-
 public class HealthController {
 
-    final private DataSource dataSource;
+    private final MongoTemplate mongoTemplate;
 
-    public HealthController(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public HealthController(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     // Main service health check
@@ -31,9 +29,10 @@ public class HealthController {
         response.put("version", "1.0.0");
 
         // Check database connectivity
-        try (Connection connection = dataSource.getConnection()) {
+        try {
+            Document result = mongoTemplate.getDb().runCommand(new Document("ping", 1));
             response.put("database", "UP");
-            response.put("databaseUrl", connection.getMetaData().getURL());
+            response.put("databaseName", mongoTemplate.getDb().getName());
         } catch (Exception e) {
             response.put("database", "DOWN");
             response.put("databaseError", e.getMessage());
@@ -60,7 +59,6 @@ public class HealthController {
             "products", "/api/products",
             "inventory", "/api/inventory"
         ));
-
         return ResponseEntity.ok(response);
     }
 
@@ -89,7 +87,6 @@ public class HealthController {
         long minutes = seconds / 60;
         long hours = minutes / 60;
         long days = hours / 24;
-
         return String.format("%d days, %d hours, %d minutes, %d seconds",
                 days, hours % 24, minutes % 60, seconds % 60);
     }
