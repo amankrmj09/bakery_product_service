@@ -6,8 +6,8 @@ import com.shah_s.bakery_product_service.service.InventoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +35,7 @@ public class InventoryController {
 
     // Get all inventory items
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getAllInventory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -76,6 +77,7 @@ public class InventoryController {
 
     // Get low stock items
     @GetMapping("/low-stock")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getLowStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -93,6 +95,7 @@ public class InventoryController {
 
     // Get out of stock items
     @GetMapping("/out-of-stock")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getOutOfStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -110,6 +113,7 @@ public class InventoryController {
 
     // Get items needing reorder
     @GetMapping("/needs-reorder")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getItemsNeedingReorder(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -127,6 +131,7 @@ public class InventoryController {
 
     // Get expired items
     @GetMapping("/expired")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getExpiredItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -144,6 +149,7 @@ public class InventoryController {
 
     // Get items expiring soon
     @GetMapping("/expiring-soon")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryResponseDto>> getItemsExpiringSoon(
             @RequestParam(defaultValue = "24") int hours,
             @RequestParam(defaultValue = "0") int page,
@@ -162,6 +168,7 @@ public class InventoryController {
 
     // Update inventory
     @PutMapping("/product/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryResponseDto> updateInventory(
             @PathVariable String productId,
             @Valid @RequestBody InventoryUpdateRequestDto request) {
@@ -176,6 +183,7 @@ public class InventoryController {
 
     // Add stock (restock)
     @PostMapping("/product/{productId}/add-stock")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryResponseDto> addStock(
             @PathVariable String productId,
             @RequestBody Map<String, Object> request) {
@@ -193,7 +201,7 @@ public class InventoryController {
 
     // Reserve stock
     @PostMapping("/product/{productId}/reserve")
-    public ResponseEntity<Map<String, Object>> reserveStock(
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockOperationResponseDto> reserveStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -202,16 +210,16 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         boolean success = inventoryService.reserveStock(productId, quantity);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", success);
-        response.put("productId", productId);
-        response.put("quantity", quantity);
+        com.shah_s.bakery_product_service.dto.StockOperationResponseDto response = new com.shah_s.bakery_product_service.dto.StockOperationResponseDto();
+        response.setSuccess(success);
+        response.setProductId(productId);
+        response.setQuantity(quantity);
 
         if (success) {
-            response.put("message", "Stock reserved successfully");
+            response.setMessage("Stock reserved successfully");
             logger.info("Stock reserved successfully: {} units for product: {}", quantity, productId);
         } else {
-            response.put("message", "Insufficient stock to reserve");
+            response.setMessage("Insufficient stock to reserve");
             logger.warn("Failed to reserve stock: {} units for product: {}", quantity, productId);
         }
 
@@ -220,7 +228,7 @@ public class InventoryController {
 
     // Release reserved stock
     @PostMapping("/product/{productId}/release-reserved")
-    public ResponseEntity<Map<String, String>> releaseReservedStock(
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockOperationResponseDto> releaseReservedStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -229,10 +237,7 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         inventoryService.releaseReservedStock(productId, quantity);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Reserved stock released successfully");
-        response.put("productId", productId.toString());
-        response.put("quantity", quantity.toString());
+        com.shah_s.bakery_product_service.dto.StockOperationResponseDto response = new com.shah_s.bakery_product_service.dto.StockOperationResponseDto(true, productId, quantity, "Reserved stock released successfully");
 
         logger.info("Reserved stock released: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
@@ -240,7 +245,8 @@ public class InventoryController {
 
     // Consume stock
     @PostMapping("/product/{productId}/consume")
-    public ResponseEntity<Map<String, String>> consumeStock(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockOperationResponseDto> consumeStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -249,10 +255,7 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         inventoryService.consumeStock(productId, quantity);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Stock consumed successfully");
-        response.put("productId", productId.toString());
-        response.put("quantity", quantity.toString());
+        com.shah_s.bakery_product_service.dto.StockOperationResponseDto response = new com.shah_s.bakery_product_service.dto.StockOperationResponseDto(true, productId, quantity, "Stock consumed successfully");
 
         logger.info("Stock consumed: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
@@ -260,7 +263,7 @@ public class InventoryController {
 
     // Check stock availability
     @GetMapping("/product/{productId}/availability")
-    public ResponseEntity<Map<String, Object>> checkStockAvailability(
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto> checkStockAvailability(
             @PathVariable String productId,
             @RequestParam Integer quantity) {
 
@@ -270,32 +273,27 @@ public class InventoryController {
         boolean available = inventoryService.checkStockAvailability(productId, quantity);
         Integer availableStock = inventoryService.getAvailableStock(productId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("productId", productId);
-        response.put("requestedQuantity", quantity);
-        response.put("availableStock", availableStock);
-        response.put("sufficient", available);
+        com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto response = new com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto(productId, quantity, availableStock, available);
 
         return ResponseEntity.ok(response);
     }
 
     // Get available stock for a product
     @GetMapping("/product/{productId}/available-stock")
-    public ResponseEntity<Map<String, Object>> getAvailableStock(@PathVariable String productId) {
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto> getAvailableStock(@PathVariable String productId) {
         logger.info("Get available stock request received for product: {}", productId);
 
         Integer availableStock = inventoryService.getAvailableStock(productId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("productId", productId);
-        response.put("availableStock", availableStock);
+        com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto response = new com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto(productId, null, availableStock, null);
 
         return ResponseEntity.ok(response);
     }
 
     // Bulk update minimum stock levels
     @PostMapping("/bulk-update-minimum-stock")
-    public ResponseEntity<Map<String, String>> bulkUpdateMinimumStock(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<org.devofblue.common.dto.MessageResponseDto> bulkUpdateMinimumStock(
             @RequestBody Map<String, Integer> productMinimumStocks) {
 
         logger.info("Bulk update minimum stock request received for {} products",
@@ -303,16 +301,13 @@ public class InventoryController {
 
         inventoryService.bulkUpdateMinimumStock(productMinimumStocks);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Minimum stock levels updated successfully");
-        response.put("updatedProducts", String.valueOf(productMinimumStocks.size()));
-
         logger.info("Bulk minimum stock update completed for {} products", productMinimumStocks.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new org.devofblue.common.dto.MessageResponseDto("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
     }
 
     // Get inventory statistics
     @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getInventoryStatistics() {
         logger.info("Get inventory statistics request received");
 
@@ -324,12 +319,7 @@ public class InventoryController {
 
     // Health check
     @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        response.put("service", "product-service-inventory");
-        response.put("timestamp", java.time.LocalDateTime.now().toString());
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<org.devofblue.common.dto.HealthResponseDto> health() {
+        return ResponseEntity.ok(new org.devofblue.common.dto.HealthResponseDto("UP", "product-service-inventory"));
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -298,6 +299,7 @@ public class ProductController {
 
     // Create new product
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody ProductRequestDto request) {
         logger.info("Create product request received: {} (SKU: {})", request.getName(), request.getSku());
 
@@ -309,6 +311,7 @@ public class ProductController {
 
     // Update product
     @PutMapping("/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable String productId,
             @Valid @RequestBody ProductRequestDto request) {
@@ -323,6 +326,7 @@ public class ProductController {
 
     // Update product status
     @PatchMapping("/{productId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> updateProductStatus(
             @PathVariable String productId,
             @RequestBody Map<String, String> request) {
@@ -340,6 +344,7 @@ public class ProductController {
 
     // Toggle featured status
     @PostMapping("/{productId}/toggle-featured")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDto> toggleFeaturedStatus(@PathVariable String productId) {
         logger.info("Toggle featured status request received: {}", productId);
 
@@ -351,35 +356,31 @@ public class ProductController {
 
     // Delete product
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable String productId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<org.devofblue.common.dto.MessageResponseDto> deleteProduct(@PathVariable String productId) {
         logger.info("Delete product request received: {}", productId);
 
         productService.deleteProduct(productId);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Product deleted successfully");
-        response.put("productId", productId.toString());
-
         logger.info("Product deleted successfully: {}", productId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new org.devofblue.common.dto.MessageResponseDto("Product deleted successfully"));
     }
 
     // Check product availability
     @GetMapping("/{productId}/availability")
-    public ResponseEntity<Map<String, Object>> checkProductAvailability(@PathVariable String productId) {
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto> checkProductAvailability(@PathVariable String productId) {
         logger.info("Check product availability request received: {}", productId);
 
         boolean available = productService.isProductAvailable(productId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("productId", productId);
-        response.put("available", available);
+        com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto response = new com.shah_s.bakery_product_service.dto.StockAvailabilityResponseDto(productId, null, null, available);
 
         return ResponseEntity.ok(response);
     }
 
     // Get product statistics
     @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getProductStatistics() {
         logger.info("Get product statistics request received");
 
@@ -391,12 +392,7 @@ public class ProductController {
 
     // Health check
     @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        response.put("service", "product-service-products");
-        response.put("timestamp", java.time.LocalDateTime.now().toString());
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<org.devofblue.common.dto.HealthResponseDto> health() {
+        return ResponseEntity.ok(new org.devofblue.common.dto.HealthResponseDto("UP", "product-service-products"));
     }
 }

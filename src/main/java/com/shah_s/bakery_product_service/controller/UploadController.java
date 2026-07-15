@@ -25,16 +25,14 @@ public class UploadController {
     }
 
     @PostMapping(value = "/media", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> uploadMedia(
+    public ResponseEntity<com.shah_s.bakery_product_service.dto.MediaUploadResponseDto> uploadMedia(
             @RequestPart("media") List<MultipartFile> media) {
         
         logger.info("Upload media request received, count: {}", media.size());
 
         List<String> urls = r2StorageService.uploadFiles(media);
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Files uploaded successfully");
-        response.put("urls", urls);
+        com.shah_s.bakery_product_service.dto.MediaUploadResponseDto response = new com.shah_s.bakery_product_service.dto.MediaUploadResponseDto("Files uploaded successfully", urls);
 
         logger.info("Successfully uploaded {} media files", urls.size());
         return ResponseEntity.ok(response);

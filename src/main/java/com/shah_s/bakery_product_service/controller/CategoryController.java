@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -118,7 +119,7 @@ public class CategoryController {
     }
 
     // Create new category
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto request) {
         logger.info("Create category request received: {}", request.getName());
@@ -131,6 +132,7 @@ public class CategoryController {
 
     // Update category
     @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable String categoryId,
             @Valid @RequestBody CategoryRequestDto request) {
@@ -145,17 +147,14 @@ public class CategoryController {
 
     // Delete category
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Map<String, String>> deleteCategory(@PathVariable String categoryId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<org.devofblue.common.dto.MessageResponseDto> deleteCategory(@PathVariable String categoryId) {
         logger.info("Delete category request received: {}", categoryId);
 
         categoryService.deleteCategory(categoryId);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Category deleted successfully");
-        response.put("categoryId", categoryId.toString());
-
         logger.info("Category deleted successfully: {}", categoryId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new org.devofblue.common.dto.MessageResponseDto("Category deleted successfully"));
     }
 
     // Search categories
@@ -179,6 +178,7 @@ public class CategoryController {
 
     // Toggle category status
     @PostMapping("/{categoryId}/toggle-status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDto> toggleCategoryStatus(@PathVariable String categoryId) {
         logger.info("Toggle category status request received: {}", categoryId);
 
@@ -190,20 +190,19 @@ public class CategoryController {
 
     // Reorder categories
     @PostMapping("/reorder")
-    public ResponseEntity<Map<String, String>> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<org.devofblue.common.dto.MessageResponseDto> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
         logger.info("Reorder categories request received for {} categories", categoryOrders.size());
 
         categoryService.reorderCategories(categoryOrders);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Categories reordered successfully");
-
         logger.info("Categories reordered successfully");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new org.devofblue.common.dto.MessageResponseDto("Categories reordered successfully"));
     }
 
     // Get category statistics
     @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getCategoryStatistics() {
         logger.info("Get category statistics request received");
 
@@ -215,12 +214,7 @@ public class CategoryController {
 
     // Health check
     @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        response.put("service", "product-service-categories");
-        response.put("timestamp", java.time.LocalDateTime.now().toString());
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<org.devofblue.common.dto.HealthResponseDto> health() {
+        return ResponseEntity.ok(new org.devofblue.common.dto.HealthResponseDto("UP", "product-service-categories"));
     }
 }
