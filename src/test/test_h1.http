@@ -1,0 +1,522 @@
+@baseUrl = http://bakery-api.blubug.me
+@adminEmail = admin@bakery.com
+@adminPassword = Admin@123
+
+### 1. Admin Login (Auth Service to get Bearer Token)
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.test("Admin Login successful", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.hasOwnProperty("access_token"), "No access token found");
+    });
+    client.global.set("auth_token", response.body.access_token);
+%}
+
+### 2. Main Service Health Check (Type: Public)[cite: 5]
+# @name healthCheck
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+> {%
+    client.test("Health check returns UP", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### 3. Service Info (Type: Public)[cite: 5]
+# @name serviceInfo
+GET {{baseUrl}}/api/info
+Accept: application/json
+
+---
+## CREATE CATEGORIES (10 Items)[cite: 5]
+---
+
+### Create Category 1: Breads (Type: Admin)[cite: 5]
+# @name createCat1
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Artisan Breads",
+  "description": "Freshly baked daily breads",
+  "displayOrder": 1,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-bread"
+}
+
+> {%
+    client.global.set("cat1_id", response.body.id);
+%}
+
+### Create Category 2: Cakes (Type: Admin)[cite: 5]
+# @name createCat2
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Custom Cakes",
+  "description": "Whole cakes for special occasions",
+  "displayOrder": 2,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-cake"
+}
+
+> {%
+    client.global.set("cat2_id", response.body.id);
+%}
+
+### Create Category 3: Pastries (Type: Admin)[cite: 5]
+# @name createCat3
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Pastries",
+  "description": "Flaky, buttery sweet pastries",
+  "displayOrder": 3,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-pastry"
+}
+
+> {%
+    client.global.set("cat3_id", response.body.id);
+%}
+
+### Create Category 4: Cookies (Type: Admin)[cite: 5]
+# @name createCat4
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Gourmet Cookies",
+  "description": "Chewy and crispy cookies",
+  "displayOrder": 4,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-cookie"
+}
+
+> {%
+    client.global.set("cat4_id", response.body.id);
+%}
+
+### Create Category 5: Pies (Type: Admin)[cite: 5]
+# @name createCat5
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Fruit Pies",
+  "description": "Seasonal fruit pies and tarts",
+  "displayOrder": 5,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-pie"
+}
+
+> {%
+    client.global.set("cat5_id", response.body.id);
+%}
+
+### Create Category 6: Tarts (Type: Admin)[cite: 5]
+# @name createCat6
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "French Tarts",
+  "description": "Delicate mini tarts",
+  "displayOrder": 6,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-tart"
+}
+
+> {%
+    client.global.set("cat6_id", response.body.id);
+%}
+
+### Create Category 7: Muffins (Type: Admin)[cite: 5]
+# @name createCat7
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Morning Muffins",
+  "description": "Perfect breakfast muffins",
+  "displayOrder": 7,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-muffin"
+}
+
+> {%
+    client.global.set("cat7_id", response.body.id);
+%}
+
+### Create Category 8: Donuts (Type: Admin)[cite: 5]
+# @name createCat8
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Donuts",
+  "description": "Fried and baked donuts",
+  "displayOrder": 8,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-donut"
+}
+
+> {%
+    client.global.set("cat8_id", response.body.id);
+%}
+
+### Create Category 9: Savory (Type: Admin)[cite: 5]
+# @name createCat9
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Savory Bakes",
+  "description": "Quiches, rolls, and savory treats",
+  "displayOrder": 9,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-savory"
+}
+
+> {%
+    client.global.set("cat9_id", response.body.id);
+%}
+
+### Create Category 10: Beverages (Type: Admin)[cite: 5]
+# @name createCat10
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Coffee & Tea",
+  "description": "Hot and cold beverages",
+  "displayOrder": 10,
+  "active": true,
+  "mediaUrls": [],
+  "iconClass": "icon-coffee"
+}
+
+> {%
+    client.global.set("cat10_id", response.body.id);
+%}
+
+
+
+### CREATE PRODUCTS (20 Items - 2 Per Category)[cite: 5]
+
+
+### Product 1: Sourdough (Cat 1)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "BRD-001",
+  "name": "Classic Sourdough",
+  "description": "Tangy and chewy artisan loaf.",
+  "categoryId": "{{cat1_id}}",
+  "price": 6.99
+}
+
+### Product 2: French Baguette (Cat 1)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "BRD-002",
+  "name": "French Baguette",
+  "description": "Crispy crust with a soft interior.",
+  "categoryId": "{{cat1_id}}",
+  "price": 3.99
+}
+
+### Product 3: Chocolate Truffle Cake (Cat 2)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "CAK-001",
+  "name": "Chocolate Truffle Cake",
+  "description": "Rich dark chocolate layer cake.",
+  "categoryId": "{{cat2_id}}",
+  "price": 35.00
+}
+
+### Product 4: Red Velvet Cake (Cat 2)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "CAK-002",
+  "name": "Red Velvet Cake",
+  "description": "Classic red velvet with cream cheese frosting.",
+  "categoryId": "{{cat2_id}}",
+  "price": 40.00
+}
+
+### Product 5: Butter Croissant (Cat 3)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "PST-001",
+  "name": "Butter Croissant",
+  "description": "Flaky, buttery, and baked fresh.",
+  "categoryId": "{{cat3_id}}",
+  "price": 4.50
+}
+
+### Product 6: Cherry Danish (Cat 3)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "PST-002",
+  "name": "Cherry Danish",
+  "description": "Sweet pastry filled with tart cherry compote.",
+  "categoryId": "{{cat3_id}}",
+  "price": 4.75
+}
+
+### Product 7: Chocolate Chip Cookie (Cat 4)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "COK-001",
+  "name": "Jumbo Chocolate Chip Cookie",
+  "description": "Loaded with semi-sweet chocolate chips.",
+  "categoryId": "{{cat4_id}}",
+  "price": 2.50
+}
+
+### Product 8: Macaron Box (Cat 4)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "COK-002",
+  "name": "Assorted Macarons (6-pack)",
+  "description": "Six delicate French macarons in varied flavors.",
+  "categoryId": "{{cat4_id}}",
+  "price": 12.00
+}
+
+### Product 9: Apple Pie (Cat 5)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "PIE-001",
+  "name": "Traditional Apple Pie",
+  "description": "Spiced apples in a flaky butter crust.",
+  "categoryId": "{{cat5_id}}",
+  "price": 22.00
+}
+
+### Product 10: Pecan Pie (Cat 5)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "PIE-002",
+  "name": "Southern Pecan Pie",
+  "description": "Gooey caramel and toasted pecans.",
+  "categoryId": "{{cat5_id}}",
+  "price": 24.00
+}
+
+### Product 11: Lemon Meringue Tart (Cat 6)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "TRT-001",
+  "name": "Lemon Meringue Tart",
+  "description": "Zesty lemon curd topped with toasted meringue.",
+  "categoryId": "{{cat6_id}}",
+  "price": 6.50
+}
+
+### Product 12: Mixed Fruit Tart (Cat 6)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "TRT-002",
+  "name": "Mixed Fruit Tart",
+  "description": "Vanilla custard topped with fresh seasonal fruit.",
+  "categoryId": "{{cat6_id}}",
+  "price": 7.00
+}
+
+### Product 13: Blueberry Muffin (Cat 7)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "MUF-001",
+  "name": "Blueberry Muffin",
+  "description": "Fluffy muffin bursting with wild blueberries.",
+  "categoryId": "{{cat7_id}}",
+  "price": 3.75
+}
+
+### Product 14: Banana Nut Muffin (Cat 7)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "MUF-002",
+  "name": "Banana Nut Muffin",
+  "description": "Made with ripe bananas and toasted walnuts.",
+  "categoryId": "{{cat7_id}}",
+  "price": 3.75
+}
+
+### Product 15: Glazed Donut (Cat 8)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "DON-001",
+  "name": "Vanilla Glazed Donut",
+  "description": "Classic yeast donut with a sweet vanilla glaze.",
+  "categoryId": "{{cat8_id}}",
+  "price": 1.99
+}
+
+### Product 16: Chocolate Frosted Donut (Cat 8)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "DON-002",
+  "name": "Chocolate Frosted Donut",
+  "description": "Yeast donut topped with rich chocolate icing.",
+  "categoryId": "{{cat8_id}}",
+  "price": 2.25
+}
+
+### Product 17: Spinach & Feta Quiche (Cat 9)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "SAV-001",
+  "name": "Spinach & Feta Quiche (Slice)",
+  "description": "Savory egg custard with fresh spinach and feta cheese.",
+  "categoryId": "{{cat9_id}}",
+  "price": 5.50
+}
+
+### Product 18: Sausage Roll (Cat 9)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "SAV-002",
+  "name": "Sausage Roll",
+  "description": "Seasoned pork sausage wrapped in puff pastry.",
+  "categoryId": "{{cat9_id}}",
+  "price": 4.50
+}
+
+### Product 19: Espresso (Cat 10)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "BEV-001",
+  "name": "Double Espresso",
+  "description": "Rich and bold double shot of espresso.",
+  "categoryId": "{{cat10_id}}",
+  "price": 3.00
+}
+
+### Product 20: Latte (Cat 10)[cite: 5]
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "sku": "BEV-002",
+  "name": "Vanilla Latte",
+  "description": "Espresso with steamed milk and vanilla syrup.",
+  "categoryId": "{{cat10_id}}",
+  "price": 4.50
+}
+
+
+### TEST READ & INVENTORY ENDPOINTS[cite: 5]
+
+
+### Get All Products (Type: Public)[cite: 5]
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+### Search Products (Type: Public)[cite: 5]
+GET {{baseUrl}}/api/products/search?query=Chocolate
+Accept: application/json
+
+### Get Low Stock Inventory (Type: Admin)[cite: 5]
+GET {{baseUrl}}/api/inventory/low-stock
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### Get Category Statistics (Type: Admin)[cite: 5]
+GET {{baseUrl}}/api/categories/statistics
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### Get Frontpage Site Config (Type: Public)[cite: 5]
+GET {{baseUrl}}/api/site-config/frontpage
+Accept: application/json
