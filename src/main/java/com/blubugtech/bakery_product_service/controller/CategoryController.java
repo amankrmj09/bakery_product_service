@@ -1,0 +1,220 @@
+package com.blubugtech.bakery_product_service.controller;
+
+import com.blubugtech.bakery_product_service.dto.CategoryRequestDto;
+import com.blubugtech.bakery_product_service.dto.CategoryResponseDto;
+import com.blubugtech.bakery_product_service.service.CategoryService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+@RestController
+@RequestMapping("/api/categories")
+
+public class CategoryController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+
+    final private CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    // Get all categories
+    @GetMapping
+    public ResponseEntity<Page<CategoryResponseDto>> getAllCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get all categories request received (page {}, size {})", page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponseDto> categories = categoryService.getAllCategories(pageable);
+
+        logger.info("Retrieved {} categories", categories.getContent().size());
+        return ResponseEntity.ok(categories);
+    }
+
+    // Get active categories only
+    @GetMapping("/active")
+    public ResponseEntity<Page<CategoryResponseDto>> getActiveCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get active categories request received (page {}, size {})", page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponseDto> categories = categoryService.getActiveCategories(pageable);
+
+        logger.info("Retrieved {} active categories", categories.getContent().size());
+        return ResponseEntity.ok(categories);
+    }
+
+    // Get categories with products
+    @GetMapping("/with-products")
+    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get categories with products request received (page {}, size {})", page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithProducts(pageable);
+
+        logger.info("Retrieved {} categories with products", categories.getContent().size());
+        return ResponseEntity.ok(categories);
+    }
+
+    // Get categories with active products
+    @GetMapping("/with-active-products")
+    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithActiveProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Get categories with active products request received (page {}, size {})", page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithActiveProducts(pageable);
+
+        logger.info("Retrieved {} categories with active products", categories.getContent().size());
+        return ResponseEntity.ok(categories);
+    }
+
+    // Get category by ID
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable String categoryId) {
+        logger.info("Get category by ID request received: {}", categoryId);
+
+        CategoryResponseDto category = categoryService.getCategoryById(categoryId);
+
+        logger.info("Category retrieved: {}", category.getName());
+        return ResponseEntity.ok(category);
+    }
+
+    // Create new category
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto request) {
+        logger.info("Create category request received: {}", request.getName());
+
+        CategoryResponseDto category = categoryService.createCategory(request);
+
+        logger.info("Category created successfully: {}", category.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
+    }
+
+    // Update category
+    @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponseDto> updateCategory(
+            @PathVariable String categoryId,
+            @Valid @RequestBody CategoryRequestDto request) {
+
+        logger.info("Update category request received: {}", categoryId);
+
+        CategoryResponseDto category = categoryService.updateCategory(categoryId, request);
+
+        logger.info("Category updated successfully: {}", categoryId);
+        return ResponseEntity.ok(category);
+    }
+
+    // Delete category
+    @DeleteMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> deleteCategory(@PathVariable String categoryId) {
+        logger.info("Delete category request received: {}", categoryId);
+
+        categoryService.deleteCategory(categoryId);
+
+        logger.info("Category deleted successfully: {}", categoryId);
+        return ResponseEntity.ok(new com.blubugtech.common.dto.MessageResponseDto("Category deleted successfully"));
+    }
+
+    // Search categories
+    @GetMapping("/search")
+    public ResponseEntity<Page<CategoryResponseDto>> searchCategories(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Search categories request received with query: {} (page {}, size {})", query, page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponseDto> categories = categoryService.searchCategories(query, pageable);
+
+        logger.info("Search returned {} categories", categories.getContent().size());
+        return ResponseEntity.ok(categories);
+    }
+
+    // Toggle category status
+    @PostMapping("/{categoryId}/toggle-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponseDto> toggleCategoryStatus(@PathVariable String categoryId) {
+        logger.info("Toggle category status request received: {}", categoryId);
+
+        CategoryResponseDto category = categoryService.toggleCategoryStatus(categoryId);
+
+        logger.info("Category status toggled to {}: {}", category.getActive(), categoryId);
+        return ResponseEntity.ok(category);
+    }
+
+    // Reorder categories
+    @PostMapping("/reorder")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
+        logger.info("Reorder categories request received for {} categories", categoryOrders.size());
+
+        categoryService.reorderCategories(categoryOrders);
+
+        logger.info("Categories reordered successfully");
+        return ResponseEntity.ok(new com.blubugtech.common.dto.MessageResponseDto("Categories reordered successfully"));
+    }
+
+    // Get category statistics
+    @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> getCategoryStatistics() {
+        logger.info("Get category statistics request received");
+
+        Map<String, Object> statistics = categoryService.getCategoryStatistics();
+
+        logger.info("Category statistics retrieved");
+        return ResponseEntity.ok(statistics);
+    }
+
+    // Health check
+    @GetMapping("/health")
+    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> health() {
+        return ResponseEntity.ok(new com.blubugtech.common.dto.HealthResponseDto("UP", "product-service-categories"));
+    }
+}
