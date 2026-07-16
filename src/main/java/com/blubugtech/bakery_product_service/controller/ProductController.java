@@ -21,10 +21,13 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Product", description = "Product Management APIs")
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);

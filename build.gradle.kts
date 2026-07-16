@@ -52,6 +52,7 @@ dependencies {
 
 	// 7. Third-Party Utilities (Jackson, AWS, etc.)
 	implementation("software.amazon.awssdk:s3:2.25.27")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.4")
 
 	// 8. Tooling & Lombok
 	compileOnly("org.projectlombok:lombok")
