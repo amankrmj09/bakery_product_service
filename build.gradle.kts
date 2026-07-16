@@ -30,29 +30,43 @@ repositories {
 extra["springCloudVersion"] = "2025.0.3"
 
 dependencies {
+	// 1. Shared Custom Libraries
 	implementation("org.blubugtech.com:common-libs:2.0.0")
+
+	// 2. Spring Boot Core & Web
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	// 3. Spring Cloud & Discovery
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	implementation("org.springframework.cloud:spring-cloud-starter-config")
-	implementation("org.springframework.kafka:spring-kafka")
+
+	// 4. Data & Persistence
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
+	// 5. Messaging & Event Driven
+	implementation("org.springframework.kafka:spring-kafka")
+
+	// 7. Third-Party Utilities (Jackson, AWS, etc.)
 	implementation("software.amazon.awssdk:s3:2.25.27")
+
+	// 8. Tooling & Lombok
 	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
 	// runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-	annotationProcessor("org.projectlombok:lombok")
+	// 9. Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	// testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	// testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 	// testImplementation("org.testcontainers:junit-jupiter")
 	// testImplementation("org.testcontainers:postgresql")
-    runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 dependencyManagement {
