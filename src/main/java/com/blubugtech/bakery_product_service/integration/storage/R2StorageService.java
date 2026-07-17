@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.service;
+package com.blubugtech.bakery_product_service.integration.storage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @Service
 @RefreshScope
-public class R2StorageService {
+public class R2StorageService implements StorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(R2StorageService.class);
 

@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.inventory;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class InventoryUpdateRequestDto {
+public class InventoryUpdateRequest {
 
     // Getters and Setters
     @NotNull(message = "Current stock is required")
@@ -44,6 +44,6 @@ public class InventoryUpdateRequestDto {
     private String notes;
 
     // Constructors
-    public InventoryUpdateRequestDto() {}
+    public InventoryUpdateRequest() {}
 
 }

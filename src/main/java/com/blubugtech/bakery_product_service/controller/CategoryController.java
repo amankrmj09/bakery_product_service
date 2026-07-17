@@ -1,7 +1,7 @@
 package com.blubugtech.bakery_product_service.controller;
 
-import com.blubugtech.bakery_product_service.dto.CategoryRequestDto;
-import com.blubugtech.bakery_product_service.dto.CategoryResponseDto;
+import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
+import com.blubugtech.bakery_product_service.dto.category.CategoryResponse;
 import com.blubugtech.bakery_product_service.service.CategoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<Page<CategoryResponseDto>> getAllCategories(
+    public ResponseEntity<Page<CategoryResponse>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -47,7 +47,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponseDto> categories = categoryService.getAllCategories(pageable);
+        Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
 
         logger.info("Retrieved {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -55,7 +55,7 @@ public class CategoryController {
 
     // Get active categories only
     @GetMapping("/active")
-    public ResponseEntity<Page<CategoryResponseDto>> getActiveCategories(
+    public ResponseEntity<Page<CategoryResponse>> getActiveCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -65,7 +65,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponseDto> categories = categoryService.getActiveCategories(pageable);
+        Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
 
         logger.info("Retrieved {} active categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -73,7 +73,7 @@ public class CategoryController {
 
     // Get categories with products
     @GetMapping("/with-products")
-    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithProducts(
+    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -83,7 +83,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithProducts(pageable);
+        Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
 
         logger.info("Retrieved {} categories with products", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -91,7 +91,7 @@ public class CategoryController {
 
     // Get categories with active products
     @GetMapping("/with-active-products")
-    public ResponseEntity<Page<CategoryResponseDto>> getCategoriesWithActiveProducts(
+    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -101,7 +101,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponseDto> categories = categoryService.getCategoriesWithActiveProducts(pageable);
+        Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
 
         logger.info("Retrieved {} categories with active products", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -109,10 +109,10 @@ public class CategoryController {
 
     // Get category by ID
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable String categoryId) {
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String categoryId) {
         logger.info("Get category by ID request received: {}", categoryId);
 
-        CategoryResponseDto category = categoryService.getCategoryById(categoryId);
+        CategoryResponse category = categoryService.getCategoryById(categoryId);
 
         logger.info("Category retrieved: {}", category.getName());
         return ResponseEntity.ok(category);
@@ -121,10 +121,10 @@ public class CategoryController {
     // Create new category
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto request) {
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
         logger.info("Create category request received: {}", request.getName());
 
-        CategoryResponseDto category = categoryService.createCategory(request);
+        CategoryResponse category = categoryService.createCategory(request);
 
         logger.info("Category created successfully: {}", category.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
@@ -133,13 +133,13 @@ public class CategoryController {
     // Update category
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponseDto> updateCategory(
+    public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable String categoryId,
-            @Valid @RequestBody CategoryRequestDto request) {
+            @Valid @RequestBody CategoryRequest request) {
 
         logger.info("Update category request received: {}", categoryId);
 
-        CategoryResponseDto category = categoryService.updateCategory(categoryId, request);
+        CategoryResponse category = categoryService.updateCategory(categoryId, request);
 
         logger.info("Category updated successfully: {}", categoryId);
         return ResponseEntity.ok(category);
@@ -148,18 +148,18 @@ public class CategoryController {
     // Delete category
     @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> deleteCategory(@PathVariable String categoryId) {
+    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> deleteCategory(@PathVariable String categoryId) {
         logger.info("Delete category request received: {}", categoryId);
 
         categoryService.deleteCategory(categoryId);
 
         logger.info("Category deleted successfully: {}", categoryId);
-        return ResponseEntity.ok(new com.blubugtech.common.dto.MessageResponseDto("Category deleted successfully"));
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Category deleted successfully"));
     }
 
     // Search categories
     @GetMapping("/search")
-    public ResponseEntity<Page<CategoryResponseDto>> searchCategories(
+    public ResponseEntity<Page<CategoryResponse>> searchCategories(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -170,7 +170,7 @@ public class CategoryController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CategoryResponseDto> categories = categoryService.searchCategories(query, pageable);
+        Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
         logger.info("Search returned {} categories", categories.getContent().size());
         return ResponseEntity.ok(categories);
@@ -179,10 +179,10 @@ public class CategoryController {
     // Toggle category status
     @PostMapping("/{categoryId}/toggle-status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponseDto> toggleCategoryStatus(@PathVariable String categoryId) {
+    public ResponseEntity<CategoryResponse> toggleCategoryStatus(@PathVariable String categoryId) {
         logger.info("Toggle category status request received: {}", categoryId);
 
-        CategoryResponseDto category = categoryService.toggleCategoryStatus(categoryId);
+        CategoryResponse category = categoryService.toggleCategoryStatus(categoryId);
 
         logger.info("Category status toggled to {}: {}", category.getActive(), categoryId);
         return ResponseEntity.ok(category);
@@ -191,13 +191,13 @@ public class CategoryController {
     // Reorder categories
     @PostMapping("/reorder")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
+    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
         logger.info("Reorder categories request received for {} categories", categoryOrders.size());
 
         categoryService.reorderCategories(categoryOrders);
 
         logger.info("Categories reordered successfully");
-        return ResponseEntity.ok(new com.blubugtech.common.dto.MessageResponseDto("Categories reordered successfully"));
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Categories reordered successfully"));
     }
 
     // Get category statistics
@@ -214,7 +214,7 @@ public class CategoryController {
 
     // Health check
     @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> health() {
-        return ResponseEntity.ok(new com.blubugtech.common.dto.HealthResponseDto("UP", "product-service-categories"));
+    public ResponseEntity<com.blubugtech.common.contract.feign.HealthResponse> health() {
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.HealthResponse("UP", "product-service-categories"));
     }
 }

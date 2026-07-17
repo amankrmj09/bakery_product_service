@@ -1,6 +1,6 @@
-package com.blubugtech.bakery_product_service.repository;
+package com.blubugtech.bakery_product_service.search.repository;
 
-import com.blubugtech.bakery_product_service.document.ProductDocument;
+import com.blubugtech.bakery_product_service.search.document.ProductDocument;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

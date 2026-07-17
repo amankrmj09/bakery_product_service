@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CategoryRequestDto {
+public class CategoryRequest {
 
     // Getters and Setters
     @NotBlank(message = "Category name is required")
@@ -29,9 +29,9 @@ public class CategoryRequestDto {
     private String iconClass;
 
     // Constructors
-    public CategoryRequestDto() {}
+    public CategoryRequest() {}
 
-    public CategoryRequestDto(String name, String description, Integer displayOrder) {
+    public CategoryRequest(String name, String description, Integer displayOrder) {
         this.name = name;
         this.description = description;
         this.displayOrder = displayOrder;

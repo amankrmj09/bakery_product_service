@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.product;
 
 import com.blubugtech.bakery_product_service.entity.Product;
 import jakarta.validation.constraints.*;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProductRequestDto {
+public class ProductRequest {
 
     // Getters and Setters
     @NotBlank(message = "SKU is required")
@@ -79,6 +79,6 @@ public class ProductRequestDto {
     private Integer reorderLevel = 0;
 
     // Constructors
-    public ProductRequestDto() {}
+    public ProductRequest() {}
 
 }

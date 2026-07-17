@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.inventory;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StockAvailabilityResponseDto {
+public class StockAvailabilityResponse {
     private String productId;
     private Integer requestedQuantity;
     private Integer availableStock;

@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.inventory;
 
 import com.blubugtech.bakery_product_service.entity.Inventory;
 import com.blubugtech.bakery_product_service.entity.Product;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryResponseDto {
+public class InventoryResponse {
 
     private String id; // This can just be the product id since 1:1
     private String productId;
@@ -46,13 +46,13 @@ public class InventoryResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static InventoryResponseDto from(Product product) {
+    public static InventoryResponse from(Product product) {
         if (product == null || product.getInventory() == null) {
             return null;
         }
         
         Inventory inventory = product.getInventory();
-        InventoryResponseDto response = new InventoryResponseDto();
+        InventoryResponse response = new InventoryResponse();
         
         response.id = product.getId();
         response.productId = product.getId();

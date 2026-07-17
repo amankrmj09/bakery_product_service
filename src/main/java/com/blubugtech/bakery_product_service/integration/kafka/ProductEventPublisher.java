@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.service;
+package com.blubugtech.bakery_product_service.integration.kafka;
 
 import com.blubugtech.common.event.ProductEvent;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ public class ProductEventPublisher {
     }
     
     public void publishProductUpdated(ProductEvent event) {
-        logger.info("Publishing ProductUpdated event for product ID: {}", event.getProductId());
-        kafkaTemplate.send("product-events", event.getProductId().toString(), event);
+        logger.info("Publishing ProductUpdated event for product ID: {}", event.getEventId());
+        kafkaTemplate.send("product-events", event.getEventId().toString(), event);
     }
 }

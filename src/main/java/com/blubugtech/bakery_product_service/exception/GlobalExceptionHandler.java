@@ -8,14 +8,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.blubugtech.common.exception.ErrorResponseDto;
+import com.blubugtech.common.exception.handler.ErrorResponse;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.blubugtech.common.exception.BaseExceptionHandler;
+import com.blubugtech.common.exception.handler.BaseExceptionHandler;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends BaseExceptionHandler {
@@ -23,10 +23,10 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ProductServiceException.class)
-    public ResponseEntity<ErrorResponseDto> handleProductServiceException(ProductServiceException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceException ex, WebRequest request) {
         logger.error("Product service error: {}", ex.getMessage());
 
-        ErrorResponseDto error = new ErrorResponseDto(
+        ErrorResponse error = new ErrorResponse(
             "PRODUCT_SERVICE_ERROR",
             ex.getMessage(),
             LocalDateTime.now(),
@@ -39,10 +39,10 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     
 
     @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<ErrorResponseDto> handleInsufficientStockException(InsufficientStockException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException ex, WebRequest request) {
         logger.error("Insufficient stock error: {}", ex.getMessage());
 
-        ErrorResponseDto error = new ErrorResponseDto(
+        ErrorResponse error = new ErrorResponse(
             "INSUFFICIENT_STOCK",
             ex.getMessage(),
             LocalDateTime.now(),
@@ -70,8 +70,8 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     
     
     @ExceptionHandler(InvalidQuantityException.class)
-    public ResponseEntity<ErrorResponseDto> handleInvalidQuantityException(InvalidQuantityException ex, WebRequest request) {
-        ErrorResponseDto error = new ErrorResponseDto("INVALID_QUANTITY", ex.getMessage(), LocalDateTime.now(), request.getDescription(false));
+    public ResponseEntity<ErrorResponse> handleInvalidQuantityException(InvalidQuantityException ex, WebRequest request) {
+        ErrorResponse error = new ErrorResponse("INVALID_QUANTITY", ex.getMessage(), LocalDateTime.now(), request.getDescription(false));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

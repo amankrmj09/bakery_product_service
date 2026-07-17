@@ -1,5 +1,6 @@
 package com.blubugtech.bakery_product_service.controller;
 
+import com.blubugtech.common.contract.feign.HealthResponse;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,8 @@ public class HealthController {
 
     // Main service health check
     @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> health() {
-        com.blubugtech.common.dto.HealthResponseDto response = new com.blubugtech.common.dto.HealthResponseDto("UP", "bakery-product-service");
+    public ResponseEntity<HealthResponse> health() {
+         HealthResponse response = new  HealthResponse("UP", "bakery-product-service");
         Map<String, Object> details = new HashMap<>();
         details.put("version", "1.0.0");
 

@@ -1,7 +1,7 @@
 package com.blubugtech.bakery_product_service.controller;
 
-import com.blubugtech.bakery_product_service.dto.InventoryResponseDto;
-import com.blubugtech.bakery_product_service.dto.InventoryUpdateRequestDto;
+import com.blubugtech.bakery_product_service.dto.inventory.InventoryResponse;
+import com.blubugtech.bakery_product_service.dto.inventory.InventoryUpdateRequest;
 import com.blubugtech.bakery_product_service.service.InventoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class InventoryController {
     // Get all inventory items
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getAllInventory(
+    public ResponseEntity<Page<InventoryResponse>> getAllInventory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -45,7 +45,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> inventory = inventoryService.getAllInventory(pageable);
+        Page<InventoryResponse> inventory = inventoryService.getAllInventory(pageable);
 
         logger.info("Retrieved {} inventory items", inventory.getContent().size());
         return ResponseEntity.ok(inventory);
@@ -53,10 +53,10 @@ public class InventoryController {
 
     // Get inventory by product ID
     @GetMapping("/product/{productId}")
-    public ResponseEntity<InventoryResponseDto> getInventoryByProductId(@PathVariable String productId) {
+    public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable String productId) {
         logger.info("Get inventory by product ID request received: {}", productId);
 
-        InventoryResponseDto inventory = inventoryService.getInventoryByProductId(productId);
+        InventoryResponse inventory = inventoryService.getInventoryByProductId(productId);
 
         logger.info("Inventory retrieved for product: {}", productId);
         return ResponseEntity.ok(inventory);
@@ -64,7 +64,7 @@ public class InventoryController {
 
     // Get inventory by product SKU
     @GetMapping("/sku/{sku}")
-    public ResponseEntity<InventoryResponseDto> getInventoryByProductSku(@PathVariable String sku) {
+    public ResponseEntity<InventoryResponse> getInventoryByProductSku(@PathVariable String sku) {
         logger.info("Get inventory by product SKU request received: {}", sku);
 
         return inventoryService.getInventoryByProductSku(sku)
@@ -78,7 +78,7 @@ public class InventoryController {
     // Get low stock items
     @GetMapping("/low-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getLowStockItems(
+    public ResponseEntity<Page<InventoryResponse>> getLowStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -87,7 +87,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> lowStockItems = inventoryService.getLowStockItems(pageable);
+        Page<InventoryResponse> lowStockItems = inventoryService.getLowStockItems(pageable);
 
         logger.info("Retrieved {} low stock items", lowStockItems.getContent().size());
         return ResponseEntity.ok(lowStockItems);
@@ -96,7 +96,7 @@ public class InventoryController {
     // Get out of stock items
     @GetMapping("/out-of-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getOutOfStockItems(
+    public ResponseEntity<Page<InventoryResponse>> getOutOfStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -105,7 +105,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
+        Page<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
 
         logger.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
         return ResponseEntity.ok(outOfStockItems);
@@ -114,7 +114,7 @@ public class InventoryController {
     // Get items needing reorder
     @GetMapping("/needs-reorder")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getItemsNeedingReorder(
+    public ResponseEntity<Page<InventoryResponse>> getItemsNeedingReorder(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -123,7 +123,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
+        Page<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
 
         logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
         return ResponseEntity.ok(itemsNeedingReorder);
@@ -132,7 +132,7 @@ public class InventoryController {
     // Get expired items
     @GetMapping("/expired")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getExpiredItems(
+    public ResponseEntity<Page<InventoryResponse>> getExpiredItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -141,7 +141,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> expiredItems = inventoryService.getExpiredItems(pageable);
+        Page<InventoryResponse> expiredItems = inventoryService.getExpiredItems(pageable);
 
         logger.info("Retrieved {} expired items", expiredItems.getContent().size());
         return ResponseEntity.ok(expiredItems);
@@ -150,7 +150,7 @@ public class InventoryController {
     // Get items expiring soon
     @GetMapping("/expiring-soon")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponseDto>> getItemsExpiringSoon(
+    public ResponseEntity<Page<InventoryResponse>> getItemsExpiringSoon(
             @RequestParam(defaultValue = "24") int hours,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -160,7 +160,7 @@ public class InventoryController {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<InventoryResponseDto> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
+        Page<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
 
         logger.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
         return ResponseEntity.ok(expiringSoonItems);
@@ -169,13 +169,13 @@ public class InventoryController {
     // Update inventory
     @PutMapping("/product/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<InventoryResponseDto> updateInventory(
+    public ResponseEntity<InventoryResponse> updateInventory(
             @PathVariable String productId,
-            @Valid @RequestBody InventoryUpdateRequestDto request) {
+            @Valid @RequestBody InventoryUpdateRequest request) {
 
         logger.info("Update inventory request received for product: {}", productId);
 
-        InventoryResponseDto inventory = inventoryService.updateInventory(productId, request);
+        InventoryResponse inventory = inventoryService.updateInventory(productId, request);
 
         logger.info("Inventory updated successfully for product: {}", productId);
         return ResponseEntity.ok(inventory);
@@ -184,7 +184,7 @@ public class InventoryController {
     // Add stock (restock)
     @PostMapping("/product/{productId}/add-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<InventoryResponseDto> addStock(
+    public ResponseEntity<InventoryResponse> addStock(
             @PathVariable String productId,
             @RequestBody Map<String, Object> request) {
 
@@ -193,7 +193,7 @@ public class InventoryController {
         Integer quantity = (Integer) request.get("quantity");
         String notes = (String) request.get("notes");
 
-        InventoryResponseDto inventory = inventoryService.addStock(productId, quantity, notes);
+        InventoryResponse inventory = inventoryService.addStock(productId, quantity, notes);
 
         logger.info("Stock added successfully: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(inventory);
@@ -201,7 +201,7 @@ public class InventoryController {
 
     // Reserve stock
     @PostMapping("/product/{productId}/reserve")
-    public ResponseEntity<com.blubugtech.bakery_product_service.dto.StockOperationResponseDto> reserveStock(
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> reserveStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -210,7 +210,7 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         boolean success = inventoryService.reserveStock(productId, quantity);
 
-        com.blubugtech.bakery_product_service.dto.StockOperationResponseDto response = new com.blubugtech.bakery_product_service.dto.StockOperationResponseDto();
+        com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse();
         response.setSuccess(success);
         response.setProductId(productId);
         response.setQuantity(quantity);
@@ -228,7 +228,7 @@ public class InventoryController {
 
     // Release reserved stock
     @PostMapping("/product/{productId}/release-reserved")
-    public ResponseEntity<com.blubugtech.bakery_product_service.dto.StockOperationResponseDto> releaseReservedStock(
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> releaseReservedStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -237,7 +237,7 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         inventoryService.releaseReservedStock(productId, quantity);
 
-        com.blubugtech.bakery_product_service.dto.StockOperationResponseDto response = new com.blubugtech.bakery_product_service.dto.StockOperationResponseDto(true, productId, quantity, "Reserved stock released successfully");
+        com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Reserved stock released successfully");
 
         logger.info("Reserved stock released: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
@@ -246,7 +246,7 @@ public class InventoryController {
     // Consume stock
     @PostMapping("/product/{productId}/consume")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.bakery_product_service.dto.StockOperationResponseDto> consumeStock(
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> consumeStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
@@ -255,7 +255,7 @@ public class InventoryController {
         Integer quantity = request.get("quantity");
         inventoryService.consumeStock(productId, quantity);
 
-        com.blubugtech.bakery_product_service.dto.StockOperationResponseDto response = new com.blubugtech.bakery_product_service.dto.StockOperationResponseDto(true, productId, quantity, "Stock consumed successfully");
+        com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Stock consumed successfully");
 
         logger.info("Stock consumed: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
@@ -263,7 +263,7 @@ public class InventoryController {
 
     // Check stock availability
     @GetMapping("/product/{productId}/availability")
-    public ResponseEntity<com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto> checkStockAvailability(
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse> checkStockAvailability(
             @PathVariable String productId,
             @RequestParam Integer quantity) {
 
@@ -273,19 +273,19 @@ public class InventoryController {
         boolean available = inventoryService.checkStockAvailability(productId, quantity);
         Integer availableStock = inventoryService.getAvailableStock(productId);
 
-        com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto response = new com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto(productId, quantity, availableStock, available);
+        com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse(productId, quantity, availableStock, available);
 
         return ResponseEntity.ok(response);
     }
 
     // Get available stock for a product
     @GetMapping("/product/{productId}/available-stock")
-    public ResponseEntity<com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto> getAvailableStock(@PathVariable String productId) {
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse> getAvailableStock(@PathVariable String productId) {
         logger.info("Get available stock request received for product: {}", productId);
 
         Integer availableStock = inventoryService.getAvailableStock(productId);
 
-        com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto response = new com.blubugtech.bakery_product_service.dto.StockAvailabilityResponseDto(productId, null, availableStock, null);
+        com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse(productId, null, availableStock, null);
 
         return ResponseEntity.ok(response);
     }
@@ -293,7 +293,7 @@ public class InventoryController {
     // Bulk update minimum stock levels
     @PostMapping("/bulk-update-minimum-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> bulkUpdateMinimumStock(
+    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> bulkUpdateMinimumStock(
             @RequestBody Map<String, Integer> productMinimumStocks) {
 
         logger.info("Bulk update minimum stock request received for {} products",
@@ -302,7 +302,7 @@ public class InventoryController {
         inventoryService.bulkUpdateMinimumStock(productMinimumStocks);
 
         logger.info("Bulk minimum stock update completed for {} products", productMinimumStocks.size());
-        return ResponseEntity.ok(new com.blubugtech.common.dto.MessageResponseDto("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
     }
 
     // Get inventory statistics
@@ -319,7 +319,7 @@ public class InventoryController {
 
     // Health check
     @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> health() {
-        return ResponseEntity.ok(new com.blubugtech.common.dto.HealthResponseDto("UP", "product-service-inventory"));
+    public ResponseEntity<com.blubugtech.common.contract.feign.HealthResponse> health() {
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.HealthResponse("UP", "product-service-inventory"));
     }
 }

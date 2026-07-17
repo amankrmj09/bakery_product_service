@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.product;
 
 import com.blubugtech.bakery_product_service.entity.Product;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ProductResponseDto {
+public class ProductResponse {
 
     // Getters and Setters
     private String id;
@@ -42,11 +42,11 @@ public class ProductResponseDto {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public ProductResponseDto() {}
+    public ProductResponse() {}
 
     // Static factory method
-    public static ProductResponseDto from(Product product) {
-        ProductResponseDto response = new ProductResponseDto();
+    public static ProductResponse from(Product product) {
+        ProductResponse response = new ProductResponse();
         response.id = product.getId();
         response.sku = product.getSku();
         response.name = product.getName();

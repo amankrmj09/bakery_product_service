@@ -1,17 +1,17 @@
-package com.blubugtech.bakery_product_service.dto;
+package com.blubugtech.bakery_product_service.dto.inventory;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MediaUploadResponseDto {
+public class StockOperationResponse {
+    private Boolean success;
+    private String productId;
+    private Integer quantity;
     private String message;
-    private List<String> urls;
 }
