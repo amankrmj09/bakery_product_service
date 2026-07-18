@@ -4,69 +4,28 @@ This document provides a comprehensive reference to the Bakery Product Service R
 
 ---
 
-## 1. Health & System
-**Base Path:** `/api`
+## 1. System & Monitoring (Actuator)
+**Base Path:** `/actuator`
 
-### 1.1 Main Service Health Check
+Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
+
+### 1.1 Health Check
 - **Method:** `GET`
-- **Path:** `/api/health`
+- **Path:** `/actuator/health`
 - **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "status": "UP",
-    "service": "bakery-product-service",
-    "timestamp": "2023-10-10T12:00:00",
-    "version": "1.0.0",
-    "database": "UP",
-    "databaseName": "bakery_products"
-  }
-  ```
+- **Response Body:** `200 OK` (Standard Actuator Health JSON)
 
 ### 1.2 Service Info
 - **Method:** `GET`
-- **Path:** `/api/info`
+- **Path:** `/actuator/info`
 - **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "serviceName": "Bakery Product Service",
-    "description": "Product catalog and inventory management service",
-    "version": "1.0.0",
-    "features": {
-      "categories": "Product category management",
-      "products": "Product catalog management",
-      "inventory": "Stock and inventory tracking",
-      "search": "Advanced product search and filtering"
-    },
-    "endpoints": {
-      "categories": "/api/categories",
-      "products": "/api/products",
-      "inventory": "/api/inventory"
-    }
-  }
-  ```
+- **Response Body:** `200 OK` (Standard Actuator Info JSON)
 
-### 1.3 Service Metrics
+### 1.3 Prometheus Metrics
 - **Method:** `GET`
-- **Path:** `/api/metrics`
+- **Path:** `/actuator/prometheus`
 - **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "uptime": "1 days, 2 hours, 30 minutes, 15 seconds",
-    "timestamp": "2023-10-10T12:00:00",
-    "memory": {
-      "maxMemory": "512 MB",
-      "totalMemory": "256 MB",
-      "freeMemory": "128 MB",
-      "usedMemory": "128 MB"
-    }
-  }
-  ```
+- **Response Body:** `200 OK` (Prometheus Text Format)
 
 ---
 
@@ -195,18 +154,6 @@ This document provides a comprehensive reference to the Bakery Product Service R
 - **Response Body:** `200 OK`
   `Map<String, Object>`
 
-### 2.13 Category health check
-- **Method:** `GET`
-- **Path:** `/api/categories/health`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "status": "UP",
-    "service": "product-service-categories"
-  }
-  ```
 
 ---
 
@@ -428,18 +375,6 @@ This document provides a comprehensive reference to the Bakery Product Service R
 - **Response Body:** `200 OK`
   `Map<String, Object>`
 
-### 3.24 Product health check
-- **Method:** `GET`
-- **Path:** `/api/products/health`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "status": "UP",
-    "service": "product-service-products"
-  }
-  ```
 
 ---
 
@@ -457,7 +392,7 @@ This document provides a comprehensive reference to the Bakery Product Service R
 ### 4.2 Get inventory for specific product
 - **Method:** `GET`
 - **Path:** `/api/inventory/product/{productId}`
-- **Type of API:** `Admin`
+- **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   `InventoryResponseDto`
@@ -465,7 +400,7 @@ This document provides a comprehensive reference to the Bakery Product Service R
 ### 4.3 Get inventory by SKU
 - **Method:** `GET`
 - **Path:** `/api/inventory/sku/{sku}`
-- **Type of API:** `Admin`
+- **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   `InventoryResponseDto`
@@ -652,18 +587,6 @@ This document provides a comprehensive reference to the Bakery Product Service R
 - **Response Body:** `200 OK`
   `Map<String, Object>`
 
-### 4.18 Inventory health check
-- **Method:** `GET`
-- **Path:** `/api/inventory/health`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "status": "UP",
-    "service": "product-service-inventory"
-  }
-  ```
 
 ---
 
@@ -681,7 +604,7 @@ This document provides a comprehensive reference to the Bakery Product Service R
 ### 5.2 Update frontpage config
 - **Method:** `PUT`
 - **Path:** `/api/site-config/frontpage`
-- **Type of API:** `Admin`
+- **Type of API:** `Public`
 - **Request Body:** `SiteConfig`
 - **Response Body:** `200 OK`
   `SiteConfig`
@@ -694,7 +617,7 @@ This document provides a comprehensive reference to the Bakery Product Service R
 ### 6.1 Upload media
 - **Method:** `POST`
 - **Path:** `/api/uploads/media`
-- **Type of API:** `Admin`
+- **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   ```json
