@@ -22,7 +22,12 @@ public class ProductResponse {
     private CategorySummary category;
     private BigDecimal price;
     private BigDecimal discountPrice;
+    private BigDecimal costPrice;
     private BigDecimal effectivePrice;
+    private String taxClass;
+    private String metaTitle;
+    private String metaDescription;
+    private Integer maxOrderQuantity;
     private Product.ProductStatus status;
     private Boolean isFeatured;
     private Integer preparationTimeMinutes;
@@ -55,7 +60,12 @@ public class ProductResponse {
         response.category = CategorySummary.from(product.getCategory());
         response.price = product.getPrice();
         response.discountPrice = product.getDiscountPrice();
+        response.costPrice = product.getCostPrice();
         response.effectivePrice = product.getEffectivePrice();
+        response.taxClass = product.getTaxClass();
+        response.metaTitle = product.getMetaTitle();
+        response.metaDescription = product.getMetaDescription();
+        response.maxOrderQuantity = product.getMaxOrderQuantity();
         response.status = product.getStatus();
         response.isFeatured = product.getIsFeatured();
         response.preparationTimeMinutes = product.getPreparationTimeMinutes();

@@ -29,11 +29,13 @@ public class CategoryServiceImpl implements CategoryService {
     final private CategoryRepository categoryRepository;
     final private com.blubugtech.bakery_product_service.repository.ProductRepository productRepository;
     final private CategoryMapper categoryMapper;
+    final private com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, com.blubugtech.bakery_product_service.repository.ProductRepository productRepository, CategoryMapper categoryMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, com.blubugtech.bakery_product_service.repository.ProductRepository productRepository, CategoryMapper categoryMapper, com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.categoryMapper = categoryMapper;
+        this.categorySearchService = categorySearchService;
     }
 
     public CategoryResponse createCategory(CategoryRequest request) {
@@ -55,6 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setIconClass(request.getIconClass());
 
         Category savedCategory = categoryRepository.save(category);
+        syncToElasticsearch(savedCategory);
         return categoryMapper.toResponse(savedCategory);
     }
 
@@ -104,6 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setIconClass(request.getIconClass());
 
         Category updatedCategory = categoryRepository.save(category);
+        syncToElasticsearch(updatedCategory);
         return categoryMapper.toResponse(updatedCategory);
     }
 
@@ -116,11 +120,20 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryRepository.delete(category);
+        deleteFromElasticsearch(categoryId);
     }
 
     public Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable) {
-        return categoryRepository.searchByName(searchTerm, pageable)
-                .map(categoryMapper::toResponse);
+        org.springframework.data.domain.Page<com.blubugtech.bakery_product_service.search.document.CategoryDocument> searchResults = categorySearchService.searchCategories(searchTerm, pageable);
+        List<String> ids = searchResults.getContent().stream().map(com.blubugtech.bakery_product_service.search.document.CategoryDocument::getId).collect(Collectors.toList());
+        List<Category> categories = (List<Category>) categoryRepository.findAllById(ids);
+        Map<String, Category> categoryMap = categories.stream().collect(Collectors.toMap(Category::getId, c -> c));
+        List<CategoryResponse> responses = ids.stream()
+                .map(categoryMap::get)
+                .filter(java.util.Objects::nonNull)
+                .map(categoryMapper::toResponse)
+                .collect(Collectors.toList());
+        return new org.springframework.data.domain.PageImpl<>(responses, pageable, searchResults.getTotalElements());
     }
 
     public CategoryResponse toggleCategoryStatus(String categoryId) {
@@ -129,6 +142,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         category.setActive(!category.getActive());
         Category updatedCategory = categoryRepository.save(category);
+        syncToElasticsearch(updatedCategory);
 
         return categoryMapper.toResponse(updatedCategory);
     }
@@ -142,7 +156,8 @@ public class CategoryServiceImpl implements CategoryService {
                     .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
 
             category.setDisplayOrder(newOrder);
-            categoryRepository.save(category);
+            Category saved = categoryRepository.save(category);
+            syncToElasticsearch(saved);
         }
     }
 
@@ -164,5 +179,21 @@ public class CategoryServiceImpl implements CategoryService {
     public Category getCategoryEntity(String categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
+    }
+
+    private void syncToElasticsearch(Category category) {
+        try {
+            categorySearchService.indexCategory(category);
+        } catch (Exception e) {
+            logger.error("Failed to sync category {} to Elasticsearch: {}", category.getId(), e.getMessage());
+        }
+    }
+
+    private void deleteFromElasticsearch(String categoryId) {
+        try {
+            categorySearchService.deleteCategoryFromIndex(categoryId);
+        } catch (Exception e) {
+            logger.error("Failed to delete category {} from Elasticsearch: {}", categoryId, e.getMessage());
+        }
     }
 }

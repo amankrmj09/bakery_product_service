@@ -23,14 +23,20 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     public void indexProduct(Product product) {
         ProductDocument doc = new ProductDocument();
         doc.setId(product.getId().toString());
+        doc.setSku(product.getSku());
         doc.setName(product.getName());
         doc.setDescription(product.getDescription());
         if (product.getCategory() != null) {
-            
             doc.setCategoryName(product.getCategory().getName());
         }
         doc.setPrice(product.getPrice());
         doc.setStatus(product.getStatus().name());
+        doc.setTags(product.getTags());
+        doc.setCostPrice(product.getCostPrice());
+        doc.setTaxClass(product.getTaxClass());
+        doc.setMetaTitle(product.getMetaTitle());
+        doc.setMetaDescription(product.getMetaDescription());
+        doc.setMaxOrderQuantity(product.getMaxOrderQuantity());
         searchRepository.save(doc);
     }
 

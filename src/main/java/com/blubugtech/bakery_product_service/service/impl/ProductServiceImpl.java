@@ -98,6 +98,11 @@ public class ProductServiceImpl implements ProductService {
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
         product.setMediaUrls(request.getMediaUrls());
+        product.setCostPrice(request.getCostPrice());
+        product.setTaxClass(request.getTaxClass());
+        product.setMetaTitle(request.getMetaTitle());
+        product.setMetaDescription(request.getMetaDescription());
+        product.setMaxOrderQuantity(request.getMaxOrderQuantity());
 
         Product savedProduct = productRepository.save(product);
 
@@ -277,6 +282,11 @@ public class ProductServiceImpl implements ProductService {
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
         product.setMediaUrls(request.getMediaUrls());
+        product.setCostPrice(request.getCostPrice());
+        product.setTaxClass(request.getTaxClass());
+        product.setMetaTitle(request.getMetaTitle());
+        product.setMetaDescription(request.getMetaDescription());
+        product.setMaxOrderQuantity(request.getMaxOrderQuantity());
 
         Product updatedProduct = productRepository.save(product);
         

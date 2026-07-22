@@ -41,6 +41,22 @@ public class ProductRequest {
     @Digits(integer = 8, fraction = 2, message = "Invalid discount price format")
     private BigDecimal discountPrice;
 
+    @DecimalMin(value = "0.00", message = "Cost price cannot be negative")
+    @Digits(integer = 8, fraction = 2, message = "Invalid cost price format")
+    private BigDecimal costPrice;
+
+    @Size(max = 50, message = "Tax class must not exceed 50 characters")
+    private String taxClass = "STANDARD";
+
+    @Size(max = 100, message = "Meta title must not exceed 100 characters")
+    private String metaTitle;
+
+    @Size(max = 255, message = "Meta description must not exceed 255 characters")
+    private String metaDescription;
+
+    @Min(value = 1, message = "Max order quantity must be at least 1")
+    private Integer maxOrderQuantity;
+
     private Product.ProductStatus status = Product.ProductStatus.ACTIVE;
 
     private Boolean isFeatured = false;
