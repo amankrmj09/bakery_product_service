@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "site_configs")
-public class SiteConfig {
+@Document(collection = "storefront")
+public class Storefront {
     @Id
     private String id;
     
@@ -29,24 +29,14 @@ public class SiteConfig {
     @AllArgsConstructor
     @Builder
     public static class HeroSection {
-        private String tag;
-        private String headline;
-        private String subtitle;
-        private String heroImageUrl;
-        private SideCard sideCard1;
-        private SideCard sideCard2;
+        private List<Campaign> campaigns;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class SideCard {
-        private String subtitle;
-        private String title;
-        private String price;
-        private String imageUrl;
-    }
+    public static class Campaign { private String largeImageUrl; private String smallImageUrl; }
 
     @Data
     @NoArgsConstructor
@@ -93,3 +83,4 @@ public class SiteConfig {
         private String authorImageUrl;
     }
 }
+
