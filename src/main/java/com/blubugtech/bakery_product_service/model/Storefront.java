@@ -36,7 +36,12 @@ public class Storefront {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class Campaign { private String largeImageUrl; private String smallImageUrl; }
+    public static class Campaign { 
+        private String largeImageUrl; 
+        private String smallImageUrl; 
+        private String title;
+        private String description;
+    }
 
     @Data
     @NoArgsConstructor
@@ -65,8 +70,18 @@ public class Storefront {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    public static class SpecialOffer {
+        private String imageUrl;
+        private String title;
+        private String description;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class SpecialOfferSection {
-        private List<String> images;
+        private List<SpecialOffer> offers;
     }
 
     @Data
