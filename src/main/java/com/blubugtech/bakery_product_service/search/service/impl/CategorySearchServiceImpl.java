@@ -6,6 +6,7 @@ import com.blubugtech.bakery_product_service.search.repository.CategorySearchRep
 import com.blubugtech.bakery_product_service.search.service.CategorySearchService;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
