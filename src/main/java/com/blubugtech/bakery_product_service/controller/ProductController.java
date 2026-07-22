@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,7 +41,7 @@ public class ProductController {
 
     // Get all products
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getAllProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -52,12 +53,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getAllProducts(pageable);
 
         logger.info("Retrieved {} products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get active products
     @GetMapping("/active")
-    public ResponseEntity<Page<ProductResponse>> getActiveProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> getActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -69,12 +70,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getActiveProducts(pageable);
 
         logger.info("Retrieved {} active products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get available products (active with stock)
     @GetMapping("/available")
-    public ResponseEntity<Page<ProductResponse>> getAvailableProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> getAvailableProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -86,12 +87,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getAvailableProducts(pageable);
 
         logger.info("Retrieved {} available products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get featured products
     @GetMapping("/featured")
-    public ResponseEntity<Page<ProductResponse>> getFeaturedProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> getFeaturedProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -103,12 +104,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getFeaturedProducts(pageable);
 
         logger.info("Retrieved {} featured products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get products on sale
     @GetMapping("/on-sale")
-    public ResponseEntity<Page<ProductResponse>> getProductsOnSale(
+    public ResponseEntity<PagedModel<ProductResponse>> getProductsOnSale(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -120,12 +121,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsOnSale(pageable);
 
         logger.info("Retrieved {} products on sale", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get recently added products
     @GetMapping("/recent")
-    public ResponseEntity<Page<ProductResponse>> getRecentlyAddedProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> getRecentlyAddedProducts(
             @RequestParam(defaultValue = "7") int days,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -138,7 +139,7 @@ public class ProductController {
         Page<ProductResponse> products = productService.getRecentlyAddedProducts(days, pageable);
 
         logger.info("Retrieved {} recently added products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get product by ID
@@ -187,7 +188,7 @@ public class ProductController {
 
     // Get products by category
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<Page<ProductResponse>> getProductsByCategory(
+    public ResponseEntity<PagedModel<ProductResponse>> getProductsByCategory(
             @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -200,12 +201,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsByCategory(categoryId, pageable);
 
         logger.info("Retrieved {} products for category", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Search products
     @GetMapping("/search")
-    public ResponseEntity<Page<ProductResponse>> searchProducts(
+    public ResponseEntity<PagedModel<ProductResponse>> searchProducts(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -218,12 +219,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.searchProducts(query, pageable);
 
         logger.info("Search returned {} products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get products by price range
     @GetMapping("/price-range")
-    public ResponseEntity<Page<ProductResponse>> getProductsByPriceRange(
+    public ResponseEntity<PagedModel<ProductResponse>> getProductsByPriceRange(
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
@@ -237,12 +238,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsByPriceRange(minPrice, maxPrice, pageable);
 
         logger.info("Retrieved {} products in price range", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get products by tag
     @GetMapping("/tag/{tag}")
-    public ResponseEntity<Page<ProductResponse>> getProductsByTag(
+    public ResponseEntity<PagedModel<ProductResponse>> getProductsByTag(
             @PathVariable String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -255,12 +256,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsByTag(tag, pageable);
 
         logger.info("Retrieved {} products with tag", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get products without allergen
     @GetMapping("/without-allergen/{allergen}")
-    public ResponseEntity<Page<ProductResponse>> getProductsWithoutAllergen(
+    public ResponseEntity<PagedModel<ProductResponse>> getProductsWithoutAllergen(
             @PathVariable String allergen,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -273,12 +274,12 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsWithoutAllergen(allergen, pageable);
 
         logger.info("Retrieved {} products without allergen", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Advanced search with filters
     @GetMapping("/filter")
-    public ResponseEntity<Page<ProductResponse>> searchProductsWithFilters(
+    public ResponseEntity<PagedModel<ProductResponse>> searchProductsWithFilters(
             @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) Product.ProductStatus status,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -297,7 +298,7 @@ public class ProductController {
                 categoryId, status, minPrice, maxPrice, inStock, pageable);
 
         logger.info("Filter search returned {} products", products.getContent().size());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Create new product

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<Page<CategoryResponse>> getAllCategories(
+    public ResponseEntity<PagedModel<CategoryResponse>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -50,12 +51,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
 
         logger.info("Retrieved {} categories", categories.getContent().size());
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
     // Get active categories only
     @GetMapping("/active")
-    public ResponseEntity<Page<CategoryResponse>> getActiveCategories(
+    public ResponseEntity<PagedModel<CategoryResponse>> getActiveCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -68,12 +69,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
 
         logger.info("Retrieved {} active categories", categories.getContent().size());
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
     // Get categories with products
     @GetMapping("/with-products")
-    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithProducts(
+    public ResponseEntity<PagedModel<CategoryResponse>> getCategoriesWithProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -86,12 +87,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
 
         logger.info("Retrieved {} categories with products", categories.getContent().size());
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
     // Get categories with active products
     @GetMapping("/with-active-products")
-    public ResponseEntity<Page<CategoryResponse>> getCategoriesWithActiveProducts(
+    public ResponseEntity<PagedModel<CategoryResponse>> getCategoriesWithActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -104,7 +105,7 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
 
         logger.info("Retrieved {} categories with active products", categories.getContent().size());
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
     // Get category by ID
@@ -159,7 +160,7 @@ public class CategoryController {
 
     // Search categories
     @GetMapping("/search")
-    public ResponseEntity<Page<CategoryResponse>> searchCategories(
+    public ResponseEntity<PagedModel<CategoryResponse>> searchCategories(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -173,7 +174,7 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
         logger.info("Search returned {} categories", categories.getContent().size());
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
     // Toggle category status

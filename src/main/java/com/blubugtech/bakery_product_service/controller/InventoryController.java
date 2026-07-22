@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class InventoryController {
     // Get all inventory items
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getAllInventory(
+    public ResponseEntity<PagedModel<InventoryResponse>> getAllInventory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -48,7 +49,7 @@ public class InventoryController {
         Page<InventoryResponse> inventory = inventoryService.getAllInventory(pageable);
 
         logger.info("Retrieved {} inventory items", inventory.getContent().size());
-        return ResponseEntity.ok(inventory);
+        return ResponseEntity.ok(new PagedModel<>(inventory));
     }
 
     // Get inventory by product ID
@@ -78,7 +79,7 @@ public class InventoryController {
     // Get low stock items
     @GetMapping("/low-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getLowStockItems(
+    public ResponseEntity<PagedModel<InventoryResponse>> getLowStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -90,13 +91,13 @@ public class InventoryController {
         Page<InventoryResponse> lowStockItems = inventoryService.getLowStockItems(pageable);
 
         logger.info("Retrieved {} low stock items", lowStockItems.getContent().size());
-        return ResponseEntity.ok(lowStockItems);
+        return ResponseEntity.ok(new PagedModel<>(lowStockItems));
     }
 
     // Get out of stock items
     @GetMapping("/out-of-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getOutOfStockItems(
+    public ResponseEntity<PagedModel<InventoryResponse>> getOutOfStockItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -108,13 +109,13 @@ public class InventoryController {
         Page<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
 
         logger.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
-        return ResponseEntity.ok(outOfStockItems);
+        return ResponseEntity.ok(new PagedModel<>(outOfStockItems));
     }
 
     // Get items needing reorder
     @GetMapping("/needs-reorder")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getItemsNeedingReorder(
+    public ResponseEntity<PagedModel<InventoryResponse>> getItemsNeedingReorder(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -126,13 +127,13 @@ public class InventoryController {
         Page<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
 
         logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
-        return ResponseEntity.ok(itemsNeedingReorder);
+        return ResponseEntity.ok(new PagedModel<>(itemsNeedingReorder));
     }
 
     // Get expired items
     @GetMapping("/expired")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getExpiredItems(
+    public ResponseEntity<PagedModel<InventoryResponse>> getExpiredItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -144,13 +145,13 @@ public class InventoryController {
         Page<InventoryResponse> expiredItems = inventoryService.getExpiredItems(pageable);
 
         logger.info("Retrieved {} expired items", expiredItems.getContent().size());
-        return ResponseEntity.ok(expiredItems);
+        return ResponseEntity.ok(new PagedModel<>(expiredItems));
     }
 
     // Get items expiring soon
     @GetMapping("/expiring-soon")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<InventoryResponse>> getItemsExpiringSoon(
+    public ResponseEntity<PagedModel<InventoryResponse>> getItemsExpiringSoon(
             @RequestParam(defaultValue = "24") int hours,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -163,7 +164,7 @@ public class InventoryController {
         Page<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
 
         logger.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
-        return ResponseEntity.ok(expiringSoonItems);
+        return ResponseEntity.ok(new PagedModel<>(expiringSoonItems));
     }
 
     // Update inventory
