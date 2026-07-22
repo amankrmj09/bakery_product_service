@@ -76,7 +76,17 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     
-
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(org.springframework.web.multipart.MaxUploadSizeExceededException exc, WebRequest request) {
+        logger.error("Upload size exceeded: {}", exc.getMessage());
+        ErrorResponse error = new ErrorResponse(
+            "PAYLOAD_TOO_LARGE",
+            "File size exceeds the configured maximum limit (50MB).",
+            LocalDateTime.now(),
+            request.getDescription(false)
+        );
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
+    }
 
 }
 
