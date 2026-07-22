@@ -66,10 +66,7 @@ public class Storefront {
     @AllArgsConstructor
     @Builder
     public static class SpecialOfferSection {
-        private String tag;
-        private String headline;
-        private String description;
-        private String imageUrl;
+        private List<String> images;
     }
 
     @Data
