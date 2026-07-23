@@ -48,6 +48,9 @@ public class ProductRequest {
     @Size(max = 50, message = "Tax class must not exceed 50 characters")
     private String taxClass = "STANDARD";
 
+    @DecimalMin(value = "0.00", message = "Tax rate cannot be negative")
+    private BigDecimal taxRate;
+
     @Size(max = 100, message = "Meta title must not exceed 100 characters")
     private String metaTitle;
 

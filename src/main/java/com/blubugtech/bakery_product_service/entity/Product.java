@@ -65,6 +65,10 @@ public class Product {
     @Size(max = 50, message = "Tax class must not exceed 50 characters")
     private String taxClass = "STANDARD";
 
+    @Field("tax_rate")
+    @DecimalMin(value = "0.00", message = "Tax rate cannot be negative")
+    private BigDecimal taxRate = new BigDecimal("0.08");
+
     @Field("meta_title")
     @Size(max = 100, message = "Meta title must not exceed 100 characters")
     private String metaTitle;
@@ -112,6 +116,12 @@ public class Product {
 
     @Field("media_urls")
     private List<String> mediaUrls = new ArrayList<>();
+
+    @Field("average_rating")
+    private Double averageRating = 0.0;
+
+    @Field("total_reviews")
+    private Integer totalReviews = 0;
 
     @CreatedDate
     @Field("created_at")

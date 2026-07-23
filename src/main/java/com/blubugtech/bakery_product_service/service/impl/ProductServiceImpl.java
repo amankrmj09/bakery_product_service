@@ -56,14 +56,16 @@ public class ProductServiceImpl implements ProductService {
     
     final private com.blubugtech.bakery_product_service.integration.kafka.ProductEventPublisher productEventPublisher;
     final private ProductMapper productMapper;
+    final private com.blubugtech.bakery_product_service.repository.ReviewRepository reviewRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryService categoryService, InventoryService inventoryService, ProductSearchService productSearchService, com.blubugtech.bakery_product_service.integration.kafka.ProductEventPublisher productEventPublisher, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryService categoryService, InventoryService inventoryService, ProductSearchService productSearchService, com.blubugtech.bakery_product_service.integration.kafka.ProductEventPublisher productEventPublisher, ProductMapper productMapper, com.blubugtech.bakery_product_service.repository.ReviewRepository reviewRepository) {
         this.productRepository = productRepository;
         this.categoryService = categoryService;
         this.inventoryService = inventoryService;
         this.productSearchService = productSearchService;
         this.productEventPublisher = productEventPublisher;
         this.productMapper = productMapper;
+        this.reviewRepository = reviewRepository;
     }
 
     // Create new product
@@ -460,14 +462,14 @@ public class ProductServiceImpl implements ProductService {
     private void publishProductEvent(Product product, String action) {
         try {
             com.blubugtech.common.contract.messaging.ProductPayload payload = com.blubugtech.common.contract.messaging.ProductPayload.builder()
-                    .productId(UUID.fromString(product.getId()))
+                    .productId(java.util.UUID.fromString(product.getId()))
                     .name(product.getName())
                     .price(product.getPrice())
                     .action(action)
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(java.time.LocalDateTime.now())
                     .build();
             com.blubugtech.common.event.ProductEvent event = new com.blubugtech.common.event.ProductEvent();
-            event.setEventId(UUID.randomUUID().toString());
+            event.setEventId(java.util.UUID.randomUUID().toString());
             event.setEventType("PRODUCT_" + action.toUpperCase());
             event.setTimestamp(java.time.Instant.now());
             event.setPayload(payload);
@@ -475,5 +477,51 @@ public class ProductServiceImpl implements ProductService {
         } catch (Exception e) {
             logger.error("Failed to publish ProductEvent for {}: {}", product.getId(), e.getMessage());
         }
+    }
+
+    @Override
+    public com.blubugtech.bakery_product_service.dto.review.ReviewResponse addReview(String productId, com.blubugtech.bakery_product_service.dto.review.ReviewRequest request) {
+        Product product = getProductEntity(productId);
+        
+        java.util.Optional<com.blubugtech.bakery_product_service.entity.Review> existingReviewOpt = reviewRepository.findByProductIdAndOrderId(productId, request.getOrderId());
+        com.blubugtech.bakery_product_service.entity.Review review;
+        if (existingReviewOpt.isPresent()) {
+            review = existingReviewOpt.get();
+            review.setRating(request.getRating());
+            review.setComment(request.getComment());
+        } else {
+            review = com.blubugtech.bakery_product_service.entity.Review.builder()
+                    .productId(productId)
+                    .orderId(request.getOrderId())
+                    .userId(request.getUserId())
+                    .userName(request.getUserName())
+                    .rating(request.getRating())
+                    .comment(request.getComment())
+                    .build();
+        }
+        
+        review = reviewRepository.save(review);
+        
+        java.util.List<com.blubugtech.bakery_product_service.entity.Review> allReviews = reviewRepository.findByProductId(productId);
+        int totalReviews = allReviews.size();
+        double sum = allReviews.stream().mapToInt(com.blubugtech.bakery_product_service.entity.Review::getRating).sum();
+        double avg = totalReviews > 0 ? sum / totalReviews : 0.0;
+        
+        product.setTotalReviews(totalReviews);
+        product.setAverageRating(Math.round(avg * 10.0) / 10.0);
+        productRepository.save(product);
+        
+        return com.blubugtech.bakery_product_service.dto.review.ReviewResponse.fromEntity(review);
+    }
+
+    @Override
+    public java.util.List<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> getProductReviews(String productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new com.blubugtech.common.exception.common.ResourceNotFoundException("Product", "id", productId);
+        }
+        java.util.List<com.blubugtech.bakery_product_service.entity.Review> reviews = reviewRepository.findByProductId(productId);
+        return reviews.stream()
+                .map(com.blubugtech.bakery_product_service.dto.review.ReviewResponse::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

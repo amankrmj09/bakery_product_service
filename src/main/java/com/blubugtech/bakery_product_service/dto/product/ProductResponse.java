@@ -25,6 +25,7 @@ public class ProductResponse {
     private BigDecimal costPrice;
     private BigDecimal effectivePrice;
     private String taxClass;
+    private BigDecimal taxRate;
     private String metaTitle;
     private String metaDescription;
     private Integer maxOrderQuantity;
@@ -63,6 +64,7 @@ public class ProductResponse {
         response.costPrice = product.getCostPrice();
         response.effectivePrice = product.getEffectivePrice();
         response.taxClass = product.getTaxClass();
+        response.taxRate = product.getTaxRate();
         response.metaTitle = product.getMetaTitle();
         response.metaDescription = product.getMetaDescription();
         response.maxOrderQuantity = product.getMaxOrderQuantity();

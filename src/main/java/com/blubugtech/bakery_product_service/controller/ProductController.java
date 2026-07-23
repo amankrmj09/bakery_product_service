@@ -389,5 +389,27 @@ public class ProductController {
         logger.info("Product statistics retrieved");
         return ResponseEntity.ok(statistics);
     }
+    
+    // Add a review to a product
+    @PostMapping("/{id}/reviews")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> addReview(
+            @PathVariable("id") String id,
+            @Valid @RequestBody com.blubugtech.bakery_product_service.dto.review.ReviewRequest request) {
+        
+        logger.info("Add review request received for product ID: {}", id);
+        com.blubugtech.bakery_product_service.dto.review.ReviewResponse response = productService.addReview(id, request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // Get all reviews for a product
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<com.blubugtech.bakery_product_service.dto.review.ReviewResponse>> getProductReviews(
+            @PathVariable("id") String id) {
+        
+        logger.info("Get reviews request received for product ID: {}", id);
+        List<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> reviews = productService.getProductReviews(id);
+        return ResponseEntity.ok(reviews);
+    }
 
 }
