@@ -56,5 +56,7 @@ public interface ProductService {
     Page<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable);
     Map<String, Object> getProductStatistics();
     boolean isProductAvailable(String productId);
+    List<ProductResponse> getProductsByIds(List<String> productIds);
+    List<ProductResponse> validateProducts(List<String> productIds);
     Product getProductEntity(String productId);
 }

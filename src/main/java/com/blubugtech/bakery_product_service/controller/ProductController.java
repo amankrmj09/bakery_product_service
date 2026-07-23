@@ -154,15 +154,11 @@ public class ProductController {
     }
 
     // Get multiple products by IDs (Batch)
-    @GetMapping("/batch")
-    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestParam List<String> productIds) {
+    @PostMapping("/batch")
+    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestBody List<String> productIds) {
         logger.info("Get products by IDs request received for {} items", productIds.size());
         
-        // This is highly inefficient now, let's fix this for MongoDB (should be handled in service, but keeping as is for backward compatibility or we can just fetch properly)
-        // Wait, for batch validate, it's better to implement in service. Since I'm overwriting, I will just do a quick fix.
-        // productService.getAllProducts(pageable) is paginated. So this is broken! 
-        // I need to add `getProductsByIds` to ProductService!
-        throw new UnsupportedOperationException("Needs service update for getProductsByIds");
+        return ResponseEntity.ok(productService.getProductsByIds(productIds));
     }
 
     // Validate multiple products (Batch)
@@ -170,7 +166,7 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<String> productIds) {
         logger.info("Validate products request received for {} items", productIds.size());
         
-        throw new UnsupportedOperationException("Needs service update for validateProducts");
+        return ResponseEntity.ok(productService.validateProducts(productIds));
     }
 
     // Get product by SKU

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import com.blubugtech.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
 import com.blubugtech.common.exception.common.DuplicateResourceException;
+import com.blubugtech.common.exception.common.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -406,6 +407,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Get product entity (for internal use)
+    @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getProductsByIds(List<String> productIds) {
+        logger.debug("Fetching products by IDs: {}", productIds);
+        return productRepository.findAllById(productIds).stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> validateProducts(List<String> productIds) {
+        logger.debug("Validating products for IDs: {}", productIds);
+        List<Product> products = productRepository.findAllById(productIds);
+        
+        if (products.size() != productIds.size()) {
+            List<String> foundIds = products.stream().map(Product::getId).collect(Collectors.toList());
+            List<String> missingIds = productIds.stream().filter(id -> !foundIds.contains(id)).collect(Collectors.toList());
+            throw new ResourceNotFoundException("Products", "ids", missingIds.toString());
+        }
+        
+        return products.stream().map(productMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Product getProductEntity(String productId) {
         return productRepository.findById(productId)
