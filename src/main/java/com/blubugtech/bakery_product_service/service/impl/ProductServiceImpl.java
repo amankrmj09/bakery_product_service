@@ -407,7 +407,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Get product entity (for internal use)
-    @Transactional(readOnly = true)
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByIds(List<String> productIds) {
