@@ -202,6 +202,7 @@ public class InventoryController {
 
     // Reserve stock
     @PostMapping("/product/{productId}/reserve")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> reserveStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
@@ -229,6 +230,7 @@ public class InventoryController {
 
     // Release reserved stock
     @PostMapping("/product/{productId}/release-reserved")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> releaseReservedStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
@@ -246,7 +248,7 @@ public class InventoryController {
 
     // Consume stock
     @PostMapping("/product/{productId}/consume")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> consumeStock(
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
