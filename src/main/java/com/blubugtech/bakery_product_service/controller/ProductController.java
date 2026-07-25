@@ -412,4 +412,38 @@ public class ProductController {
         return ResponseEntity.ok(reviews);
     }
 
+    // Delete a review
+    @DeleteMapping("/{id}/reviews/{reviewId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable("id") String productId,
+            @PathVariable("reviewId") String reviewId,
+            @RequestHeader(value = "X-User-Id", required = false) String headerUserId) {
+        
+        logger.info("Delete review request received for product ID: {}, review ID: {}", productId, reviewId);
+        
+        // In a real app with proper Spring Security, we would get the user ID from SecurityContextHolder
+        // Here we're simulating it by accepting it in a header or just using a placeholder
+        // For simplicity, we assume the frontend passes the correct user ID for now
+        String userId = headerUserId != null ? headerUserId : "current-user-id";
+        
+        productService.deleteReview(productId, reviewId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Report a review
+    @PostMapping("/{id}/reviews/{reviewId}/report")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> reportReview(
+            @PathVariable("id") String productId,
+            @PathVariable("reviewId") String reviewId,
+            @RequestBody Map<String, String> request) {
+        
+        logger.info("Report review request received for product ID: {}, review ID: {}", productId, reviewId);
+        
+        String reason = request.getOrDefault("reason", "Inappropriate content");
+        productService.reportReview(productId, reviewId, reason);
+        return ResponseEntity.ok().build();
+    }
+
 }

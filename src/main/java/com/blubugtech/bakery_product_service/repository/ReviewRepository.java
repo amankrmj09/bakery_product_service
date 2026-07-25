@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ReviewRepository extends MongoRepository<Review, String> {
     List<Review> findByProductId(String productId);
     Optional<Review> findByProductIdAndOrderId(String productId, String orderId);
+    org.springframework.data.domain.Page<Review> findByIsReportedTrue(org.springframework.data.domain.Pageable pageable);
+    Optional<Review> findByIdAndUserId(String id, String userId);
 }

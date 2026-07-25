@@ -18,6 +18,9 @@ public class ReviewResponse {
     private String comment;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean isReported;
+    private String reportReason;
+    private LocalDateTime reportedAt;
 
     public static ReviewResponse fromEntity(Review review) {
         return ReviewResponse.builder()
@@ -30,6 +33,9 @@ public class ReviewResponse {
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
+                .isReported(review.getIsReported())
+                .reportReason(review.getReportReason())
+                .reportedAt(review.getReportedAt())
                 .build();
     }
 }

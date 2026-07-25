@@ -524,4 +524,70 @@ public class ProductServiceImpl implements ProductService {
                 .map(com.blubugtech.bakery_product_service.dto.review.ReviewResponse::fromEntity)
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public void deleteReview(String productId, String reviewId, String userId) {
+        com.blubugtech.bakery_product_service.entity.Review review;
+        if (userId == null) {
+            review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new com.blubugtech.common.exception.common.ResourceNotFoundException("Review", "id", reviewId));
+        } else {
+            review = reviewRepository.findByIdAndUserId(reviewId, userId)
+                .orElseThrow(() -> new com.blubugtech.common.exception.common.ResourceNotFoundException("Review", "id", reviewId));
+        }
+        
+        if (!review.getProductId().equals(productId)) {
+            throw new IllegalArgumentException("Review does not belong to the specified product");
+        }
+
+        reviewRepository.delete(review);
+        updateProductRating(productId);
+    }
+
+    @Override
+    @Transactional
+    public void reportReview(String productId, String reviewId, String reason) {
+        com.blubugtech.bakery_product_service.entity.Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new com.blubugtech.common.exception.common.ResourceNotFoundException("Review", "id", reviewId));
+        
+        if (!review.getProductId().equals(productId)) {
+            throw new IllegalArgumentException("Review does not belong to the specified product");
+        }
+
+        review.setIsReported(true);
+        review.setReportReason(reason);
+        review.setReportedAt(java.time.LocalDateTime.now());
+        reviewRepository.save(review);
+    }
+
+    @Override
+    public Page<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> getReportedReviews(Pageable pageable) {
+        return reviewRepository.findByIsReportedTrue(pageable)
+                .map(com.blubugtech.bakery_product_service.dto.review.ReviewResponse::fromEntity);
+    }
+
+    @Override
+    @Transactional
+    public void dismissReviewReport(String reviewId) {
+        com.blubugtech.bakery_product_service.entity.Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new com.blubugtech.common.exception.common.ResourceNotFoundException("Review", "id", reviewId));
+        
+        review.setIsReported(false);
+        review.setReportReason(null);
+        review.setReportedAt(null);
+        reviewRepository.save(review);
+    }
+
+    private void updateProductRating(String productId) {
+        Product product = getProductEntity(productId);
+        java.util.List<com.blubugtech.bakery_product_service.entity.Review> allReviews = reviewRepository.findByProductId(productId);
+        int totalReviews = allReviews.size();
+        double sum = allReviews.stream().mapToInt(com.blubugtech.bakery_product_service.entity.Review::getRating).sum();
+        double avg = totalReviews > 0 ? sum / totalReviews : 0.0;
+        
+        product.setTotalReviews(totalReviews);
+        product.setAverageRating(Math.round(avg * 10.0) / 10.0);
+        productRepository.save(product);
+    }
 }

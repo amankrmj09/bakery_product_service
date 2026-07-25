@@ -46,6 +46,8 @@ public class ProductResponse {
     private Boolean isOnSale;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Double averageRating;
+    private Integer totalReviews;
 
     // Constructors
     public ProductResponse() {}
@@ -86,6 +88,8 @@ public class ProductResponse {
         response.isOnSale = product.isOnSale();
         response.createdAt = product.getCreatedAt();
         response.updatedAt = product.getUpdatedAt();
+        response.averageRating = product.getAverageRating();
+        response.totalReviews = product.getTotalReviews();
         return response;
     }
 

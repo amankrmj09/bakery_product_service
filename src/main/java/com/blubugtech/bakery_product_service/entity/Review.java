@@ -38,4 +38,10 @@ public class Review {
     
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    private Boolean isReported = false;
+
+    private String reportReason;
+
+    private LocalDateTime reportedAt;
 }
