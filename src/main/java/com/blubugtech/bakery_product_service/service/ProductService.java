@@ -59,10 +59,4 @@ public interface ProductService {
     List<ProductResponse> getProductsByIds(List<String> productIds);
     List<ProductResponse> validateProducts(List<String> productIds);
     Product getProductEntity(String productId);
-    com.blubugtech.bakery_product_service.dto.review.ReviewResponse addReview(String productId, com.blubugtech.bakery_product_service.dto.review.ReviewRequest request);
-    List<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> getProductReviews(String productId);
-    void deleteReview(String productId, String reviewId, String userId);
-    void reportReview(String productId, String reviewId, String reason);
-    Page<com.blubugtech.bakery_product_service.dto.review.ReviewResponse> getReportedReviews(Pageable pageable);
-    void dismissReviewReport(String reviewId);
 }
