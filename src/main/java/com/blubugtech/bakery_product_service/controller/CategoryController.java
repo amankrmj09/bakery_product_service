@@ -108,6 +108,18 @@ public class CategoryController {
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
+    // Get top categories with top products
+    @GetMapping("/top-with-products")
+    public ResponseEntity<List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
+            @RequestParam(defaultValue = "5") int productLimit) {
+        logger.info("Get top categories with top products request received (productLimit {})", productLimit);
+
+        List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit);
+
+        logger.info("Retrieved {} top categories with products", categories.size());
+        return ResponseEntity.ok(categories);
+    }
+
     // Get category by ID
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String categoryId) {

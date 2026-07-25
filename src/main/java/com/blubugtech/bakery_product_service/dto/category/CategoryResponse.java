@@ -18,6 +18,7 @@ public class CategoryResponse {
     private String description;
     private Integer displayOrder;
     private Boolean active;
+    private Boolean isTopCategory;
     private List<String> mediaUrls;
     private String iconClass;
     private Integer productCount;
@@ -36,6 +37,7 @@ public class CategoryResponse {
         response.description = category.getDescription();
         response.displayOrder = category.getDisplayOrder();
         response.active = category.getActive();
+        response.isTopCategory = category.getIsTopCategory();
         response.mediaUrls = category.getMediaUrls();
         response.iconClass = category.getIconClass();
         response.productCount = 0;

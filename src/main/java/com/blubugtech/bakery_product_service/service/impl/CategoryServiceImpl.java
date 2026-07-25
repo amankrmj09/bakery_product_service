@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
+import com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse;
+import com.blubugtech.bakery_product_service.dto.product.ProductResponse;
+import com.blubugtech.bakery_product_service.entity.Product;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -53,6 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setDisplayOrder(request.getDisplayOrder());
         category.setActive(request.getActive());
+        category.setIsTopCategory(request.getIsTopCategory());
         category.setMediaUrls(request.getMediaUrls());
         category.setIconClass(request.getIconClass());
 
@@ -79,6 +84,34 @@ public class CategoryServiceImpl implements CategoryService {
         return getActiveCategories(pageable);
     }
 
+    public List<CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit) {
+        List<Category> topCategories = categoryRepository.findByIsTopCategoryTrueAndActiveTrueOrderByDisplayOrderAsc();
+        if (topCategories == null || topCategories.isEmpty()) {
+            Page<Category> fallbackCategories = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(PageRequest.of(0, 3));
+            topCategories = fallbackCategories.getContent();
+        }
+
+        return topCategories.stream().map(category -> {
+            Page<Product> productsPage = productRepository.findByCategoryIdAndStatusAndAverageRatingGreaterThanOrderByAverageRatingDesc(
+                    category.getId(), Product.ProductStatus.ACTIVE, 0.0, PageRequest.of(0, productLimit)
+            );
+            List<Product> products = productsPage.getContent();
+
+            if (products == null || products.isEmpty()) {
+                Page<Product> fallbackProductsPage = productRepository.findByCategoryIdAndStatus(
+                        category.getId(), Product.ProductStatus.ACTIVE, PageRequest.of(0, Math.min(productLimit, 3))
+                );
+                products = fallbackProductsPage.getContent();
+            }
+
+            List<ProductResponse> productResponses = products.stream()
+                    .map(ProductResponse::from)
+                    .collect(Collectors.toList());
+
+            return new CategoryWithTopProductsResponse(categoryMapper.toResponse(category), productResponses);
+        }).collect(Collectors.toList());
+    }
+
     public CategoryResponse getCategoryById(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
@@ -103,6 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setDisplayOrder(request.getDisplayOrder());
         category.setActive(request.getActive());
+        category.setIsTopCategory(request.getIsTopCategory());
         category.setMediaUrls(request.getMediaUrls());
         category.setIconClass(request.getIconClass());
 

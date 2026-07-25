@@ -22,6 +22,7 @@ public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest request);
     Page<CategoryResponse> getAllCategories(Pageable pageable);
     Page<CategoryResponse> getActiveCategories(Pageable pageable);
+    List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit);
     Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable);
     Page<CategoryResponse> getCategoriesWithActiveProducts(Pageable pageable);
     CategoryResponse getCategoryById(String categoryId);

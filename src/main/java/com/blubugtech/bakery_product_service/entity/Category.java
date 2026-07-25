@@ -38,6 +38,10 @@ public class Category {
     @Indexed
     private Boolean active = true;
 
+    @Field("is_top_category")
+    @Indexed
+    private Boolean isTopCategory = false;
+
     @Field("media_urls")
     private List<String> mediaUrls = new ArrayList<>();
 

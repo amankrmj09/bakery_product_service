@@ -22,6 +22,9 @@ public interface CategoryRepository extends MongoRepository<Category, String> {
     // Find active categories ordered by display order
     Page<Category> findByActiveTrueOrderByDisplayOrderAsc(Pageable pageable);
 
+    // Find top categories ordered by display order
+    List<Category> findByIsTopCategoryTrueAndActiveTrueOrderByDisplayOrderAsc();
+
     // Find categories by active status
     Page<Category> findByActiveOrderByDisplayOrderAsc(Boolean active, Pageable pageable);
 

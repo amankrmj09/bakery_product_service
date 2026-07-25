@@ -24,6 +24,8 @@ public class CategoryRequest {
 
     private Boolean active = true;
 
+    private Boolean isTopCategory = false;
+
     private List<String> mediaUrls = new ArrayList<>();
 
     private String iconClass;

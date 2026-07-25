@@ -24,6 +24,12 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Find active products by category with pagination
     Page<Product> findByCategoryIdAndStatus(String categoryId, Product.ProductStatus status, Pageable pageable);
 
+    // Find top rated products by category
+    Page<Product> findByCategoryIdAndStatusOrderByAverageRatingDesc(String categoryId, Product.ProductStatus status, Pageable pageable);
+
+    // Find top rated products by category (rating > 0)
+    Page<Product> findByCategoryIdAndStatusAndAverageRatingGreaterThanOrderByAverageRatingDesc(String categoryId, Product.ProductStatus status, Double minRating, Pageable pageable);
+
     // Check if category has products
     boolean existsByCategoryId(String categoryId);
 
