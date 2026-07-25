@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/products/taxes")
+@RequestMapping("/api/taxes")
 public class TaxRateController {
 
     @Autowired
