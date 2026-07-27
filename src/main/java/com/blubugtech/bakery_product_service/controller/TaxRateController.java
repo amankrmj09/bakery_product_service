@@ -42,6 +42,7 @@ public class TaxRateController {
             }
             taxRate.setType(request.getType());
             taxRate.setRate(request.getRate());
+            taxRate.setDescription(request.getDescription());
             taxRate.setUpdatedAt(LocalDateTime.now());
             return ResponseEntity.ok((Object) taxRateRepository.save(taxRate));
         }).orElse(ResponseEntity.notFound().build());

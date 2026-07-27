@@ -29,6 +29,8 @@ public class TaxRate {
     @Digits(integer = 2, fraction = 4, message = "Invalid tax rate format")
     private BigDecimal rate; // e.g., 0.08 for 8%
 
+    private String description;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
