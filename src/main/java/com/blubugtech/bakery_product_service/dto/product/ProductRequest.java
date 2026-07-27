@@ -70,14 +70,11 @@ public class ProductRequest {
     @Min(value = 0, message = "Shelf life cannot be negative")
     private Integer shelfLifeHours;
 
-    @Size(max = 100, message = "Unit must not exceed 100 characters")
+    @Size(max = 255, message = "Unit description must not exceed 255 characters")
     private String unit = "piece";
 
-    @Min(value = 0, message = "Weight cannot be negative")
-    private Integer weightGrams;
-
-    @Min(value = 0, message = "Calories cannot be negative")
-    private Integer caloriesPerUnit;
+    @Size(max = 255, message = "Calories description must not exceed 255 characters")
+    private String calories;
 
     private List<String> ingredients = new ArrayList<>();
 

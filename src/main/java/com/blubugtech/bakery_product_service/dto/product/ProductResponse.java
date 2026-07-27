@@ -34,8 +34,7 @@ public class ProductResponse {
     private Integer preparationTimeMinutes;
     private Integer shelfLifeHours;
     private String unit;
-    private Integer weightGrams;
-    private Integer caloriesPerUnit;
+    private String calories;
     private List<String> ingredients;
     private List<String> allergens;
     private List<String> tags;
@@ -75,8 +74,7 @@ public class ProductResponse {
         response.preparationTimeMinutes = product.getPreparationTimeMinutes();
         response.shelfLifeHours = product.getShelfLifeHours();
         response.unit = product.getUnit();
-        response.weightGrams = product.getWeightGrams();
-        response.caloriesPerUnit = product.getCaloriesPerUnit();
+        response.calories = product.getCalories();
         response.ingredients = product.getIngredients();
         response.allergens = product.getAllergens();
         response.tags = product.getTags();

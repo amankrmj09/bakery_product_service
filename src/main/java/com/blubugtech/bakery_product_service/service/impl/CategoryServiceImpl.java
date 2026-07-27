@@ -158,16 +158,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable) {
-        org.springframework.data.domain.Page<com.blubugtech.bakery_product_service.search.document.CategoryDocument> searchResults = categorySearchService.searchCategories(searchTerm, pageable);
-        List<String> ids = searchResults.getContent().stream().map(com.blubugtech.bakery_product_service.search.document.CategoryDocument::getId).collect(Collectors.toList());
-        List<Category> categories = (List<Category>) categoryRepository.findAllById(ids);
-        Map<String, Category> categoryMap = categories.stream().collect(Collectors.toMap(Category::getId, c -> c));
-        List<CategoryResponse> responses = ids.stream()
-                .map(categoryMap::get)
-                .filter(java.util.Objects::nonNull)
-                .map(categoryMapper::toResponse)
-                .collect(Collectors.toList());
-        return new org.springframework.data.domain.PageImpl<>(responses, pageable, searchResults.getTotalElements());
+        return categoryRepository.searchByName(searchTerm, pageable)
+                .map(categoryMapper::toResponse);
     }
 
     public CategoryResponse toggleCategoryStatus(String categoryId) {

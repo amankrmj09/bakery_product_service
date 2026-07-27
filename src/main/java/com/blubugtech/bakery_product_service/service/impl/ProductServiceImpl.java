@@ -95,8 +95,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPreparationTimeMinutes(request.getPreparationTimeMinutes());
         product.setShelfLifeHours(request.getShelfLifeHours());
         product.setUnit(request.getUnit());
-        product.setWeightGrams(request.getWeightGrams());
-        product.setCaloriesPerUnit(request.getCaloriesPerUnit());
+        product.setCalories(request.getCalories());
         product.setIngredients(request.getIngredients());
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
@@ -190,17 +189,8 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> searchProducts(String searchTerm, Pageable pageable) {
         logger.debug("Searching products with pagination, term: {}", searchTerm);
 
-        List<com.blubugtech.bakery_product_service.search.document.ProductDocument> results = productSearchService.searchProducts(searchTerm);
-        List<String> productIds = results.stream()
-            .map(doc -> doc.getId())
-            .collect(Collectors.toList());
-            
-        List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
-                .filter(p -> p.getStatus() == Product.ProductStatus.ACTIVE)
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
-                
-        return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.size());
+        return productRepository.searchProducts(searchTerm, Product.ProductStatus.ACTIVE, pageable)
+                .map(productMapper::toResponse);
     }
 
     // Search products for admin (no status filter)
@@ -208,16 +198,8 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> searchAdminProducts(String searchTerm, Pageable pageable) {
         logger.debug("Admin searching products with pagination, term: {}", searchTerm);
 
-        List<com.blubugtech.bakery_product_service.search.document.ProductDocument> results = productSearchService.searchProducts(searchTerm);
-        List<String> productIds = results.stream()
-            .map(doc -> doc.getId())
-            .collect(Collectors.toList());
-            
-        List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
-                
-        return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.size());
+        return productRepository.searchAdminProducts(searchTerm, pageable)
+                .map(productMapper::toResponse);
     }
 
     // Get products by price range
@@ -296,8 +278,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPreparationTimeMinutes(request.getPreparationTimeMinutes());
         product.setShelfLifeHours(request.getShelfLifeHours());
         product.setUnit(request.getUnit());
-        product.setWeightGrams(request.getWeightGrams());
-        product.setCaloriesPerUnit(request.getCaloriesPerUnit());
+        product.setCalories(request.getCalories());
         product.setIngredients(request.getIngredients());
         product.setAllergens(request.getAllergens());
         product.setTags(request.getTags());
