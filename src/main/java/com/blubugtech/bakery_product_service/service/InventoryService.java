@@ -25,6 +25,7 @@ public interface InventoryService {
                                              Integer minimumStock, Integer reorderLevel);
     InventoryResponse getInventoryByProductId(String productId);
     Optional<InventoryResponse> getInventoryByProductSku(String sku);
+    Page<InventoryResponse> searchInventory(String searchTerm, Pageable pageable);
     Page<InventoryResponse> getAllInventory(Pageable pageable);
     Page<InventoryResponse> getLowStockItems(Pageable pageable);
     Page<InventoryResponse> getOutOfStockItems(Pageable pageable);

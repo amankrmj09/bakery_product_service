@@ -203,6 +203,23 @@ public class ProductServiceImpl implements ProductService {
         return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.size());
     }
 
+    // Search products for admin (no status filter)
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> searchAdminProducts(String searchTerm, Pageable pageable) {
+        logger.debug("Admin searching products with pagination, term: {}", searchTerm);
+
+        List<com.blubugtech.bakery_product_service.search.document.ProductDocument> results = productSearchService.searchProducts(searchTerm);
+        List<String> productIds = results.stream()
+            .map(doc -> doc.getId())
+            .collect(Collectors.toList());
+            
+        List<ProductResponse> productResponses = productRepository.findAllById(productIds).stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+                
+        return new org.springframework.data.domain.PageImpl<>(productResponses, pageable, results.size());
+    }
+
     // Get products by price range
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {

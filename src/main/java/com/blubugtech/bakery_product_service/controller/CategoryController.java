@@ -189,6 +189,25 @@ public class CategoryController {
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
+    @GetMapping("/admin/search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PagedModel<CategoryResponse>> searchCategoriesAdmin(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Admin search categories request received with query: {} (page {}, size {})", query, page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
+
+        logger.info("Admin search returned {} categories", categories.getContent().size());
+        return ResponseEntity.ok(new PagedModel<>(categories));
+    }
+
     // Toggle category status
     @PostMapping("/{categoryId}/toggle-status")
     @PreAuthorize("hasRole('ADMIN')")

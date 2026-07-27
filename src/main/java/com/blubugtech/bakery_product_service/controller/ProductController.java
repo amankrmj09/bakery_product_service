@@ -218,6 +218,25 @@ public class ProductController {
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
+    @GetMapping("/admin/search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PagedModel<ProductResponse>> searchProductsAdmin(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        logger.info("Admin search products request received with query: {} (page {}, size {})", query, page, size);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ProductResponse> products = productService.searchAdminProducts(query, pageable);
+
+        logger.info("Admin search returned {} products", products.getContent().size());
+        return ResponseEntity.ok(new PagedModel<>(products));
+    }
+
     // Get products by price range
     @GetMapping("/price-range")
     public ResponseEntity<PagedModel<ProductResponse>> getProductsByPriceRange(

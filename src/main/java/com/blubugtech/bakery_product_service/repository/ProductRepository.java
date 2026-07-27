@@ -48,10 +48,14 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     // Search products by name or description
     @Query("{ $and: [ " +
-           "{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } }, { 'short_description': { $regex: ?0, $options: 'i' } } ] }, " +
+           "{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'sku': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } }, { 'short_description': { $regex: ?0, $options: 'i' } } ] }, " +
            "{ 'status': ?1 } " +
            "] }")
     Page<Product> searchProducts(String searchTerm, Product.ProductStatus status, Pageable pageable);
+
+    // Search products (admin - no status filter)
+    @Query("{ $or: [ { 'name': { $regex: ?0, $options: 'i' } }, { 'sku': { $regex: ?0, $options: 'i' } }, { 'description': { $regex: ?0, $options: 'i' } }, { 'short_description': { $regex: ?0, $options: 'i' } } ] }")
+    Page<Product> searchAdminProducts(String searchTerm, Pageable pageable);
 
     // Find products by price range
     @Query("{ 'price': { $gte: ?0, $lte: ?1 }, 'status': ?2 }")

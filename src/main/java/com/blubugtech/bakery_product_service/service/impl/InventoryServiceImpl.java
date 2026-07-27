@@ -72,6 +72,11 @@ public class InventoryServiceImpl implements InventoryService {
                 .map(inventoryMapper::toResponse);
     }
 
+    public Page<InventoryResponse> searchInventory(String searchTerm, Pageable pageable) {
+        return productRepository.searchAdminProducts(searchTerm, pageable)
+                .map(inventoryMapper::toResponse);
+    }
+
     public Page<InventoryResponse> getAllInventory(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(inventoryMapper::toResponse);
