@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ProductSearchRepository extends ElasticsearchRepository<ProductDocument, String> {
 
-    @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"name^3\", \"description\"], \"type\": \"phrase_prefix\"}}")
+    @Query("{\"bool\": {\"should\": [{\"multi_match\": {\"query\": \"?0\", \"fields\": [\"name^3\", \"description\"], \"type\": \"phrase_prefix\"}}, {\"wildcard\": {\"tags\": {\"value\": \"*?0*\", \"case_insensitive\": true}}}]}}")
     Page<ProductDocument> searchAutocomplete(String query, Pageable pageable);
     
     Page<ProductDocument> findByCategoryName(String categoryName, Pageable pageable);
