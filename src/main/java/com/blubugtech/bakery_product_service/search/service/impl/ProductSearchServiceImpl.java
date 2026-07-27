@@ -47,6 +47,6 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     @Override
     public List<ProductDocument> searchProducts(String query) {
-        return searchRepository.findByNameOrDescriptionOrTags(query, query, query, org.springframework.data.domain.Pageable.unpaged()).getContent();
+        return searchRepository.searchAutocomplete(query, org.springframework.data.domain.Pageable.unpaged()).getContent();
     }
 }
