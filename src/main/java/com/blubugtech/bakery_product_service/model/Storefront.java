@@ -37,8 +37,7 @@ public class Storefront {
     @AllArgsConstructor
     @Builder
     public static class Campaign { 
-        private String largeImageUrl; 
-        private String smallImageUrl; 
+        private String imageUrl;
         private String title;
         private String description;
     }
