@@ -26,6 +26,46 @@ public class StorefrontServiceImpl implements StorefrontService {
         return storefrontRepository.save(config);
     }
 
+    public com.blubugtech.common.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal) {
+        Storefront config = getStorefront();
+        if (config.getSpecialOfferSection() == null || config.getSpecialOfferSection().getOffers() == null) {
+            throw new RuntimeException("invalid_coupon");
+        }
+        
+        Storefront.SpecialOffer offer = config.getSpecialOfferSection().getOffers().stream()
+                .filter(o -> code.equalsIgnoreCase(o.getCouponCode()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("invalid_coupon"));
+                
+        if (offer.getExpiryDate() != null && !offer.getExpiryDate().isEmpty()) {
+            try {
+                java.time.LocalDate expiry = java.time.LocalDate.parse(offer.getExpiryDate());
+                if (java.time.LocalDate.now().isAfter(expiry)) {
+                    throw new RuntimeException("coupon code expired and not valid");
+                }
+            } catch (Exception e) {
+                // If it's an ISO date time string
+                try {
+                    java.time.Instant expiry = java.time.Instant.parse(offer.getExpiryDate());
+                    if (java.time.Instant.now().isAfter(expiry)) {
+                        throw new RuntimeException("coupon code expired and not valid");
+                    }
+                } catch(Exception ignored) {}
+            }
+        }
+        
+        if (offer.getMinCartValue() != null && cartTotal != null && cartTotal < offer.getMinCartValue()) {
+            throw new RuntimeException("doesn't apply on this cart");
+        }
+        
+        return com.blubugtech.common.contract.feign.CouponValidationResponse.builder()
+                .couponCode(offer.getCouponCode())
+                .discountType(offer.getDiscountType())
+                .discountValue(offer.getDiscountValue())
+                .message("Valid")
+                .build();
+    }
+
     private Storefront createDefaultConfig() {
         Storefront config = Storefront.builder()
                 .id(DEFAULT_ID)

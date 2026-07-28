@@ -73,6 +73,11 @@ public class Storefront {
         private String imageUrl;
         private String title;
         private String description;
+        private String couponCode;
+        private String discountType; // PERCENTAGE or FLAT
+        private Double discountValue;
+        private String expiryDate; // e.g. ISO-8601 string or local date string
+        private Double minCartValue;
     }
 
     @Data

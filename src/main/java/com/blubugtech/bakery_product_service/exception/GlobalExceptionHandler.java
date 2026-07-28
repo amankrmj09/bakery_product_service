@@ -88,5 +88,17 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleMultipartException(org.springframework.web.multipart.MultipartException exc, WebRequest request) {
+        logger.error("Multipart error: {}", exc.getMessage());
+        ErrorResponse error = new ErrorResponse(
+            "MULTIPART_ERROR",
+            "Failed to parse multipart request, possibly due to file size exceeding limits.",
+            LocalDateTime.now(),
+            request.getDescription(false)
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 }
 

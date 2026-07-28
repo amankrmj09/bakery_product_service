@@ -11,5 +11,6 @@ import java.util.List;
 public interface StorefrontService {
     Storefront getStorefront();
     Storefront updateStorefront(Storefront config);
+    com.blubugtech.common.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal);
 }
 
