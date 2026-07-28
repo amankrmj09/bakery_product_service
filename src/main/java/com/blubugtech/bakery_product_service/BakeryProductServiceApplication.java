@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import org.springframework.context.annotation.Import;
-import com.blubugtech.common.security.MethodSecurityConfig;
+import org.blubakery.bakery_common_libs.security.MethodSecurityConfig;
 
 @SpringBootApplication
 @EnableDiscoveryClient

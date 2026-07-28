@@ -21,13 +21,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.blubugtech.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
-import com.blubugtech.common.exception.common.DuplicateResourceException;
-import com.blubugtech.common.exception.common.ResourceNotFoundException;
+import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
+import org.blubakery.bakery_common_libs.exception.common.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import com.blubugtech.common.exception.common.DuplicateResourceException;
+import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
