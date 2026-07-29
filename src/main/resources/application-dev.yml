@@ -19,3 +19,7 @@ r2:
   access-key: ad4653738654f9f0e8baf193fd9af2a3
   secret-key: a64f372de305f1e9bc8f94c84209ee8098383f81bf333dbb21e7b534d554935b
   bucket: blu-bakery-products
+
+product:
+  inventory:
+    low-stock-threshold: 10

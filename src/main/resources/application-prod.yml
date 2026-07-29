@@ -24,3 +24,7 @@ r2:
   access-key: ${R2_ACCESS_KEY}
   secret-key: ${R2_SECRET_KEY}
   bucket: ${R2_BUCKET}
+
+product:
+  inventory:
+    low-stock-threshold: ${PRODUCT_LOW_STOCK:10}
