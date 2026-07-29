@@ -26,7 +26,7 @@ public class StorefrontServiceImpl implements StorefrontService {
         return storefrontRepository.save(config);
     }
 
-    public com.blubugtech.common.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal) {
+    public org.blubakery.bakery_common_libs.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal) {
         Storefront config = getStorefront();
         if (config.getSpecialOfferSection() == null || config.getSpecialOfferSection().getOffers() == null) {
             throw new RuntimeException("invalid_coupon");
@@ -58,7 +58,7 @@ public class StorefrontServiceImpl implements StorefrontService {
             throw new RuntimeException("doesn't apply on this cart");
         }
         
-        return com.blubugtech.common.contract.feign.CouponValidationResponse.builder()
+        return org.blubakery.bakery_common_libs.contract.feign.CouponValidationResponse.builder()
                 .couponCode(offer.getCouponCode())
                 .discountType(offer.getDiscountType())
                 .discountValue(offer.getDiscountValue())

@@ -344,12 +344,12 @@ public class ProductServiceImpl implements ProductService {
         deleteFromElasticsearch(productId);
         
         // publish event
-        com.blubugtech.common.contract.messaging.ProductPayload payload = com.blubugtech.common.contract.messaging.ProductPayload.builder()
+        org.blubakery.bakery_common_libs.contract.messaging.ProductPayload payload = org.blubakery.bakery_common_libs.contract.messaging.ProductPayload.builder()
                 .productId(UUID.fromString(productId))
                 .action("DELETED")
                 .timestamp(LocalDateTime.now())
                 .build();
-        com.blubugtech.common.event.ProductEvent event = new com.blubugtech.common.event.ProductEvent();
+        org.blubakery.bakery_common_libs.event.ProductEvent event = new org.blubakery.bakery_common_libs.event.ProductEvent();
         event.setEventId(UUID.randomUUID().toString());
         event.setEventType("PRODUCT_DELETED");
         event.setTimestamp(java.time.Instant.now());
@@ -457,14 +457,14 @@ public class ProductServiceImpl implements ProductService {
 
     private void publishProductEvent(Product product, String action) {
         try {
-            com.blubugtech.common.contract.messaging.ProductPayload payload = com.blubugtech.common.contract.messaging.ProductPayload.builder()
+            org.blubakery.bakery_common_libs.contract.messaging.ProductPayload payload = org.blubakery.bakery_common_libs.contract.messaging.ProductPayload.builder()
                     .productId(java.util.UUID.fromString(product.getId()))
                     .name(product.getName())
                     .price(product.getPrice())
                     .action(action)
                     .timestamp(java.time.LocalDateTime.now())
                     .build();
-            com.blubugtech.common.event.ProductEvent event = new com.blubugtech.common.event.ProductEvent();
+            org.blubakery.bakery_common_libs.event.ProductEvent event = new org.blubakery.bakery_common_libs.event.ProductEvent();
             event.setEventId(java.util.UUID.randomUUID().toString());
             event.setEventType("PRODUCT_" + action.toUpperCase());
             event.setTimestamp(java.time.Instant.now());

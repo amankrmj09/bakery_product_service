@@ -313,7 +313,7 @@ public class InventoryController {
     // Bulk update minimum stock levels
     @PostMapping("/bulk-update-minimum-stock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> bulkUpdateMinimumStock(
+    public ResponseEntity<org.blubakery.bakery_common_libs.contract.feign.MessageResponse> bulkUpdateMinimumStock(
             @RequestBody Map<String, Integer> productMinimumStocks) {
 
         log.info("Bulk update minimum stock request received for {} products",
@@ -322,7 +322,7 @@ public class InventoryController {
         inventoryService.bulkUpdateMinimumStock(productMinimumStocks);
 
         log.info("Bulk minimum stock update completed for {} products", productMinimumStocks.size());
-        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
+        return ResponseEntity.ok(new org.blubakery.bakery_common_libs.contract.feign.MessageResponse("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
     }
 
     // Get inventory statistics

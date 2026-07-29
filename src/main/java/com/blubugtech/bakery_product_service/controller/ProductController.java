@@ -374,13 +374,13 @@ public class ProductController {
     // Delete product
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> deleteProduct(@PathVariable String productId) {
+    public ResponseEntity<org.blubakery.bakery_common_libs.contract.feign.MessageResponse> deleteProduct(@PathVariable String productId) {
         log.info("Delete product request received: {}", productId);
 
         productService.deleteProduct(productId);
 
         log.info("Product deleted successfully: {}", productId);
-        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Product deleted successfully"));
+        return ResponseEntity.ok(new org.blubakery.bakery_common_libs.contract.feign.MessageResponse("Product deleted successfully"));
     }
 
     // Check product availability
