@@ -1,7 +1,6 @@
 package com.blubugtech.bakery_product_service.integration.storage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
@@ -23,9 +22,8 @@ import java.util.UUID;
 
 @Service
 @RefreshScope
+@Slf4j
 public class R2StorageService implements StorageService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(R2StorageService.class);
 
     private final S3Client s3Client;
     private final String bucketName;
@@ -92,11 +90,11 @@ public class R2StorageService implements StorageService {
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
             String url = cdnBaseUrl + key;
-            LOG.info("Successfully uploaded file to R2, returning URL: {}", url);
+            log.info("Successfully uploaded file to R2, returning URL: {}", url);
             return url;
             
         } catch (IOException e) {
-            LOG.error("Failed to upload file to R2", e);
+            log.error("Failed to upload file to R2", e);
             throw new RuntimeException("Failed to upload file to R2", e);
         }
     }
@@ -124,9 +122,9 @@ public class R2StorageService implements StorageService {
                     .build();
             
             s3Client.deleteObject(request);
-            LOG.info("Successfully deleted file from R2: {}", key);
+            log.info("Successfully deleted file from R2: {}", key);
         } catch (Exception e) {
-            LOG.error("Failed to delete file from R2: {}", url, e);
+            log.error("Failed to delete file from R2: {}", url, e);
         }
     }
 

@@ -1,12 +1,11 @@
 package com.blubugtech.bakery_product_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.dto.product.ProductRequest;
 import com.blubugtech.bakery_product_service.dto.product.ProductResponse;
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.service.ProductService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,9 +28,8 @@ import io.swagger.v3.oas.annotations.Operation;
 @RestController
 @RequestMapping("/api/products")
 @Tag(name = "Product", description = "Product Management APIs")
+@Slf4j
 public class ProductController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     final private ProductService productService;
 
@@ -46,13 +44,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get all products request received (page {}, size {})", page, size);
+        log.info("Get all products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getAllProducts(pageable);
 
-        logger.info("Retrieved {} products", products.getContent().size());
+        log.info("Retrieved {} products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -63,13 +61,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get active products request received (page {}, size {})", page, size);
+        log.info("Get active products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getActiveProducts(pageable);
 
-        logger.info("Retrieved {} active products", products.getContent().size());
+        log.info("Retrieved {} active products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -80,13 +78,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get available products request received (page {}, size {})", page, size);
+        log.info("Get available products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getAvailableProducts(pageable);
 
-        logger.info("Retrieved {} available products", products.getContent().size());
+        log.info("Retrieved {} available products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -97,13 +95,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        logger.info("Get featured products request received (page {}, size {})", page, size);
+        log.info("Get featured products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getFeaturedProducts(pageable);
 
-        logger.info("Retrieved {} featured products", products.getContent().size());
+        log.info("Retrieved {} featured products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -114,13 +112,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get products on sale request received (page {}, size {})", page, size);
+        log.info("Get products on sale request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getProductsOnSale(pageable);
 
-        logger.info("Retrieved {} products on sale", products.getContent().size());
+        log.info("Retrieved {} products on sale", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -132,31 +130,31 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        logger.info("Get recently added products request received (last {} days, page {}, size {})", days, page, size);
+        log.info("Get recently added products request received (last {} days, page {}, size {})", days, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getRecentlyAddedProducts(days, pageable);
 
-        logger.info("Retrieved {} recently added products", products.getContent().size());
+        log.info("Retrieved {} recently added products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
     // Get product by ID
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable String productId) {
-        logger.info("Get product by ID request received: {}", productId);
+        log.info("Get product by ID request received: {}", productId);
 
         ProductResponse product = productService.getProductById(productId);
 
-        logger.info("Product retrieved: {}", product.getName());
+        log.info("Product retrieved: {}", product.getName());
         return ResponseEntity.ok(product);
     }
 
     // Get multiple products by IDs (Batch)
     @PostMapping("/batch")
     public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestBody List<String> productIds) {
-        logger.info("Get products by IDs request received for {} items", productIds.size());
+        log.info("Get products by IDs request received for {} items", productIds.size());
         
         return ResponseEntity.ok(productService.getProductsByIds(productIds));
     }
@@ -164,7 +162,7 @@ public class ProductController {
     // Validate multiple products (Batch)
     @PostMapping("/batch/validate")
     public ResponseEntity<List<ProductResponse>> validateProducts(@RequestBody List<String> productIds) {
-        logger.info("Validate products request received for {} items", productIds.size());
+        log.info("Validate products request received for {} items", productIds.size());
         
         return ResponseEntity.ok(productService.validateProducts(productIds));
     }
@@ -172,11 +170,11 @@ public class ProductController {
     // Get product by SKU
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
-        logger.info("Get product by SKU request received: {}", sku);
+        log.info("Get product by SKU request received: {}", sku);
 
         return productService.getProductBySku(sku)
                 .map(product -> {
-                    logger.info("Product found by SKU: {}", product.getName());
+                    log.info("Product found by SKU: {}", product.getName());
                     return ResponseEntity.ok(product);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -190,13 +188,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get products by category request received: {} (page {}, size {})", categoryId, page, size);
+        log.info("Get products by category request received: {} (page {}, size {})", categoryId, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getProductsByCategory(categoryId, pageable);
 
-        logger.info("Retrieved {} products for category", products.getContent().size());
+        log.info("Retrieved {} products for category", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -208,13 +206,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Search products request received with query: {} (page {}, size {})", query, page, size);
+        log.info("Search products request received with query: {} (page {}, size {})", query, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.searchProducts(query, pageable);
 
-        logger.info("Search returned {} products", products.getContent().size());
+        log.info("Search returned {} products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -226,14 +224,14 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Admin search products request received with query: {} (page {}, size {})", query, page, size);
+        log.info("Admin search products request received with query: {} (page {}, size {})", query, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<ProductResponse> products = productService.searchAdminProducts(query, pageable);
 
-        logger.info("Admin search returned {} products", products.getContent().size());
+        log.info("Admin search returned {} products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -246,13 +244,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "price") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get products by price range request received: {} - {} (page {}, size {})", minPrice, maxPrice, page, size);
+        log.info("Get products by price range request received: {} - {} (page {}, size {})", minPrice, maxPrice, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getProductsByPriceRange(minPrice, maxPrice, pageable);
 
-        logger.info("Retrieved {} products in price range", products.getContent().size());
+        log.info("Retrieved {} products in price range", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -264,13 +262,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get products by tag request received: {} (page {}, size {})", tag, page, size);
+        log.info("Get products by tag request received: {} (page {}, size {})", tag, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getProductsByTag(tag, pageable);
 
-        logger.info("Retrieved {} products with tag", products.getContent().size());
+        log.info("Retrieved {} products with tag", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -282,13 +280,13 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get products without allergen request received: {} (page {}, size {})", allergen, page, size);
+        log.info("Get products without allergen request received: {} (page {}, size {})", allergen, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.getProductsWithoutAllergen(allergen, pageable);
 
-        logger.info("Retrieved {} products without allergen", products.getContent().size());
+        log.info("Retrieved {} products without allergen", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -305,14 +303,14 @@ public class ProductController {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
 
-        logger.info("Advanced product search with filters (page {}, size {})", page, size);
+        log.info("Advanced product search with filters (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductResponse> products = productService.searchProductsWithFilters(
                 categoryId, status, minPrice, maxPrice, inStock, pageable);
 
-        logger.info("Filter search returned {} products", products.getContent().size());
+        log.info("Filter search returned {} products", products.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(products));
     }
 
@@ -320,11 +318,11 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-        logger.info("Create product request received: {} (SKU: {})", request.getName(), request.getSku());
+        log.info("Create product request received: {} (SKU: {})", request.getName(), request.getSku());
 
         ProductResponse product = productService.createProduct(request);
 
-        logger.info("Product created successfully: {}", product.getId());
+        log.info("Product created successfully: {}", product.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
@@ -335,11 +333,11 @@ public class ProductController {
             @PathVariable String productId,
             @Valid @RequestBody ProductRequest request) {
 
-        logger.info("Update product request received: {}", productId);
+        log.info("Update product request received: {}", productId);
 
         ProductResponse product = productService.updateProduct(productId, request);
 
-        logger.info("Product updated successfully: {}", productId);
+        log.info("Product updated successfully: {}", productId);
         return ResponseEntity.ok(product);
     }
 
@@ -350,14 +348,14 @@ public class ProductController {
             @PathVariable String productId,
             @RequestBody Map<String, String> request) {
 
-        logger.info("Update product status request received: {}", productId);
+        log.info("Update product status request received: {}", productId);
 
         String statusStr = request.get("status");
         Product.ProductStatus status = Product.ProductStatus.valueOf(statusStr.toUpperCase());
 
         ProductResponse product = productService.updateProductStatus(productId, status);
 
-        logger.info("Product status updated to {}: {}", status, productId);
+        log.info("Product status updated to {}: {}", status, productId);
         return ResponseEntity.ok(product);
     }
 
@@ -365,11 +363,11 @@ public class ProductController {
     @PostMapping("/{productId}/toggle-featured")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> toggleFeaturedStatus(@PathVariable String productId) {
-        logger.info("Toggle featured status request received: {}", productId);
+        log.info("Toggle featured status request received: {}", productId);
 
         ProductResponse product = productService.toggleFeaturedStatus(productId);
 
-        logger.info("Product featured status toggled: {}", productId);
+        log.info("Product featured status toggled: {}", productId);
         return ResponseEntity.ok(product);
     }
 
@@ -377,18 +375,18 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> deleteProduct(@PathVariable String productId) {
-        logger.info("Delete product request received: {}", productId);
+        log.info("Delete product request received: {}", productId);
 
         productService.deleteProduct(productId);
 
-        logger.info("Product deleted successfully: {}", productId);
+        log.info("Product deleted successfully: {}", productId);
         return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Product deleted successfully"));
     }
 
     // Check product availability
     @GetMapping("/{productId}/availability")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse> checkProductAvailability(@PathVariable String productId) {
-        logger.info("Check product availability request received: {}", productId);
+        log.info("Check product availability request received: {}", productId);
 
         boolean available = productService.isProductAvailable(productId);
 
@@ -401,11 +399,11 @@ public class ProductController {
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getProductStatistics() {
-        logger.info("Get product statistics request received");
+        log.info("Get product statistics request received");
 
         Map<String, Object> statistics = productService.getProductStatistics();
 
-        logger.info("Product statistics retrieved");
+        log.info("Product statistics retrieved");
         return ResponseEntity.ok(statistics);
     }
     

@@ -1,11 +1,10 @@
 package com.blubugtech.bakery_product_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
 import com.blubugtech.bakery_product_service.dto.category.CategoryResponse;
 import com.blubugtech.bakery_product_service.service.CategoryService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +25,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/categories")
 
+@Slf4j
 public class CategoryController {
-
-    private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
     final private CategoryService categoryService;
 
@@ -43,14 +41,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get all categories request received (page {}, size {})", page, size);
+        log.info("Get all categories request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
 
-        logger.info("Retrieved {} categories", categories.getContent().size());
+        log.info("Retrieved {} categories", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -61,14 +59,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get active categories request received (page {}, size {})", page, size);
+        log.info("Get active categories request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
 
-        logger.info("Retrieved {} active categories", categories.getContent().size());
+        log.info("Retrieved {} active categories", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -79,14 +77,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get categories with products request received (page {}, size {})", page, size);
+        log.info("Get categories with products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
 
-        logger.info("Retrieved {} categories with products", categories.getContent().size());
+        log.info("Retrieved {} categories with products", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -97,14 +95,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get categories with active products request received (page {}, size {})", page, size);
+        log.info("Get categories with active products request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
 
-        logger.info("Retrieved {} categories with active products", categories.getContent().size());
+        log.info("Retrieved {} categories with active products", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -112,22 +110,22 @@ public class CategoryController {
     @GetMapping("/top-with-products")
     public ResponseEntity<List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
             @RequestParam(defaultValue = "5") int productLimit) {
-        logger.info("Get top categories with top products request received (productLimit {})", productLimit);
+        log.info("Get top categories with top products request received (productLimit {})", productLimit);
 
         List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit);
 
-        logger.info("Retrieved {} top categories with products", categories.size());
+        log.info("Retrieved {} top categories with products", categories.size());
         return ResponseEntity.ok(categories);
     }
 
     // Get category by ID
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String categoryId) {
-        logger.info("Get category by ID request received: {}", categoryId);
+        log.info("Get category by ID request received: {}", categoryId);
 
         CategoryResponse category = categoryService.getCategoryById(categoryId);
 
-        logger.info("Category retrieved: {}", category.getName());
+        log.info("Category retrieved: {}", category.getName());
         return ResponseEntity.ok(category);
     }
 
@@ -135,11 +133,11 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
-        logger.info("Create category request received: {}", request.getName());
+        log.info("Create category request received: {}", request.getName());
 
         CategoryResponse category = categoryService.createCategory(request);
 
-        logger.info("Category created successfully: {}", category.getId());
+        log.info("Category created successfully: {}", category.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
@@ -150,11 +148,11 @@ public class CategoryController {
             @PathVariable String categoryId,
             @Valid @RequestBody CategoryRequest request) {
 
-        logger.info("Update category request received: {}", categoryId);
+        log.info("Update category request received: {}", categoryId);
 
         CategoryResponse category = categoryService.updateCategory(categoryId, request);
 
-        logger.info("Category updated successfully: {}", categoryId);
+        log.info("Category updated successfully: {}", categoryId);
         return ResponseEntity.ok(category);
     }
 
@@ -162,11 +160,11 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> deleteCategory(@PathVariable String categoryId) {
-        logger.info("Delete category request received: {}", categoryId);
+        log.info("Delete category request received: {}", categoryId);
 
         categoryService.deleteCategory(categoryId);
 
-        logger.info("Category deleted successfully: {}", categoryId);
+        log.info("Category deleted successfully: {}", categoryId);
         return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Category deleted successfully"));
     }
 
@@ -178,14 +176,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Search categories request received with query: {} (page {}, size {})", query, page, size);
+        log.info("Search categories request received with query: {} (page {}, size {})", query, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
-        logger.info("Search returned {} categories", categories.getContent().size());
+        log.info("Search returned {} categories", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -197,14 +195,14 @@ public class CategoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Admin search categories request received with query: {} (page {}, size {})", query, page, size);
+        log.info("Admin search categories request received with query: {} (page {}, size {})", query, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
-        logger.info("Admin search returned {} categories", categories.getContent().size());
+        log.info("Admin search returned {} categories", categories.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(categories));
     }
 
@@ -212,11 +210,11 @@ public class CategoryController {
     @PostMapping("/{categoryId}/toggle-status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> toggleCategoryStatus(@PathVariable String categoryId) {
-        logger.info("Toggle category status request received: {}", categoryId);
+        log.info("Toggle category status request received: {}", categoryId);
 
         CategoryResponse category = categoryService.toggleCategoryStatus(categoryId);
 
-        logger.info("Category status toggled to {}: {}", category.getActive(), categoryId);
+        log.info("Category status toggled to {}: {}", category.getActive(), categoryId);
         return ResponseEntity.ok(category);
     }
 
@@ -224,11 +222,11 @@ public class CategoryController {
     @PostMapping("/reorder")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
-        logger.info("Reorder categories request received for {} categories", categoryOrders.size());
+        log.info("Reorder categories request received for {} categories", categoryOrders.size());
 
         categoryService.reorderCategories(categoryOrders);
 
-        logger.info("Categories reordered successfully");
+        log.info("Categories reordered successfully");
         return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Categories reordered successfully"));
     }
 
@@ -236,11 +234,11 @@ public class CategoryController {
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getCategoryStatistics() {
-        logger.info("Get category statistics request received");
+        log.info("Get category statistics request received");
 
         Map<String, Object> statistics = categoryService.getCategoryStatistics();
 
-        logger.info("Category statistics retrieved");
+        log.info("Category statistics retrieved");
         return ResponseEntity.ok(statistics);
     }
 

@@ -1,11 +1,10 @@
 package com.blubugtech.bakery_product_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.dto.inventory.InventoryResponse;
 import com.blubugtech.bakery_product_service.dto.inventory.InventoryUpdateRequest;
 import com.blubugtech.bakery_product_service.service.InventoryService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +23,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/inventory")
 
+@Slf4j
 public class InventoryController {
-
-    private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
 
     final private InventoryService inventoryService;
 
@@ -42,13 +40,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get all inventory request received (page {}, size {})", page, size);
+        log.info("Get all inventory request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> inventory = inventoryService.getAllInventory(pageable);
 
-        logger.info("Retrieved {} inventory items", inventory.getContent().size());
+        log.info("Retrieved {} inventory items", inventory.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(inventory));
     }
 
@@ -60,36 +58,36 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Admin search inventory request received with query: {} (page {}, size {})", query, page, size);
+        log.info("Admin search inventory request received with query: {} (page {}, size {})", query, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<InventoryResponse> inventory = inventoryService.searchInventory(query, pageable);
 
-        logger.info("Admin search returned {} inventory items", inventory.getContent().size());
+        log.info("Admin search returned {} inventory items", inventory.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(inventory));
     }
 
     // Get inventory by product ID
     @GetMapping("/product/{productId}")
     public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable String productId) {
-        logger.info("Get inventory by product ID request received: {}", productId);
+        log.info("Get inventory by product ID request received: {}", productId);
 
         InventoryResponse inventory = inventoryService.getInventoryByProductId(productId);
 
-        logger.info("Inventory retrieved for product: {}", productId);
+        log.info("Inventory retrieved for product: {}", productId);
         return ResponseEntity.ok(inventory);
     }
 
     // Get inventory by product SKU
     @GetMapping("/sku/{sku}")
     public ResponseEntity<InventoryResponse> getInventoryByProductSku(@PathVariable String sku) {
-        logger.info("Get inventory by product SKU request received: {}", sku);
+        log.info("Get inventory by product SKU request received: {}", sku);
 
         return inventoryService.getInventoryByProductSku(sku)
                 .map(inventory -> {
-                    logger.info("Inventory found for SKU: {}", sku);
+                    log.info("Inventory found for SKU: {}", sku);
                     return ResponseEntity.ok(inventory);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -103,13 +101,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get low stock items request received (page {}, size {})", page, size);
+        log.info("Get low stock items request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> lowStockItems = inventoryService.getLowStockItems(pageable);
 
-        logger.info("Retrieved {} low stock items", lowStockItems.getContent().size());
+        log.info("Retrieved {} low stock items", lowStockItems.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(lowStockItems));
     }
 
@@ -121,13 +119,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get out of stock items request received (page {}, size {})", page, size);
+        log.info("Get out of stock items request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> outOfStockItems = inventoryService.getOutOfStockItems(pageable);
 
-        logger.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
+        log.info("Retrieved {} out of stock items", outOfStockItems.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(outOfStockItems));
     }
 
@@ -139,13 +137,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get items needing reorder request received (page {}, size {})", page, size);
+        log.info("Get items needing reorder request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> itemsNeedingReorder = inventoryService.getItemsNeedingReorder(pageable);
 
-        logger.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
+        log.info("Retrieved {} items needing reorder", itemsNeedingReorder.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(itemsNeedingReorder));
     }
 
@@ -157,13 +155,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get expired items request received (page {}, size {})", page, size);
+        log.info("Get expired items request received (page {}, size {})", page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> expiredItems = inventoryService.getExpiredItems(pageable);
 
-        logger.info("Retrieved {} expired items", expiredItems.getContent().size());
+        log.info("Retrieved {} expired items", expiredItems.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(expiredItems));
     }
 
@@ -176,13 +174,13 @@ public class InventoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        logger.info("Get items expiring soon request received (within {} hours, page {}, size {})", hours, page, size);
+        log.info("Get items expiring soon request received (within {} hours, page {}, size {})", hours, page, size);
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<InventoryResponse> expiringSoonItems = inventoryService.getItemsExpiringSoon(hours, pageable);
 
-        logger.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
+        log.info("Retrieved {} items expiring soon", expiringSoonItems.getContent().size());
         return ResponseEntity.ok(new PagedModel<>(expiringSoonItems));
     }
 
@@ -193,11 +191,11 @@ public class InventoryController {
             @PathVariable String productId,
             @Valid @RequestBody InventoryUpdateRequest request) {
 
-        logger.info("Update inventory request received for product: {}", productId);
+        log.info("Update inventory request received for product: {}", productId);
 
         InventoryResponse inventory = inventoryService.updateInventory(productId, request);
 
-        logger.info("Inventory updated successfully for product: {}", productId);
+        log.info("Inventory updated successfully for product: {}", productId);
         return ResponseEntity.ok(inventory);
     }
 
@@ -208,14 +206,14 @@ public class InventoryController {
             @PathVariable String productId,
             @RequestBody Map<String, Object> request) {
 
-        logger.info("Add stock request received for product: {}", productId);
+        log.info("Add stock request received for product: {}", productId);
 
         Integer quantity = (Integer) request.get("quantity");
         String notes = (String) request.get("notes");
 
         InventoryResponse inventory = inventoryService.addStock(productId, quantity, notes);
 
-        logger.info("Stock added successfully: {} units for product: {}", quantity, productId);
+        log.info("Stock added successfully: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(inventory);
     }
 
@@ -226,7 +224,7 @@ public class InventoryController {
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
-        logger.info("Reserve stock request received for product: {}", productId);
+        log.info("Reserve stock request received for product: {}", productId);
 
         Integer quantity = request.get("quantity");
         boolean success = inventoryService.reserveStock(productId, quantity);
@@ -238,10 +236,10 @@ public class InventoryController {
 
         if (success) {
             response.setMessage("Stock reserved successfully");
-            logger.info("Stock reserved successfully: {} units for product: {}", quantity, productId);
+            log.info("Stock reserved successfully: {} units for product: {}", quantity, productId);
         } else {
             response.setMessage("Insufficient stock to reserve");
-            logger.warn("Failed to reserve stock: {} units for product: {}", quantity, productId);
+            log.warn("Failed to reserve stock: {} units for product: {}", quantity, productId);
         }
 
         return ResponseEntity.ok(response);
@@ -254,14 +252,14 @@ public class InventoryController {
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
-        logger.info("Release reserved stock request received for product: {}", productId);
+        log.info("Release reserved stock request received for product: {}", productId);
 
         Integer quantity = request.get("quantity");
         inventoryService.releaseReservedStock(productId, quantity);
 
         com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Reserved stock released successfully");
 
-        logger.info("Reserved stock released: {} units for product: {}", quantity, productId);
+        log.info("Reserved stock released: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
     }
 
@@ -272,14 +270,14 @@ public class InventoryController {
             @PathVariable String productId,
             @RequestBody Map<String, Integer> request) {
 
-        logger.info("Consume stock request received for product: {}", productId);
+        log.info("Consume stock request received for product: {}", productId);
 
         Integer quantity = request.get("quantity");
         inventoryService.consumeStock(productId, quantity);
 
         com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Stock consumed successfully");
 
-        logger.info("Stock consumed: {} units for product: {}", quantity, productId);
+        log.info("Stock consumed: {} units for product: {}", quantity, productId);
         return ResponseEntity.ok(response);
     }
 
@@ -289,7 +287,7 @@ public class InventoryController {
             @PathVariable String productId,
             @RequestParam Integer quantity) {
 
-        logger.info("Check stock availability request received for product: {} (quantity: {})",
+        log.info("Check stock availability request received for product: {} (quantity: {})",
                 productId, quantity);
 
         boolean available = inventoryService.checkStockAvailability(productId, quantity);
@@ -303,7 +301,7 @@ public class InventoryController {
     // Get available stock for a product
     @GetMapping("/product/{productId}/available-stock")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockAvailabilityResponse> getAvailableStock(@PathVariable String productId) {
-        logger.info("Get available stock request received for product: {}", productId);
+        log.info("Get available stock request received for product: {}", productId);
 
         Integer availableStock = inventoryService.getAvailableStock(productId);
 
@@ -318,12 +316,12 @@ public class InventoryController {
     public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> bulkUpdateMinimumStock(
             @RequestBody Map<String, Integer> productMinimumStocks) {
 
-        logger.info("Bulk update minimum stock request received for {} products",
+        log.info("Bulk update minimum stock request received for {} products",
                 productMinimumStocks.size());
 
         inventoryService.bulkUpdateMinimumStock(productMinimumStocks);
 
-        logger.info("Bulk minimum stock update completed for {} products", productMinimumStocks.size());
+        log.info("Bulk minimum stock update completed for {} products", productMinimumStocks.size());
         return ResponseEntity.ok(new com.blubugtech.common.contract.feign.MessageResponse("Minimum stock levels updated successfully. Updated products: " + productMinimumStocks.size()));
     }
 
@@ -331,11 +329,11 @@ public class InventoryController {
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getInventoryStatistics() {
-        logger.info("Get inventory statistics request received");
+        log.info("Get inventory statistics request received");
 
         Map<String, Object> statistics = inventoryService.getInventoryStatistics();
 
-        logger.info("Inventory statistics retrieved");
+        log.info("Inventory statistics retrieved");
         return ResponseEntity.ok(statistics);
     }
 

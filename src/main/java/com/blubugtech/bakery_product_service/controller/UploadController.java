@@ -1,8 +1,7 @@
 package com.blubugtech.bakery_product_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.integration.storage.StorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +13,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/uploads")
+@Slf4j
 public class UploadController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     private final StorageService storageService;
 
@@ -28,13 +26,13 @@ public class UploadController {
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.media.MediaUploadResponse> uploadMedia(
             @RequestPart("media") List<MultipartFile> media) {
         
-        logger.info("Upload media request received, count: {}", media.size());
+        log.info("Upload media request received, count: {}", media.size());
 
         List<String> urls = storageService.uploadFiles(media);
         
         com.blubugtech.bakery_product_service.dto.media.MediaUploadResponse response = new com.blubugtech.bakery_product_service.dto.media.MediaUploadResponse("Files uploaded successfully", urls);
 
-        logger.info("Successfully uploaded {} media files", urls.size());
+        log.info("Successfully uploaded {} media files", urls.size());
         return ResponseEntity.ok(response);
     }
 

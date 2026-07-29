@@ -1,7 +1,6 @@
 package com.blubugtech.bakery_product_service.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,13 +17,12 @@ import java.util.Map;
 import org.blubakery.bakery_common_libs.exception.handler.BaseExceptionHandler;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends BaseExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ProductServiceException.class)
     public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceException ex, WebRequest request) {
-        logger.error("Product service error: {}", ex.getMessage());
+        log.error("Product service error: {}", ex.getMessage());
 
         ErrorResponse error = new ErrorResponse(
             "PRODUCT_SERVICE_ERROR",
@@ -40,7 +38,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException ex, WebRequest request) {
-        logger.error("Insufficient stock error: {}", ex.getMessage());
+        log.error("Insufficient stock error: {}", ex.getMessage());
 
         ErrorResponse error = new ErrorResponse(
             "INSUFFICIENT_STOCK",
@@ -78,7 +76,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     
     @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxSizeException(org.springframework.web.multipart.MaxUploadSizeExceededException exc, WebRequest request) {
-        logger.error("Upload size exceeded: {}", exc.getMessage());
+        log.error("Upload size exceeded: {}", exc.getMessage());
         ErrorResponse error = new ErrorResponse(
             "PAYLOAD_TOO_LARGE",
             "File size exceeds the configured maximum limit (50MB).",
@@ -90,7 +88,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
     @ExceptionHandler(org.springframework.web.multipart.MultipartException.class)
     public ResponseEntity<ErrorResponse> handleMultipartException(org.springframework.web.multipart.MultipartException exc, WebRequest request) {
-        logger.error("Multipart error: {}", exc.getMessage());
+        log.error("Multipart error: {}", exc.getMessage());
         ErrorResponse error = new ErrorResponse(
             "MULTIPART_ERROR",
             "Failed to parse multipart request, possibly due to file size exceeding limits.",

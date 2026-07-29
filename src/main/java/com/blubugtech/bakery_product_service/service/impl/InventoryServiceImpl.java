@@ -1,5 +1,6 @@
 package com.blubugtech.bakery_product_service.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.service.InventoryService;
 
 import com.blubugtech.bakery_product_service.dto.inventory.InventoryResponse;
@@ -9,8 +10,6 @@ import com.blubugtech.bakery_product_service.mapper.InventoryMapper;
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import com.blubugtech.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
@@ -24,9 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @Service
+@Slf4j
 public class InventoryServiceImpl implements InventoryService {
-
-    private static final Logger logger = LoggerFactory.getLogger(InventoryService.class);
 
     final private ProductRepository productRepository;
     final private InventoryMapper inventoryMapper;
@@ -41,7 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     public Inventory createInventoryForProduct(Product product, Integer initialStock,
                                              Integer minimumStock, Integer reorderLevel) {
-        logger.info("Creating inventory for product: {} (SKU: {})", product.getName(), product.getSku());
+        log.info("Creating inventory for product: {} (SKU: {})", product.getName(), product.getSku());
 
         Inventory inventory = new Inventory();
         inventory.setCurrentStock(initialStock != null ? initialStock : 0);
@@ -52,7 +50,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         product.setInventory(inventory);
         productRepository.save(product);
-        logger.info("Inventory created for product: {}", product.getId());
+        log.info("Inventory created for product: {}", product.getId());
 
         return inventory;
     }

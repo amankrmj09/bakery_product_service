@@ -1,5 +1,6 @@
 package com.blubugtech.bakery_product_service.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.service.CategoryService;
 
 import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
@@ -8,8 +9,6 @@ import com.blubugtech.bakery_product_service.entity.Category;
 import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.CategoryRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
 import org.springframework.data.domain.Page;
@@ -26,9 +25,8 @@ import com.blubugtech.bakery_product_service.dto.product.ProductResponse;
 import com.blubugtech.bakery_product_service.entity.Product;
 
 @Service
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
-
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     final private CategoryRepository categoryRepository;
     final private com.blubugtech.bakery_product_service.repository.ProductRepository productRepository;
@@ -211,7 +209,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             categorySearchService.indexCategory(category);
         } catch (Exception e) {
-            logger.error("Failed to sync category {} to Elasticsearch: {}", category.getId(), e.getMessage());
+            log.error("Failed to sync category {} to Elasticsearch: {}", category.getId(), e.getMessage());
         }
     }
 
@@ -219,7 +217,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             categorySearchService.deleteCategoryFromIndex(categoryId);
         } catch (Exception e) {
-            logger.error("Failed to delete category {} from Elasticsearch: {}", categoryId, e.getMessage());
+            log.error("Failed to delete category {} from Elasticsearch: {}", categoryId, e.getMessage());
         }
     }
 }

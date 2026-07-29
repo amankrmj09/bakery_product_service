@@ -1,5 +1,6 @@
 package com.blubugtech.bakery_product_service.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_product_service.service.CategoryService;
 import com.blubugtech.bakery_product_service.service.InventoryService;
 
@@ -14,8 +15,6 @@ import com.blubugtech.bakery_product_service.mapper.ProductMapper;
 import com.blubugtech.bakery_product_service.search.service.ProductSearchService;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +41,8 @@ import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
+@Slf4j
 public class ProductServiceImpl implements ProductService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     final private ProductRepository productRepository;
 
@@ -70,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Create new product
     public ProductResponse createProduct(ProductRequest request) {
-        logger.info("Creating new product: {} (SKU: {})", request.getName(), request.getSku());
+        log.info("Creating new product: {} (SKU: {})", request.getName(), request.getSku());
 
         // Check if SKU already exists
         if (productRepository.existsBySku(request.getSku())) {
@@ -115,14 +113,14 @@ public class ProductServiceImpl implements ProductService {
         syncToElasticsearch(savedProduct);
         publishProductEvent(savedProduct, "CREATED");
 
-        logger.info("Product created successfully with ID: {}", savedProduct.getId());
+        log.info("Product created successfully with ID: {}", savedProduct.getId());
         return productMapper.toResponse(savedProduct);
     }
 
     // Get all products
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        logger.debug("Fetching all products");
+        log.debug("Fetching all products");
 
         return productRepository.findAll(pageable)
                 .map(productMapper::toResponse);
@@ -131,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
     // Get active products
     @Transactional(readOnly = true)
     public Page<ProductResponse> getActiveProducts(Pageable pageable) {
-        logger.debug("Fetching active products");
+        log.debug("Fetching active products");
 
         return productRepository.findByStatus(Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -140,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
     // Get available products (active with stock)
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAvailableProducts(Pageable pageable) {
-        logger.debug("Fetching available products");
+        log.debug("Fetching available products");
 
         return productRepository.findAvailableProducts(pageable)
                 .map(productMapper::toResponse);
@@ -149,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
     // Get featured products
     @Transactional(readOnly = true)
     public Page<ProductResponse> getFeaturedProducts(Pageable pageable) {
-        logger.debug("Fetching featured products");
+        log.debug("Fetching featured products");
 
         return productRepository.findByIsFeaturedTrueAndStatus(Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -158,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
     // Get product by ID
     @Transactional(readOnly = true)
     public ProductResponse getProductById(String productId) {
-        logger.debug("Fetching product by ID: {}", productId);
+        log.debug("Fetching product by ID: {}", productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
@@ -169,7 +167,7 @@ public class ProductServiceImpl implements ProductService {
     // Get product by SKU
     @Transactional(readOnly = true)
     public Optional<ProductResponse> getProductBySku(String sku) {
-        logger.debug("Fetching product by SKU: {}", sku);
+        log.debug("Fetching product by SKU: {}", sku);
 
         return productRepository.findBySku(sku)
                 .map(productMapper::toResponse);
@@ -178,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products by category
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
-        logger.debug("Fetching products by category with pagination: {}", categoryId);
+        log.debug("Fetching products by category with pagination: {}", categoryId);
 
         return productRepository.findByCategoryIdAndStatus(categoryId, Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -187,7 +185,7 @@ public class ProductServiceImpl implements ProductService {
     // Search products
     @Transactional(readOnly = true)
     public Page<ProductResponse> searchProducts(String searchTerm, Pageable pageable) {
-        logger.debug("Searching products with pagination, term: {}", searchTerm);
+        log.debug("Searching products with pagination, term: {}", searchTerm);
 
         return productRepository.searchProducts(searchTerm, Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -196,7 +194,7 @@ public class ProductServiceImpl implements ProductService {
     // Search products for admin (no status filter)
     @Transactional(readOnly = true)
     public Page<ProductResponse> searchAdminProducts(String searchTerm, Pageable pageable) {
-        logger.debug("Admin searching products with pagination, term: {}", searchTerm);
+        log.debug("Admin searching products with pagination, term: {}", searchTerm);
 
         return productRepository.searchAdminProducts(searchTerm, pageable)
                 .map(productMapper::toResponse);
@@ -205,7 +203,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products by price range
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        logger.debug("Fetching products by price range: {} - {}", minPrice, maxPrice);
+        log.debug("Fetching products by price range: {} - {}", minPrice, maxPrice);
 
         return productRepository.findByPriceRange(minPrice, maxPrice, Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -214,7 +212,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products on sale
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsOnSale(Pageable pageable) {
-        logger.debug("Fetching products on sale");
+        log.debug("Fetching products on sale");
 
         return productRepository.findProductsOnSale(Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -223,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products by tag
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsByTag(String tag, Pageable pageable) {
-        logger.debug("Fetching products by tag: {}", tag);
+        log.debug("Fetching products by tag: {}", tag);
 
         return productRepository.findByTag(tag, Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -232,7 +230,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products without specific allergen
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsWithoutAllergen(String allergen, Pageable pageable) {
-        logger.debug("Fetching products without allergen: {}", allergen);
+        log.debug("Fetching products without allergen: {}", allergen);
 
         return productRepository.findProductsWithoutAllergen(allergen, Product.ProductStatus.ACTIVE, pageable)
                 .map(productMapper::toResponse);
@@ -243,7 +241,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> searchProductsWithFilters(String categoryId, Product.ProductStatus status,
                                                           BigDecimal minPrice, BigDecimal maxPrice,
                                                           Boolean inStock, Pageable pageable) {
-        logger.debug("Advanced product search with filters");
+        log.debug("Advanced product search with filters");
 
         return productRepository.findProductsWithFilters(categoryId, status, minPrice, maxPrice, inStock, pageable)
                 .map(productMapper::toResponse);
@@ -251,7 +249,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Update product
     public ProductResponse updateProduct(String productId, ProductRequest request) {
-        logger.info("Updating product: {}", productId);
+        log.info("Updating product: {}", productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
@@ -294,14 +292,14 @@ public class ProductServiceImpl implements ProductService {
         syncToElasticsearch(updatedProduct);
         publishProductEvent(updatedProduct, "UPDATED");
         
-        logger.info("Product updated successfully: {}", productId);
+        log.info("Product updated successfully: {}", productId);
 
         return productMapper.toResponse(updatedProduct);
     }
 
     // Update product status
     public ProductResponse updateProductStatus(String productId, Product.ProductStatus status) {
-        logger.info("Updating product status to {} for product: {}", status, productId);
+        log.info("Updating product status to {} for product: {}", status, productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
@@ -312,13 +310,13 @@ public class ProductServiceImpl implements ProductService {
         syncToElasticsearch(updatedProduct);
         publishProductEvent(updatedProduct, "STATUS_UPDATED");
 
-        logger.info("Product status updated successfully: {}", productId);
+        log.info("Product status updated successfully: {}", productId);
         return productMapper.toResponse(updatedProduct);
     }
 
     // Toggle featured status
     public ProductResponse toggleFeaturedStatus(String productId) {
-        logger.info("Toggling featured status for product: {}", productId);
+        log.info("Toggling featured status for product: {}", productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
@@ -326,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
         product.setIsFeatured(!product.getIsFeatured());
         Product updatedProduct = productRepository.save(product);
 
-        logger.info("Product featured status toggled to {} for product: {}",
+        log.info("Product featured status toggled to {} for product: {}",
                    updatedProduct.getIsFeatured(), productId);
 
         return productMapper.toResponse(updatedProduct);
@@ -334,7 +332,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Delete product
     public void deleteProduct(String productId) {
-        logger.info("Deleting product: {}", productId);
+        log.info("Deleting product: {}", productId);
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
@@ -358,13 +356,13 @@ public class ProductServiceImpl implements ProductService {
         event.setPayload(payload);
         productEventPublisher.publishProductUpdated(event);
         
-        logger.info("Product deleted successfully: {}", productId);
+        log.info("Product deleted successfully: {}", productId);
     }
 
     // Get recently added products
     @Transactional(readOnly = true)
     public Page<ProductResponse> getRecentlyAddedProducts(int days, Pageable pageable) {
-        logger.debug("Fetching products added in last {} days", days);
+        log.debug("Fetching products added in last {} days", days);
 
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         return productRepository.findByStatusAndCreatedAtAfter(Product.ProductStatus.ACTIVE, since, pageable)
@@ -374,7 +372,7 @@ public class ProductServiceImpl implements ProductService {
     // Get products by preparation time range
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable) {
-        logger.debug("Fetching products by preparation time: {} - {} minutes", minMinutes, maxMinutes);
+        log.debug("Fetching products by preparation time: {} - {} minutes", minMinutes, maxMinutes);
 
         return productRepository.findByStatusAndPreparationTimeMinutesBetween(
                 Product.ProductStatus.ACTIVE, minMinutes, maxMinutes, pageable)
@@ -383,7 +381,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Get product statistics
     public Map<String, Object> getProductStatistics() {
-        logger.debug("Fetching product statistics");
+        log.debug("Fetching product statistics");
         long totalProducts = productRepository.count();
         long activeProducts = productRepository.countByStatus(Product.ProductStatus.ACTIVE);
 
@@ -410,7 +408,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByIds(List<String> productIds) {
-        logger.debug("Fetching products by IDs: {}", productIds);
+        log.debug("Fetching products by IDs: {}", productIds);
         return productRepository.findAllById(productIds).stream()
                 .map(productMapper::toResponse)
                 .collect(Collectors.toList());
@@ -419,7 +417,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> validateProducts(List<String> productIds) {
-        logger.debug("Validating products for IDs: {}", productIds);
+        log.debug("Validating products for IDs: {}", productIds);
         List<Product> products = productRepository.findAllById(productIds);
         
         if (products.size() != productIds.size()) {
@@ -445,7 +443,7 @@ public class ProductServiceImpl implements ProductService {
 
             productSearchService.indexProduct(product);
         } catch (Exception e) {
-            logger.error("Failed to sync product {} to Elasticsearch: {}", product.getId(), e.getMessage());
+            log.error("Failed to sync product {} to Elasticsearch: {}", product.getId(), e.getMessage());
         }
     }
 
@@ -453,7 +451,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             productSearchService.deleteProductFromIndex(productId);
         } catch (Exception e) {
-            logger.error("Failed to delete product {} from Elasticsearch: {}", productId, e.getMessage());
+            log.error("Failed to delete product {} from Elasticsearch: {}", productId, e.getMessage());
         }
     }
 
@@ -473,7 +471,7 @@ public class ProductServiceImpl implements ProductService {
             event.setPayload(payload);
             productEventPublisher.publishProductUpdated(event);
         } catch (Exception e) {
-            logger.error("Failed to publish ProductEvent for {}: {}", product.getId(), e.getMessage());
+            log.error("Failed to publish ProductEvent for {}: {}", product.getId(), e.getMessage());
         }
     }
 
