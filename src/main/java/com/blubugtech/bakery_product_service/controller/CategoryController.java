@@ -159,13 +159,13 @@ public class CategoryController {
     // Delete category
     @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<org.blubakery.bakery_common_libs.contract.feign.MessageResponse> deleteCategory(@PathVariable String categoryId) {
+    public ResponseEntity<org.blubakery.common.feign.contract.feign.MessageResponse> deleteCategory(@PathVariable String categoryId) {
         log.info("Delete category request received: {}", categoryId);
 
         categoryService.deleteCategory(categoryId);
 
         log.info("Category deleted successfully: {}", categoryId);
-        return ResponseEntity.ok(new org.blubakery.bakery_common_libs.contract.feign.MessageResponse("Category deleted successfully"));
+        return ResponseEntity.ok(new org.blubakery.common.feign.contract.feign.MessageResponse("Category deleted successfully"));
     }
 
     // Search categories
@@ -221,13 +221,13 @@ public class CategoryController {
     // Reorder categories
     @PostMapping("/reorder")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<org.blubakery.bakery_common_libs.contract.feign.MessageResponse> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
+    public ResponseEntity<org.blubakery.common.feign.contract.feign.MessageResponse> reorderCategories(@RequestBody Map<String, Integer> categoryOrders) {
         log.info("Reorder categories request received for {} categories", categoryOrders.size());
 
         categoryService.reorderCategories(categoryOrders);
 
         log.info("Categories reordered successfully");
-        return ResponseEntity.ok(new org.blubakery.bakery_common_libs.contract.feign.MessageResponse("Categories reordered successfully"));
+        return ResponseEntity.ok(new org.blubakery.common.feign.contract.feign.MessageResponse("Categories reordered successfully"));
     }
 
     // Get category statistics

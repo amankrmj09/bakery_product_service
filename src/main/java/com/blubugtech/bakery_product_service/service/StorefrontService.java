@@ -11,6 +11,6 @@ import java.util.List;
 public interface StorefrontService {
     Storefront getStorefront();
     Storefront updateStorefront(Storefront config);
-    org.blubakery.bakery_common_libs.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal);
+    org.blubakery.common.feign.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal);
 }
 

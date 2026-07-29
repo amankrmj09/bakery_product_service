@@ -10,7 +10,7 @@ import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
-import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
+import org.blubakery.common.core.exception.common.DuplicateResourceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

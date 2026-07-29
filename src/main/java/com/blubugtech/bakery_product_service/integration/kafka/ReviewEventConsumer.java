@@ -2,9 +2,9 @@ package com.blubugtech.bakery_product_service.integration.kafka;
 
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.repository.ProductRepository;
-import org.blubakery.bakery_common_libs.constants.KafkaTopics;
-import org.blubakery.bakery_common_libs.contract.messaging.ReviewPayload;
-import org.blubakery.bakery_common_libs.event.ReviewEvent;
+import org.blubakery.common.messaging.constants.KafkaTopics;
+import org.blubakery.common.messaging.contract.messaging.ReviewPayload;
+import org.blubakery.common.messaging.event.ReviewEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

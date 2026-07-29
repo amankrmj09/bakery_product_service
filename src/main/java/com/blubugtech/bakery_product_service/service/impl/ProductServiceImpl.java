@@ -20,13 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.blubugtech.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
-import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
-import org.blubakery.bakery_common_libs.exception.common.ResourceNotFoundException;
+import org.blubakery.common.core.exception.common.DuplicateResourceException;
+import org.blubakery.common.core.exception.common.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
+import org.blubakery.common.core.exception.common.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -344,12 +344,12 @@ public class ProductServiceImpl implements ProductService {
         deleteFromElasticsearch(productId);
         
         // publish event
-        org.blubakery.bakery_common_libs.contract.messaging.ProductPayload payload = org.blubakery.bakery_common_libs.contract.messaging.ProductPayload.builder()
+        org.blubakery.common.messaging.contract.messaging.ProductPayload payload = org.blubakery.common.messaging.contract.messaging.ProductPayload.builder()
                 .productId(UUID.fromString(productId))
                 .action("DELETED")
                 .timestamp(LocalDateTime.now())
                 .build();
-        org.blubakery.bakery_common_libs.event.ProductEvent event = new org.blubakery.bakery_common_libs.event.ProductEvent();
+        org.blubakery.common.messaging.event.ProductEvent event = new org.blubakery.common.messaging.event.ProductEvent();
         event.setEventId(UUID.randomUUID().toString());
         event.setEventType("PRODUCT_DELETED");
         event.setTimestamp(java.time.Instant.now());
@@ -457,14 +457,14 @@ public class ProductServiceImpl implements ProductService {
 
     private void publishProductEvent(Product product, String action) {
         try {
-            org.blubakery.bakery_common_libs.contract.messaging.ProductPayload payload = org.blubakery.bakery_common_libs.contract.messaging.ProductPayload.builder()
+            org.blubakery.common.messaging.contract.messaging.ProductPayload payload = org.blubakery.common.messaging.contract.messaging.ProductPayload.builder()
                     .productId(java.util.UUID.fromString(product.getId()))
                     .name(product.getName())
                     .price(product.getPrice())
                     .action(action)
                     .timestamp(java.time.LocalDateTime.now())
                     .build();
-            org.blubakery.bakery_common_libs.event.ProductEvent event = new org.blubakery.bakery_common_libs.event.ProductEvent();
+            org.blubakery.common.messaging.event.ProductEvent event = new org.blubakery.common.messaging.event.ProductEvent();
             event.setEventId(java.util.UUID.randomUUID().toString());
             event.setEventType("PRODUCT_" + action.toUpperCase());
             event.setTimestamp(java.time.Instant.now());

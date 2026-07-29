@@ -9,7 +9,7 @@ import com.blubugtech.bakery_product_service.repository.CategoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.blubakery.bakery_common_libs.exception.common.DuplicateResourceException;
+import org.blubakery.common.core.exception.common.DuplicateResourceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
