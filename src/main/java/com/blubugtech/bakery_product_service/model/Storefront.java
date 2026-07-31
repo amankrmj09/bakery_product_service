@@ -29,14 +29,14 @@ public class Storefront {
     @AllArgsConstructor
     @Builder
     public static class HeroSection {
-        private List<Campaign> campaigns;
+        private List<HeroBanner> heroBanners;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class Campaign { 
+    public static class HeroBanner { 
         private String imageUrl;
         private String title;
         private String description;

@@ -70,7 +70,7 @@ public class StorefrontServiceImpl implements StorefrontService {
         Storefront config = Storefront.builder()
                 .id(DEFAULT_ID)
                 .heroSection(Storefront.HeroSection.builder()
-                        .campaigns(List.of())
+                        .heroBanners(List.of())
                         .build())
                 .aboutSection(Storefront.AboutSection.builder()
                         .tag(null)

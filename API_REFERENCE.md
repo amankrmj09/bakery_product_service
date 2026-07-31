@@ -38,7 +38,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<CategoryResponseDto>`
+  `Page<CategoryResponse>`
 
 ### 2.2 Get active categories
 - **Method:** `GET`
@@ -46,7 +46,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<CategoryResponseDto>`
+  `Page<CategoryResponse>`
 
 ### 2.3 Get categories with products
 - **Method:** `GET`
@@ -54,7 +54,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<CategoryResponseDto>`
+  `Page<CategoryResponse>`
 
 ### 2.4 Get categories with active products
 - **Method:** `GET`
@@ -62,7 +62,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<CategoryResponseDto>`
+  `Page<CategoryResponse>`
 
 ### 2.5 Get category by ID
 - **Method:** `GET`
@@ -70,7 +70,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `CategoryResponseDto`
+  `CategoryResponse`
 
 ### 2.6 Create new category
 - **Method:** `POST`
@@ -88,7 +88,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 - **Response Body:** `201 Created`
-  `CategoryResponseDto`
+  `CategoryResponse`
 
 ### 2.7 Update category
 - **Method:** `PUT`
@@ -97,7 +97,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Request Body:**
   *(Same as Create new category)*
 - **Response Body:** `200 OK`
-  `CategoryResponseDto`
+  `CategoryResponse`
 
 ### 2.8 Delete category
 - **Method:** `DELETE`
@@ -118,7 +118,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<CategoryResponseDto>`
+  `Page<CategoryResponse>`
 
 ### 2.10 Toggle category status
 - **Method:** `POST`
@@ -126,7 +126,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `CategoryResponseDto`
+  `CategoryResponse`
 
 ### 2.11 Reorder categories
 - **Method:** `POST`
@@ -166,7 +166,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.2 Get active products
 - **Method:** `GET`
@@ -174,7 +174,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.3 Get available products
 - **Method:** `GET`
@@ -182,7 +182,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.4 Get featured products
 - **Method:** `GET`
@@ -190,7 +190,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.5 Get products on sale
 - **Method:** `GET`
@@ -198,7 +198,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.6 Get recently added products
 - **Method:** `GET`
@@ -206,7 +206,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.7 Get product by ID
 - **Method:** `GET`
@@ -214,7 +214,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.8 Get multiple products by IDs
 - **Method:** `GET`
@@ -222,7 +222,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `List<ProductResponseDto>`
+  `List<ProductResponse>`
 
 ### 3.9 Validate multiple products
 - **Method:** `POST`
@@ -236,7 +236,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   ]
   ```
 - **Response Body:** `200 OK`
-  `List<ProductResponseDto>`
+  `List<ProductResponse>`
 
 ### 3.10 Get product by SKU
 - **Method:** `GET`
@@ -244,7 +244,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.11 Get products by category
 - **Method:** `GET`
@@ -252,7 +252,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.12 Search products by query
 - **Method:** `GET`
@@ -260,7 +260,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.13 Get products by price range
 - **Method:** `GET`
@@ -268,7 +268,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.14 Get products by tag
 - **Method:** `GET`
@@ -276,7 +276,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.15 Get products without allergen
 - **Method:** `GET`
@@ -284,7 +284,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.16 Advanced search with filters
 - **Method:** `GET`
@@ -292,7 +292,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<ProductResponseDto>`
+  `Page<ProductResponse>`
 
 ### 3.17 Create new product
 - **Method:** `POST`
@@ -309,7 +309,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 - **Response Body:** `201 Created`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.18 Update product
 - **Method:** `PUT`
@@ -318,7 +318,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Request Body:**
   *(Same as Create new product)*
 - **Response Body:** `200 OK`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.19 Update product status
 - **Method:** `PATCH`
@@ -331,7 +331,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 - **Response Body:** `200 OK`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.20 Toggle featured status
 - **Method:** `POST`
@@ -339,7 +339,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `ProductResponseDto`
+  `ProductResponse`
 
 ### 3.21 Delete product
 - **Method:** `DELETE`
@@ -387,7 +387,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.2 Get inventory for specific product
 - **Method:** `GET`
@@ -395,7 +395,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `InventoryResponseDto`
+  `InventoryResponse`
 
 ### 4.3 Get inventory by SKU
 - **Method:** `GET`
@@ -403,7 +403,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `InventoryResponseDto`
+  `InventoryResponse`
 
 ### 4.4 Get low stock
 - **Method:** `GET`
@@ -411,7 +411,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.5 Get out of stock
 - **Method:** `GET`
@@ -419,7 +419,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.6 Get items needing reorder
 - **Method:** `GET`
@@ -427,7 +427,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.7 Get expired
 - **Method:** `GET`
@@ -435,7 +435,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.8 Get expiring soon
 - **Method:** `GET`
@@ -443,7 +443,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 - **Type of API:** `Admin`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `Page<InventoryResponseDto>`
+  `Page<InventoryResponse>`
 
 ### 4.9 Update inventory details
 - **Method:** `PUT`
@@ -458,7 +458,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 - **Response Body:** `200 OK`
-  `InventoryResponseDto`
+  `InventoryResponse`
 
 ### 4.10 Add stock
 - **Method:** `POST`
@@ -472,7 +472,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 - **Response Body:** `200 OK`
-  `InventoryResponseDto`
+  `InventoryResponse`
 
 ### 4.11 Reserve stock
 - **Method:** `POST`
@@ -590,31 +590,74 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 
 ---
 
-## 5. Site Configuration
-**Base Path:** `/api/site-config`
+## 5. Storefront
+**Base Path:** `/api/storefront`
 
-### 5.1 Fetch frontpage config
+### 5.1 Fetch storefront config
 - **Method:** `GET`
-- **Path:** `/api/site-config/frontpage`
+- **Path:** `/api/storefront/frontpage`
 - **Type of API:** `Public`
 - **Request Body:** None
 - **Response Body:** `200 OK`
-  `SiteConfig`
+  `Storefront`
 
-### 5.2 Update frontpage config
+### 5.2 Update storefront config
 - **Method:** `PUT`
-- **Path:** `/api/site-config/frontpage`
+- **Path:** `/api/storefront/frontpage`
 - **Type of API:** `Public`
-- **Request Body:** `SiteConfig`
+- **Request Body:** `Storefront`
 - **Response Body:** `200 OK`
-  `SiteConfig`
+  `Storefront`
+
+### 5.3 Validate coupon
+- **Method:** `GET`
+- **Path:** `/api/storefront/validate-coupon?code={string}&cartTotal={double}`
+- **Type of API:** `Public`
+- **Request Body:** None
+- **Response Body:** `200 OK` (Validation result JSON)
 
 ---
 
-## 6. Uploads
+## 6. Tax Rates
+**Base Path:** `/api/taxes`
+
+### 6.1 Get all tax rates
+- **Method:** `GET`
+- **Path:** `/api/taxes`
+- **Type of API:** `Public`
+- **Request Body:** None
+- **Response Body:** `200 OK`
+  `List<TaxRate>`
+
+### 6.2 Create tax rate
+- **Method:** `POST`
+- **Path:** `/api/taxes`
+- **Type of API:** `Admin`
+- **Request Body:** `TaxRate`
+- **Response Body:** `201 Created`
+  `TaxRate`
+
+### 6.3 Update tax rate
+- **Method:** `PUT`
+- **Path:** `/api/taxes/{id}`
+- **Type of API:** `Admin`
+- **Request Body:** `TaxRate`
+- **Response Body:** `200 OK`
+  `TaxRate`
+
+### 6.4 Delete tax rate
+- **Method:** `DELETE`
+- **Path:** `/api/taxes/{id}`
+- **Type of API:** `Admin`
+- **Request Body:** None
+- **Response Body:** `204 No Content`
+
+---
+
+## 7. Uploads
 **Base Path:** `/api/uploads`
 
-### 6.1 Upload media
+### 7.1 Upload media
 - **Method:** `POST`
 - **Path:** `/api/uploads/media`
 - **Type of API:** `Public`
@@ -627,7 +670,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
   }
   ```
 
-### 6.2 Get uploaded media
+### 7.2 Get uploaded media
 - **Method:** `GET`
 - **Path:** `/api/uploads/media/{fileName}`
 - **Type of API:** `Public`
@@ -639,7 +682,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 
 ## Common DTOs
 
-### CategoryResponseDto
+### CategoryResponse
 ```json
 {
   "id": "string",
@@ -656,7 +699,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 }
 ```
 
-### ProductResponseDto
+### ProductResponse
 ```json
 {
   "id": "string",
@@ -679,7 +722,7 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 }
 ```
 
-### InventoryResponseDto
+### InventoryResponse
 ```json
 {
   "id": "string",
@@ -693,13 +736,65 @@ Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
 }
 ```
 
-### SiteConfig
+### Storefront
 ```json
 {
   "id": "string",
   "heroSection": {
-    "headline": "string",
-    "heroImageUrl": "string"
+    "campaigns": [
+      {
+        "imageUrl": "string",
+        "title": "string",
+        "description": "string"
+      }
+    ]
+  },
+  "aboutSection": {
+    "tag": "string",
+    "title": "string",
+    "description": "string",
+    "image1Url": "string",
+    "image2Url": "string",
+    "image3Url": "string"
+  },
+  "howWeWorkSection": [
+    {
+      "title": "string",
+      "description": "string",
+      "iconName": "string"
+    }
+  ],
+  "specialOfferSection": {
+    "offers": [
+      {
+        "imageUrl": "string",
+        "title": "string",
+        "description": "string",
+        "couponCode": "string",
+        "discountType": "string",
+        "discountValue": 0.0,
+        "expiryDate": "string",
+        "minCartValue": 0.0
+      }
+    ]
+  },
+  "testimonialSection": {
+    "quote": "string",
+    "author": "string",
+    "rating": 0,
+    "authorImageUrl": "string"
   }
+}
+```
+
+### TaxRate
+```json
+{
+  "id": "string",
+  "type": "string",
+  "rate": 0.0,
+  "description": "string",
+  "createdAt": "2023-10-10T12:00:00",
+  "updatedAt": "2023-10-10T12:00:00"
 }
 ```
