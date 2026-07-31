@@ -443,7 +443,7 @@ public class ProductServiceImpl implements ProductService {
 
             productSearchService.indexProduct(product);
         } catch (Exception e) {
-            log.error("Failed to sync product {} to Elasticsearch: {}", product.getId(), e.getMessage());
+            log.error("Failed to sync product {} to Elasticsearch", product.getId(), e);
         }
     }
 
@@ -451,7 +451,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             productSearchService.deleteProductFromIndex(productId);
         } catch (Exception e) {
-            log.error("Failed to delete product {} from Elasticsearch: {}", productId, e.getMessage());
+            log.error("Failed to delete product {} from Elasticsearch", productId, e);
         }
     }
 
@@ -471,7 +471,7 @@ public class ProductServiceImpl implements ProductService {
             event.setPayload(payload);
             productEventPublisher.publishProductUpdated(event);
         } catch (Exception e) {
-            log.error("Failed to publish ProductEvent for {}: {}", product.getId(), e.getMessage());
+            log.error("Failed to publish ProductEvent for {}", product.getId(), e);
         }
     }
 

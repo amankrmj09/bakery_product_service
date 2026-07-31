@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StorefrontServiceImpl implements StorefrontService {
 
     private final StorefrontRepository storefrontRepository;
@@ -43,14 +45,16 @@ public class StorefrontServiceImpl implements StorefrontService {
                 if (java.time.LocalDate.now().isAfter(expiry)) {
                     throw new RuntimeException("coupon code expired and not valid");
                 }
-            } catch (Exception e) {
+            } catch (java.time.format.DateTimeParseException e) {
                 // If it's an ISO date time string
                 try {
                     java.time.Instant expiry = java.time.Instant.parse(offer.getExpiryDate());
                     if (java.time.Instant.now().isAfter(expiry)) {
                         throw new RuntimeException("coupon code expired and not valid");
                     }
-                } catch(Exception ignored) {}
+                } catch(Exception ex) {
+                    log.error("Failed to parse expiry date for coupon {}", code, ex);
+                }
             }
         }
         

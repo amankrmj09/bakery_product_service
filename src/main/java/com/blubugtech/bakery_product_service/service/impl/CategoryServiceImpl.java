@@ -209,7 +209,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             categorySearchService.indexCategory(category);
         } catch (Exception e) {
-            log.error("Failed to sync category {} to Elasticsearch: {}", category.getId(), e.getMessage());
+            log.error("Failed to sync category {} to Elasticsearch", category.getId(), e);
         }
     }
 
@@ -217,7 +217,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             categorySearchService.deleteCategoryFromIndex(categoryId);
         } catch (Exception e) {
-            log.error("Failed to delete category {} from Elasticsearch: {}", categoryId, e.getMessage());
+            log.error("Failed to delete category {} from Elasticsearch", categoryId, e);
         }
     }
 }
