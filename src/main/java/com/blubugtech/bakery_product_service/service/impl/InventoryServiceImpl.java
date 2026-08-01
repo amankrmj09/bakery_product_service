@@ -9,7 +9,8 @@ import com.blubugtech.bakery_product_service.entity.Inventory;
 import com.blubugtech.bakery_product_service.mapper.InventoryMapper;
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
-import com.blubugtech.bakery_product_service.repository.ProductRepository;
+import com.blubugtech.bakery_product_service.repository.ProductQueryRepository;
+import com.blubugtech.bakery_product_service.repository.ProductCommandRepository;
 import org.springframework.beans.factory.annotation.Value;
 import com.blubugtech.bakery_product_service.exception.*;
 import org.springframework.stereotype.Service;
@@ -26,14 +27,16 @@ import org.springframework.data.domain.Pageable;
 @Slf4j
 public class InventoryServiceImpl implements InventoryService {
 
-    final private ProductRepository productRepository;
+    final private ProductQueryRepository productQueryRepository;
+    final private ProductCommandRepository productCommandRepository;
     final private InventoryMapper inventoryMapper;
 
     @Value("${product.inventory.low-stock-threshold:10}")
     private Integer defaultLowStockThreshold;
 
-    public InventoryServiceImpl(ProductRepository productRepository, InventoryMapper inventoryMapper) {
-        this.productRepository = productRepository;
+    public InventoryServiceImpl(ProductQueryRepository productQueryRepository, ProductCommandRepository productCommandRepository, InventoryMapper inventoryMapper) {
+        this.productQueryRepository = productQueryRepository;
+        this.productCommandRepository = productCommandRepository;
         this.inventoryMapper = inventoryMapper;
     }
 
@@ -49,14 +52,14 @@ public class InventoryServiceImpl implements InventoryService {
         inventory.updateStatus();
 
         product.setInventory(inventory);
-        productRepository.save(product);
+        productCommandRepository.save(product);
         log.info("Inventory created for product: {}", product.getId());
 
         return inventory;
     }
 
     public InventoryResponse getInventoryByProductId(String productId) {
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         if (product.getInventory() == null) {
             throw new ProductServiceException("Inventory not found for product: " + productId);
@@ -65,48 +68,48 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     public Optional<InventoryResponse> getInventoryByProductSku(String sku) {
-        return productRepository.findBySku(sku)
+        return productQueryRepository.findBySku(sku)
                 .filter(p -> p.getInventory() != null)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> searchInventory(String searchTerm, Pageable pageable) {
-        return productRepository.searchAdminProducts(searchTerm, pageable)
+        return productQueryRepository.searchAdminProducts(searchTerm, pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getAllInventory(Pageable pageable) {
-        return productRepository.findAll(pageable)
+        return productQueryRepository.findAll(pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getLowStockItems(Pageable pageable) {
-        return productRepository.findLowStockProducts(pageable)
+        return productQueryRepository.findLowStockProducts(pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getOutOfStockItems(Pageable pageable) {
-        return productRepository.findOutOfStockProducts(pageable)
+        return productQueryRepository.findOutOfStockProducts(pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getItemsNeedingReorder(Pageable pageable) {
-        return productRepository.findProductsNeedingReorder(pageable)
+        return productQueryRepository.findProductsNeedingReorder(pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getExpiredItems(Pageable pageable) {
-        return productRepository.findProductsExpiringSoon(LocalDateTime.MIN, LocalDateTime.now(), pageable)
+        return productQueryRepository.findProductsExpiringSoon(LocalDateTime.MIN, LocalDateTime.now(), pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public Page<InventoryResponse> getItemsExpiringSoon(int hours, Pageable pageable) {
-        return productRepository.findProductsExpiringSoon(LocalDateTime.now(), LocalDateTime.now().plusHours(hours), pageable)
+        return productQueryRepository.findProductsExpiringSoon(LocalDateTime.now(), LocalDateTime.now().plusHours(hours), pageable)
                 .map(inventoryMapper::toResponse);
     }
 
     public InventoryResponse updateInventory(String productId, InventoryUpdateRequest request) {
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
         Inventory inventory = product.getInventory();
@@ -129,7 +132,7 @@ public class InventoryServiceImpl implements InventoryService {
         if (request.getNotes() != null) inventory.setNotes(request.getNotes());
 
         inventory.updateStatus();
-        productRepository.save(product);
+        productCommandRepository.save(product);
 
         return inventoryMapper.toResponse(product);
     }
@@ -137,7 +140,7 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryResponse addStock(String productId, Integer quantity, String notes) {
         if (quantity <= 0) throw new InvalidQuantityException("Quantity must be positive");
 
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
         Inventory inventory = product.getInventory();
@@ -153,7 +156,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         inventory.updateStatus();
-        productRepository.save(product);
+        productCommandRepository.save(product);
 
         return inventoryMapper.toResponse(product);
     }
@@ -161,7 +164,7 @@ public class InventoryServiceImpl implements InventoryService {
     public boolean reserveStock(String productId, Integer quantity) {
         if (quantity <= 0) throw new InvalidQuantityException("Quantity must be positive");
 
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
         Inventory inventory = product.getInventory();
@@ -171,7 +174,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         inventory.setReservedStock(inventory.getReservedStock() + quantity);
         inventory.updateStatus();
-        productRepository.save(product);
+        productCommandRepository.save(product);
 
         return true;
     }
@@ -179,7 +182,7 @@ public class InventoryServiceImpl implements InventoryService {
     public void releaseReservedStock(String productId, Integer quantity) {
         if (quantity <= 0) throw new InvalidQuantityException("Quantity must be positive");
 
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
         Inventory inventory = product.getInventory();
@@ -189,13 +192,13 @@ public class InventoryServiceImpl implements InventoryService {
 
         inventory.setReservedStock(inventory.getReservedStock() - quantity);
         inventory.updateStatus();
-        productRepository.save(product);
+        productCommandRepository.save(product);
     }
 
     public void consumeStock(String productId, Integer quantity) {
         if (quantity <= 0) throw new InvalidQuantityException("Quantity must be positive");
 
-        Product product = productRepository.findById(productId)
+        Product product = productCommandRepository.findById(productId)
                 .orElseThrow(() -> new ProductServiceException("Product not found: " + productId));
         
         Inventory inventory = product.getInventory();
@@ -206,18 +209,18 @@ public class InventoryServiceImpl implements InventoryService {
         inventory.setCurrentStock(inventory.getCurrentStock() - quantity);
         inventory.setReservedStock(inventory.getReservedStock() - quantity);
         inventory.updateStatus();
-        productRepository.save(product);
+        productCommandRepository.save(product);
     }
 
     public boolean checkStockAvailability(String productId, Integer requiredQuantity) {
-        return productRepository.findById(productId)
+        return productCommandRepository.findById(productId)
                 .map(p -> p.getInventory())
                 .map(i -> i.getAvailableStock() >= requiredQuantity)
                 .orElse(false);
     }
 
     public Integer getAvailableStock(String productId) {
-        return productRepository.findById(productId)
+        return productCommandRepository.findById(productId)
                 .map(p -> p.getInventory())
                 .map(Inventory::getAvailableStock)
                 .orElse(0);
@@ -236,10 +239,10 @@ public class InventoryServiceImpl implements InventoryService {
 
     public void bulkUpdateMinimumStock(Map<String, Integer> productMinimumStocks) {
         for (Map.Entry<String, Integer> entry : productMinimumStocks.entrySet()) {
-            productRepository.findById(entry.getKey()).ifPresent(product -> {
+            productCommandRepository.findById(entry.getKey()).ifPresent(product -> {
                 if (product.getInventory() != null) {
                     product.getInventory().setMinimumStock(entry.getValue());
-                    productRepository.save(product);
+                    productCommandRepository.save(product);
                 }
             });
         }
