@@ -6,7 +6,7 @@ import com.blubugtech.bakery_product_service.dto.inventory.InventoryUpdateReques
 import com.blubugtech.bakery_product_service.entity.Inventory;
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
-import com.blubugtech.bakery_product_service.repository.ProductRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

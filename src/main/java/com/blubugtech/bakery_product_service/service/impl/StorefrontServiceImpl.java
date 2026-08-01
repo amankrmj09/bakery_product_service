@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import com.blubugtech.bakery_product_service.service.strategy.CouponValidationStrategy;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StorefrontServiceImpl implements StorefrontService {
 
     private final StorefrontRepository storefrontRepository;
+    private final List<CouponValidationStrategy> couponValidationStrategies;
     private static final String DEFAULT_ID = "home-page";
 
     public Storefront getStorefront() {
@@ -30,37 +32,15 @@ public class StorefrontServiceImpl implements StorefrontService {
 
     public org.blubakery.common.feign.contract.feign.CouponValidationResponse validateCoupon(String code, Double cartTotal) {
         Storefront config = getStorefront();
-        if (config.getSpecialOfferSection() == null || config.getSpecialOfferSection().getOffers() == null) {
-            throw new RuntimeException("invalid_coupon");
+        
+        for (CouponValidationStrategy strategy : couponValidationStrategies) {
+            strategy.validate(code, cartTotal, config);
         }
         
         Storefront.SpecialOffer offer = config.getSpecialOfferSection().getOffers().stream()
                 .filter(o -> code.equalsIgnoreCase(o.getCouponCode()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("invalid_coupon"));
-                
-        if (offer.getExpiryDate() != null && !offer.getExpiryDate().isEmpty()) {
-            try {
-                java.time.LocalDate expiry = java.time.LocalDate.parse(offer.getExpiryDate());
-                if (java.time.LocalDate.now().isAfter(expiry)) {
-                    throw new RuntimeException("coupon code expired and not valid");
-                }
-            } catch (java.time.format.DateTimeParseException e) {
-                // If it's an ISO date time string
-                try {
-                    java.time.Instant expiry = java.time.Instant.parse(offer.getExpiryDate());
-                    if (java.time.Instant.now().isAfter(expiry)) {
-                        throw new RuntimeException("coupon code expired and not valid");
-                    }
-                } catch(Exception ex) {
-                    log.error("Failed to parse expiry date for coupon {}", code, ex);
-                }
-            }
-        }
-        
-        if (offer.getMinCartValue() != null && cartTotal != null && cartTotal < offer.getMinCartValue()) {
-            throw new RuntimeException("doesn't apply on this cart");
-        }
         
         return org.blubakery.common.feign.contract.feign.CouponValidationResponse.builder()
                 .couponCode(offer.getCouponCode())

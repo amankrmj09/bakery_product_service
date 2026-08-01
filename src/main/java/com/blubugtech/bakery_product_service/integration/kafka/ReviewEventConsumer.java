@@ -1,7 +1,7 @@
 package com.blubugtech.bakery_product_service.integration.kafka;
 
 import com.blubugtech.bakery_product_service.entity.Product;
-import com.blubugtech.bakery_product_service.repository.ProductRepository;
+import com.blubugtech.bakery_product_service.repository.ProductCommandRepository;
 import org.blubakery.common.messaging.constants.KafkaTopics;
 import org.blubakery.common.messaging.contract.messaging.ReviewPayload;
 import org.blubakery.common.messaging.event.ReviewEvent;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewEventConsumer {
 
-    private final ProductRepository productRepository;
+    private final ProductCommandRepository productRepository;
 
     @KafkaListener(topics = KafkaTopics.REVIEWS_TOPIC, groupId = "product-service-review-group")
     public void consumeReviewEvent(ReviewEvent event) {

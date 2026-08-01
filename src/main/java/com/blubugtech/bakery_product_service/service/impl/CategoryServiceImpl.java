@@ -9,6 +9,7 @@ import com.blubugtech.bakery_product_service.entity.Category;
 import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.CategoryRepository;
+import com.blubugtech.bakery_product_service.repository.ProductQueryRepository;
 import org.springframework.stereotype.Service;
 import org.blubakery.common.core.exception.common.DuplicateResourceException;
 import org.springframework.data.domain.Page;
@@ -29,11 +30,11 @@ import com.blubugtech.bakery_product_service.entity.Product;
 public class CategoryServiceImpl implements CategoryService {
 
     final private CategoryRepository categoryRepository;
-    final private com.blubugtech.bakery_product_service.repository.ProductRepository productRepository;
+    final private ProductQueryRepository productRepository;
     final private CategoryMapper categoryMapper;
     final private com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, com.blubugtech.bakery_product_service.repository.ProductRepository productRepository, CategoryMapper categoryMapper, com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductQueryRepository productRepository, CategoryMapper categoryMapper, com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.categoryMapper = categoryMapper;
