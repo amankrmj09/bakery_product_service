@@ -2,7 +2,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://product_user:product_password@mongo-products:27017/bakery_products?authSource=admin
+      uri: mongodb://product_user:product_password@mongodb:27017/bakery_products?authSource=admin
 
 # Eureka Configuration for Docker
 eureka:
