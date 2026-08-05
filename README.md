@@ -174,5 +174,6 @@ To execute unit and integration tests:
 - **Utilities:** MapStruct, Lombok, Spring Security
 
 ## 🔗 Related Links
-- [Parent Repository](https://github.com/amankrmj09/Blu_s_Bakery)
-- [API Reference](./API_REFERENCE.md)
+
+*For overall architecture, contribution guidelines, and security policies, please refer to the main [Blu's Bakery](https://github.com/amankrmj09/Blu_s_Bakery) repository.*
+
