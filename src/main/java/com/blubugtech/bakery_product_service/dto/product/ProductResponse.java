@@ -1,19 +1,22 @@
 package com.blubugtech.bakery_product_service.dto.product;
 
 import com.blubugtech.bakery_product_service.entity.Product;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-
-@Setter
-@Getter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponse {
 
-    // Getters and Setters
     private String id;
     private String sku;
     private String name;
@@ -21,7 +24,7 @@ public class ProductResponse {
     private String shortDescription;
     private CategorySummary category;
     private BigDecimal price;
-    private BigDecimal discountPrice;
+    @Builder.Default private BigDecimal discountPrice = BigDecimal.ZERO;
     private BigDecimal costPrice;
     private BigDecimal effectivePrice;
     private String taxClass;
@@ -30,105 +33,44 @@ public class ProductResponse {
     private String metaDescription;
     private Integer maxOrderQuantity;
     private Product.ProductStatus status;
-    private Boolean isFeatured;
+    @Builder.Default private boolean isFeatured = false;
+    @Builder.Default private boolean isActive = true;
     private Integer preparationTimeMinutes;
     private Integer shelfLifeHours;
     private String unit;
     private String calories;
-    private List<String> ingredients;
-    private List<String> allergens;
-    private List<String> tags;
+    @Builder.Default private List<String> ingredients = new ArrayList<>();
+    @Builder.Default private List<String> allergens = new ArrayList<>();
+    @Builder.Default private List<String> tags = new ArrayList<>();
     private InventorySummary inventory;
-    private List<String> mediaUrls;
+    @Builder.Default private List<String> mediaUrls = new ArrayList<>();
     private String primaryImageUrl;
-    private Boolean isAvailable;
-    private Boolean isOnSale;
+    @Builder.Default private Boolean isAvailable = false;
+    @Builder.Default private Boolean isOnSale = false;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Double averageRating;
     private Integer totalReviews;
 
-    // Constructors
-    public ProductResponse() {}
-
-    // Static factory method
-    public static ProductResponse from(Product product) {
-        ProductResponse response = new ProductResponse();
-        response.id = product.getId();
-        response.sku = product.getSku();
-        response.name = product.getName();
-        response.description = product.getDescription();
-        response.shortDescription = product.getShortDescription();
-        response.category = CategorySummary.from(product.getCategory());
-        response.price = product.getPrice();
-        response.discountPrice = product.getDiscountPrice();
-        response.costPrice = product.getCostPrice();
-        response.effectivePrice = product.getEffectivePrice();
-        response.taxClass = product.getTaxClass();
-        response.taxRate = product.getTaxRate();
-        response.metaTitle = product.getMetaTitle();
-        response.metaDescription = product.getMetaDescription();
-        response.maxOrderQuantity = product.getMaxOrderQuantity();
-        response.status = product.getStatus();
-        response.isFeatured = product.getIsFeatured();
-        response.preparationTimeMinutes = product.getPreparationTimeMinutes();
-        response.shelfLifeHours = product.getShelfLifeHours();
-        response.unit = product.getUnit();
-        response.calories = product.getCalories();
-        response.ingredients = product.getIngredients();
-        response.allergens = product.getAllergens();
-        response.tags = product.getTags();
-        response.inventory = product.getInventory() != null ?
-            InventorySummary.from(product.getInventory()) : null;
-        response.mediaUrls = product.getMediaUrls();
-        response.primaryImageUrl = product.getPrimaryImageUrl();
-        response.isAvailable = product.isAvailable();
-        response.isOnSale = product.isOnSale();
-        response.createdAt = product.getCreatedAt();
-        response.updatedAt = product.getUpdatedAt();
-        response.averageRating = product.getAverageRating();
-        response.totalReviews = product.getTotalReviews();
-        return response;
-    }
-
-    // Inner classes for nested objects
-    @Setter
-    @Getter
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CategorySummary {
-        // Getters and Setters
         private String id;
         private String name;
         private String iconClass;
-
-        public static CategorySummary from(com.blubugtech.bakery_product_service.entity.Category category) {
-            CategorySummary summary = new CategorySummary();
-            summary.id = category.getId();
-            summary.name = category.getName();
-            summary.iconClass = category.getIconClass();
-            return summary;
-        }
-
     }
 
-    @Setter
-    @Getter
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class InventorySummary {
-        // Getters and Setters
         private Integer currentStock;
         private Integer availableStock;
         private Boolean isLowStock;
         private Boolean isOutOfStock;
         private com.blubugtech.bakery_product_service.entity.Inventory.InventoryStatus status;
-
-        public static InventorySummary from(com.blubugtech.bakery_product_service.entity.Inventory inventory) {
-            InventorySummary summary = new InventorySummary();
-            summary.currentStock = inventory.getCurrentStock();
-            summary.availableStock = inventory.getAvailableStock();
-            summary.isLowStock = inventory.getIsLowStock();
-            summary.isOutOfStock = inventory.getIsOutOfStock();
-            summary.status = inventory.getStatus();
-            return summary;
-        }
-
     }
 }

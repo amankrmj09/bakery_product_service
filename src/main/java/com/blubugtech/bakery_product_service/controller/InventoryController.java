@@ -204,12 +204,12 @@ public class InventoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryResponse> addStock(
             @PathVariable String productId,
-            @RequestBody Map<String, Object> request) {
+            @Valid @RequestBody com.blubugtech.bakery_product_service.dto.inventory.StockAdjustmentRequest request) {
 
         log.info("Add stock request received for product: {}", productId);
 
-        Integer quantity = (Integer) request.get("quantity");
-        String notes = (String) request.get("notes");
+        Integer quantity = request.getQuantity();
+        String notes = request.getNotes();
 
         InventoryResponse inventory = inventoryService.addStock(productId, quantity, notes);
 
@@ -222,11 +222,11 @@ public class InventoryController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> reserveStock(
             @PathVariable String productId,
-            @RequestBody Map<String, Integer> request) {
+            @Valid @RequestBody com.blubugtech.bakery_product_service.dto.inventory.StockAdjustmentRequest request) {
 
         log.info("Reserve stock request received for product: {}", productId);
 
-        Integer quantity = request.get("quantity");
+        Integer quantity = request.getQuantity();
         boolean success = inventoryService.reserveStock(productId, quantity);
 
         com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse();
@@ -250,11 +250,11 @@ public class InventoryController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> releaseReservedStock(
             @PathVariable String productId,
-            @RequestBody Map<String, Integer> request) {
+            @Valid @RequestBody com.blubugtech.bakery_product_service.dto.inventory.StockAdjustmentRequest request) {
 
         log.info("Release reserved stock request received for product: {}", productId);
 
-        Integer quantity = request.get("quantity");
+        Integer quantity = request.getQuantity();
         inventoryService.releaseReservedStock(productId, quantity);
 
         com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Reserved stock released successfully");
@@ -268,11 +268,11 @@ public class InventoryController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
     public ResponseEntity<com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse> consumeStock(
             @PathVariable String productId,
-            @RequestBody Map<String, Integer> request) {
+            @Valid @RequestBody com.blubugtech.bakery_product_service.dto.inventory.StockAdjustmentRequest request) {
 
         log.info("Consume stock request received for product: {}", productId);
 
-        Integer quantity = request.get("quantity");
+        Integer quantity = request.getQuantity();
         inventoryService.consumeStock(productId, quantity);
 
         com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse response = new com.blubugtech.bakery_product_service.dto.inventory.StockOperationResponse(true, productId, quantity, "Stock consumed successfully");

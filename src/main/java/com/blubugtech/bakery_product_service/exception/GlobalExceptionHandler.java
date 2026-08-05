@@ -24,12 +24,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceException ex, WebRequest request) {
         log.error("Product service error: {}", ex.getMessage());
 
-        ErrorResponse error = new ErrorResponse(
-            "PRODUCT_SERVICE_ERROR",
-            ex.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+        ErrorResponse error = ErrorResponse.builder()
+            .code("PRODUCT_SERVICE_ERROR")
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.badRequest().body(error);
     }
@@ -40,12 +40,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException ex, WebRequest request) {
         log.error("Insufficient stock error: {}", ex.getMessage());
 
-        ErrorResponse error = new ErrorResponse(
-            "INSUFFICIENT_STOCK",
-            ex.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+        ErrorResponse error = ErrorResponse.builder()
+            .code("INSUFFICIENT_STOCK")
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         if (ex.getProductId() != null) {
             Map<String, Object> details = new HashMap<>();
@@ -69,7 +69,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     
     @ExceptionHandler(InvalidQuantityException.class)
     public ResponseEntity<ErrorResponse> handleInvalidQuantityException(InvalidQuantityException ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse("INVALID_QUANTITY", ex.getMessage(), LocalDateTime.now(), request.getDescription(false));
+        ErrorResponse error = ErrorResponse.builder()
+            .code("INVALID_QUANTITY")
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -77,24 +82,24 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxSizeException(org.springframework.web.multipart.MaxUploadSizeExceededException exc, WebRequest request) {
         log.error("Upload size exceeded: {}", exc.getMessage());
-        ErrorResponse error = new ErrorResponse(
-            "PAYLOAD_TOO_LARGE",
-            "File size exceeds the configured maximum limit (50MB).",
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+        ErrorResponse error = ErrorResponse.builder()
+            .code("PAYLOAD_TOO_LARGE")
+            .message("File size exceeds the configured maximum limit (50MB).")
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
     }
 
     @ExceptionHandler(org.springframework.web.multipart.MultipartException.class)
     public ResponseEntity<ErrorResponse> handleMultipartException(org.springframework.web.multipart.MultipartException exc, WebRequest request) {
         log.error("Multipart error: {}", exc.getMessage());
-        ErrorResponse error = new ErrorResponse(
-            "MULTIPART_ERROR",
-            "Failed to parse multipart request, possibly due to file size exceeding limits.",
-            LocalDateTime.now(),
-            request.getDescription(false)
-        );
+        ErrorResponse error = ErrorResponse.builder()
+            .code("MULTIPART_ERROR")
+            .message("Failed to parse multipart request, possibly due to file size exceeding limits.")
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

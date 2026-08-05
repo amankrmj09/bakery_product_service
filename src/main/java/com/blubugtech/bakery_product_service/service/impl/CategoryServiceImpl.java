@@ -7,6 +7,7 @@ import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
 import com.blubugtech.bakery_product_service.dto.category.CategoryResponse;
 import com.blubugtech.bakery_product_service.entity.Category;
 import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
+import com.blubugtech.bakery_product_service.mapper.ProductMapper;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.CategoryRepository;
 import com.blubugtech.bakery_product_service.repository.ProductQueryRepository;
@@ -32,12 +33,14 @@ public class CategoryServiceImpl implements CategoryService {
     final private CategoryRepository categoryRepository;
     final private ProductQueryRepository productRepository;
     final private CategoryMapper categoryMapper;
+    final private ProductMapper productMapper;
     final private com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductQueryRepository productRepository, CategoryMapper categoryMapper, com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductQueryRepository productRepository, CategoryMapper categoryMapper, ProductMapper productMapper, com.blubugtech.bakery_product_service.search.service.CategorySearchService categorySearchService) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.categoryMapper = categoryMapper;
+        this.productMapper = productMapper;
         this.categorySearchService = categorySearchService;
     }
 
@@ -101,7 +104,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
 
             List<ProductResponse> productResponses = products.stream()
-                    .map(ProductResponse::from)
+                    .map(productMapper::toResponse)
                     .collect(Collectors.toList());
 
             return new CategoryWithTopProductsResponse(categoryMapper.toResponse(category), productResponses);
