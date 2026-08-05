@@ -22,7 +22,7 @@ public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest request);
     Page<CategoryResponse> getAllCategories(Pageable pageable);
     Page<CategoryResponse> getActiveCategories(Pageable pageable);
-    List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit);
+    org.springframework.data.web.PagedModel<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit, Pageable pageable);
     Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable);
     Page<CategoryResponse> getCategoriesWithActiveProducts(Pageable pageable);
     CategoryResponse getCategoryById(String categoryId);
@@ -32,7 +32,7 @@ public interface CategoryService {
     Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable);
     CategoryResponse toggleCategoryStatus(String categoryId);
     void reorderCategories(Map<String, Integer> categoryOrders);
-    Map<String, Object> getCategoryStatistics();
+    com.blubugtech.bakery_product_service.dto.CategoryStatisticsResponse getCategoryStatistics();
     boolean categoryExists(String categoryId);
     Category getCategoryEntity(String categoryId);
 }

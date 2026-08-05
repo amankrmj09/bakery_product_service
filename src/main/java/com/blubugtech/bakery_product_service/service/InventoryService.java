@@ -39,6 +39,6 @@ public interface InventoryService {
     void consumeStock(String productId, Integer quantity);
     boolean checkStockAvailability(String productId, Integer requiredQuantity);
     Integer getAvailableStock(String productId);
-    Map<String, Object> getInventoryStatistics();
+    com.blubugtech.bakery_product_service.dto.InventoryStatisticsResponse getInventoryStatistics();
     void bulkUpdateMinimumStock(Map<String, Integer> productMinimumStocks);
 }

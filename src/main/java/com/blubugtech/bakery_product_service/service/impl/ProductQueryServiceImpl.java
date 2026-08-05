@@ -126,10 +126,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public List<ProductResponse> getProductsByIds(List<String> productIds) {
+    public org.springframework.data.web.PagedModel<ProductResponse> getProductsByIds(List<String> productIds, Pageable pageable) {
         log.debug("Fetching products by IDs: {}", productIds);
-        return productRepository.findAllById(productIds).stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
+        Page<Product> page = productRepository.findByIdIn(productIds, pageable);
+        Page<ProductResponse> responsePage = page.map(productMapper::toResponse);
+        return new org.springframework.data.web.PagedModel<>(responsePage);
     }
 }

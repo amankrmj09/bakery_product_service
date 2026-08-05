@@ -226,15 +226,15 @@ public class InventoryServiceImpl implements InventoryService {
                 .orElse(0);
     }
 
-    public Map<String, Object> getInventoryStatistics() {
-        return Map.of(
-                "totalItems", 0L,
-                "totalStock", 0L,
-                "totalReservedStock", 0L,
-                "lowStockItems", 0L,
-                "outOfStockItems", 0L,
-                "totalInventoryValue", 0.0
-        );
+    public com.blubugtech.bakery_product_service.dto.InventoryStatisticsResponse getInventoryStatistics() {
+        return com.blubugtech.bakery_product_service.dto.InventoryStatisticsResponse.builder()
+                .totalItems(0L)
+                .totalStock(0L)
+                .totalReservedStock(0L)
+                .lowStockItems(0L)
+                .outOfStockItems(0L)
+                .totalInventoryValue(0.0)
+        .build();
     }
 
     public void bulkUpdateMinimumStock(Map<String, Integer> productMinimumStocks) {

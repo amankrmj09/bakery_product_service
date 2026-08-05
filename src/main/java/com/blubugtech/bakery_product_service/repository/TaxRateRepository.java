@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface TaxRateRepository extends MongoRepository<TaxRate, String> {
     Optional<TaxRate> findByType(String type);
     boolean existsByType(String type);
+    org.springframework.data.domain.Page<TaxRate> findAll(org.springframework.data.domain.Pageable pageable);
 }

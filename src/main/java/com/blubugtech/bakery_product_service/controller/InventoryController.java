@@ -328,10 +328,10 @@ public class InventoryController {
     // Get inventory statistics
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> getInventoryStatistics() {
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.InventoryStatisticsResponse> getInventoryStatistics() {
         log.info("Get inventory statistics request received");
 
-        Map<String, Object> statistics = inventoryService.getInventoryStatistics();
+        com.blubugtech.bakery_product_service.dto.InventoryStatisticsResponse statistics = inventoryService.getInventoryStatistics();
 
         log.info("Inventory statistics retrieved");
         return ResponseEntity.ok(statistics);

@@ -18,8 +18,14 @@ public class TaxRateController {
     private TaxRateService taxRateService;
 
     @GetMapping
-    public ResponseEntity<List<TaxRate>> getAllTaxRates() {
-        return ResponseEntity.ok(taxRateService.getAllTaxRates());
+    public ResponseEntity<org.springframework.data.web.PagedModel<TaxRate>> getAllTaxRates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir) {
+        org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.fromString(sortDir), sortBy);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(taxRateService.getAllTaxRates(pageable));
     }
 
     @PostMapping

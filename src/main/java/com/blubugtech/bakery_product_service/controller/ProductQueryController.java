@@ -103,8 +103,15 @@ public class ProductQueryController {
     }
 
     @PostMapping("/batch")
-    public ResponseEntity<List<ProductResponse>> getProductsByIds(@RequestBody List<String> productIds) {
-        return ResponseEntity.ok(productService.getProductsByIds(productIds));
+    public ResponseEntity<org.springframework.data.web.PagedModel<ProductResponse>> getProductsByIds(
+            @RequestBody List<String> productIds,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(productService.getProductsByIds(productIds, pageable));
     }
 
     @GetMapping("/sku/{sku}")

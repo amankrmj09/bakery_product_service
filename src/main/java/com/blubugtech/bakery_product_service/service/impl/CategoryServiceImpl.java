@@ -83,23 +83,20 @@ public class CategoryServiceImpl implements CategoryService {
         return getActiveCategories(pageable);
     }
 
-    public List<CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit) {
-        List<Category> topCategories = categoryRepository.findByIsTopCategoryTrueAndActiveTrueOrderByDisplayOrderAsc();
-        if (topCategories == null || topCategories.isEmpty()) {
-            Page<Category> fallbackCategories = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(PageRequest.of(0, 3));
-            topCategories = fallbackCategories.getContent();
+    public org.springframework.data.web.PagedModel<CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit, Pageable pageable) {
+        Page<Category> topCategoriesPage = categoryRepository.findByIsTopCategoryTrueAndActiveTrue(pageable);
+        if (topCategoriesPage == null || topCategoriesPage.isEmpty()) {
+            topCategoriesPage = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable);
         }
 
-        return topCategories.stream().map(category -> {
+        Page<CategoryWithTopProductsResponse> page = topCategoriesPage.map(category -> {
             Page<Product> productsPage = productRepository.findByCategoryIdAndStatusAndAverageRatingGreaterThanOrderByAverageRatingDesc(
-                    category.getId(), Product.ProductStatus.ACTIVE, 0.0, PageRequest.of(0, productLimit)
-            );
+                    category.getId(), Product.ProductStatus.ACTIVE, 0.0, PageRequest.of(0, productLimit));
             List<Product> products = productsPage.getContent();
 
             if (products == null || products.isEmpty()) {
                 Page<Product> fallbackProductsPage = productRepository.findByCategoryIdAndStatus(
-                        category.getId(), Product.ProductStatus.ACTIVE, PageRequest.of(0, Math.min(productLimit, 3))
-                );
+                        category.getId(), Product.ProductStatus.ACTIVE, PageRequest.of(0, Math.min(productLimit, 3)));
                 products = fallbackProductsPage.getContent();
             }
 
@@ -108,7 +105,9 @@ public class CategoryServiceImpl implements CategoryService {
                     .collect(Collectors.toList());
 
             return new CategoryWithTopProductsResponse(categoryMapper.toResponse(category), productResponses);
-        }).collect(Collectors.toList());
+        });
+        
+        return new org.springframework.data.web.PagedModel<>(page);
     }
 
     public CategoryResponse getCategoryById(String categoryId) {
@@ -186,15 +185,15 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    public Map<String, Object> getCategoryStatistics() {
+    public com.blubugtech.bakery_product_service.dto.CategoryStatisticsResponse getCategoryStatistics() {
         long activeCategoriesCount = categoryRepository.countByActiveTrue();
 
-        return Map.of(
-                "totalCategories", categoryRepository.count(),
-                "activeCategories", activeCategoriesCount,
-                "inactiveCategories", categoryRepository.count() - activeCategoriesCount,
-                "categoryStats", List.of()
-        );
+        return com.blubugtech.bakery_product_service.dto.CategoryStatisticsResponse.builder()
+                .totalCategories(categoryRepository.count())
+                .activeCategories(activeCategoriesCount)
+                .inactiveCategories(categoryRepository.count() - activeCategoriesCount)
+                .categoryStats(java.util.List.of())
+        .build();
     }
 
     public boolean categoryExists(String categoryId) {

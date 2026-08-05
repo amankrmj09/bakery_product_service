@@ -108,13 +108,20 @@ public class CategoryController {
 
     // Get top categories with top products
     @GetMapping("/top-with-products")
-    public ResponseEntity<List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
-            @RequestParam(defaultValue = "5") int productLimit) {
+    public ResponseEntity<org.springframework.data.web.PagedModel<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
+            @RequestParam(defaultValue = "5") int productLimit,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "displayOrder") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
         log.info("Get top categories with top products request received (productLimit {})", productLimit);
 
-        List<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit);
+        org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.fromString(sortDir), sortBy);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
 
-        log.info("Retrieved {} top categories with products", categories.size());
+        org.springframework.data.web.PagedModel<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit, pageable);
+
+        log.info("Retrieved top categories with products");
         return ResponseEntity.ok(categories);
     }
 
@@ -233,10 +240,10 @@ public class CategoryController {
     // Get category statistics
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> getCategoryStatistics() {
+    public ResponseEntity<com.blubugtech.bakery_product_service.dto.CategoryStatisticsResponse> getCategoryStatistics() {
         log.info("Get category statistics request received");
 
-        Map<String, Object> statistics = categoryService.getCategoryStatistics();
+        com.blubugtech.bakery_product_service.dto.CategoryStatisticsResponse statistics = categoryService.getCategoryStatistics();
 
         log.info("Category statistics retrieved");
         return ResponseEntity.ok(statistics);

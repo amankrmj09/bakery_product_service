@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface ProductQueryRepository extends Repository<Product, String> {
     Optional<Product> findById(String id);
     boolean existsById(String id);
+    Page<Product> findByIdIn(List<String> ids, Pageable pageable);
     List<Product> findAllById(Iterable<String> ids);
     Page<Product> findAll(Pageable pageable);
     Optional<Product> findBySku(String sku);

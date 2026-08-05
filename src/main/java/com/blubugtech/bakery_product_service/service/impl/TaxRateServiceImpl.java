@@ -17,8 +17,9 @@ public class TaxRateServiceImpl implements TaxRateService {
     private TaxRateRepository taxRateRepository;
 
     @Override
-    public List<TaxRate> getAllTaxRates() {
-        return taxRateRepository.findAll();
+    public org.springframework.data.web.PagedModel<TaxRate> getAllTaxRates(org.springframework.data.domain.Pageable pageable) {
+        org.springframework.data.domain.Page<TaxRate> page = taxRateRepository.findAll(pageable);
+        return new org.springframework.data.web.PagedModel<>(page);
     }
 
     @Override
