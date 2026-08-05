@@ -1,800 +1,2797 @@
 # Bakery Product Service API Reference
 
-This document provides a comprehensive reference to the Bakery Product Service REST API, reflecting the current Java controllers and their associated request/response DTOs.
+This document provides a comprehensive reference to the **Bakery Product Service REST API**, reflecting all Spring REST Controllers (`@RestController`), request/response DTOs, endpoint parameters, and security requirements.
+
+---
+
+## 📑 Table of Contents
+- [1. System & Monitoring (Actuator)](#1-system--monitoring-actuator)
+- [2. Categories API](#2-categories-api)
+- [3. Product Command API](#3-product-command-api)
+- [4. Product Query API](#4-product-query-api)
+- [5. Inventory API](#5-inventory-api)
+- [6. Storefront API](#6-storefront-api)
+- [7. Tax Rates API](#7-tax-rates-api)
+- [8. Uploads API](#8-uploads-api)
+- [Data Transfer Objects (DTOs)](#data-transfer-objects-dtos)
+- [Error Responses](#error-responses)
 
 ---
 
 ## 1. System & Monitoring (Actuator)
 **Base Path:** `/actuator`
 
-Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
+Standard Spring Boot Actuator endpoints for health check, runtime information, and Prometheus metrics scraping.
 
 ### 1.1 Health Check
 - **Method:** `GET`
 - **Path:** `/actuator/health`
-- **Type of API:** `Public`
-- **Response Body:** `200 OK` (Standard Actuator Health JSON)
+- **Access Level:** `Public`
+- **Response:** `200 OK`
 
-### 1.2 Service Info
+### 1.2 Application Information
 - **Method:** `GET`
 - **Path:** `/actuator/info`
-- **Type of API:** `Public`
-- **Response Body:** `200 OK` (Standard Actuator Info JSON)
+- **Access Level:** `Public`
+- **Response:** `200 OK`
 
 ### 1.3 Prometheus Metrics
 - **Method:** `GET`
 - **Path:** `/actuator/prometheus`
-- **Type of API:** `Public`
-- **Response Body:** `200 OK` (Prometheus Text Format)
+- **Access Level:** `Public`
+- **Response:** `200 OK`
 
 ---
 
-## 2. Categories
-**Base Path:** `/api/categories`
+## 2. Categories API
+**Base Path:** `/api/categories`  
+**Controller:** `CategoryController`
 
-### 2.1 Get all categories
+### 2.1 Get All Categories
 - **Method:** `GET`
 - **Path:** `/api/categories`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<CategoryResponse>`
+- **Access Level:** `Public`
+- **Query Parameters:**
+  - `page` (int, default: `0`)
+  - `size` (int, default: `20`)
+  - `sortBy` (string, default: `displayOrder`)
+  - `sortDir` (string, default: `ASC`)
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
 
-### 2.2 Get active categories
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `400 Bad Request`
+
+### 2.2 Get Active Categories Only
 - **Method:** `GET`
 - **Path:** `/api/categories/active`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<CategoryResponse>`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
 
-### 2.3 Get categories with products
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.3 Get Categories with Products
 - **Method:** `GET`
 - **Path:** `/api/categories/with-products`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<CategoryResponse>`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
 
-### 2.4 Get categories with active products
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.4 Get Categories with Active Products
 - **Method:** `GET`
 - **Path:** `/api/categories/with-active-products`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<CategoryResponse>`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
 
-### 2.5 Get category by ID
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.5 Get Top Categories with Top Products
+- **Method:** `GET`
+- **Path:** `/api/categories/top-with-products`
+- **Access Level:** `Public`
+- **Query Parameters:**
+  - `productLimit` (int, default: `5`)
+  - `page` (int, default: `0`)
+  - `size` (int, default: `20`)
+  - `sortBy` (string, default: `displayOrder`)
+  - `sortDir` (string, default: `ASC`)
+- **Response:** `200 OK` — `PagedModel<[`CategoryWithTopProductsResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryWithTopProductsResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categorywithtopproductsresponseList": [
+        {
+          "category": {
+            "id": "...",
+            "name": "..."
+          },
+          "topProducts": [
+            {
+              "id": "...",
+              "name": "..."
+            }
+          ]
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.6 Get Category by ID
 - **Method:** `GET`
 - **Path:** `/api/categories/{categoryId}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `CategoryResponse`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)
 
-### 2.6 Create new category
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
+    "active": true,
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake",
+    "productCount": 15,
+    "activeProductCount": 12,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00"
+  }
+  ```
+- **Error Responses:** `404 Not Found`
+
+### 2.7 Create Category
 - **Method:** `POST`
 - **Path:** `/api/categories`
-- **Type of API:** `Admin`
-- **Request Body:**
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`CategoryRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryRequest.java)
+
+  **Example Request Body:**
   ```json
   {
-    "name": "string",
-    "description": "string",
-    "displayOrder": 0,
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
     "active": true,
-    "mediaUrls": ["string"],
-    "iconClass": "string"
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake"
   }
   ```
-- **Response Body:** `201 Created`
-  `CategoryResponse`
+- **Response:** `201 Created` — [`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)
 
-### 2.7 Update category
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
+    "active": true,
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake",
+    "productCount": 15,
+    "activeProductCount": 12,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00"
+  }
+  ```
+- **Error Responses:** `400 Bad Request` (Validation Failed), `403 Forbidden`
+
+### 2.8 Update Category
 - **Method:** `PUT`
 - **Path:** `/api/categories/{categoryId}`
-- **Type of API:** `Admin`
-- **Request Body:**
-  *(Same as Create new category)*
-- **Response Body:** `200 OK`
-  `CategoryResponse`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`CategoryRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryRequest.java)
 
-### 2.8 Delete category
-- **Method:** `DELETE`
-- **Path:** `/api/categories/{categoryId}`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
+  **Example Request Body:**
   ```json
   {
-    "message": "Category deleted successfully",
-    "categoryId": "string"
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
+    "active": true,
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake"
   }
   ```
+- **Response:** `200 OK` — [`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)
 
-### 2.9 Search categories
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
+    "active": true,
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake",
+    "productCount": 15,
+    "activeProductCount": 12,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 2.9 Delete Category
+- **Method:** `DELETE`
+- **Path:** `/api/categories/{categoryId}`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — `MessageResponse`
+
+  **Example Response Body:**
+  ```json
+  {
+    "message": "Operation successful"
+  }
+  ```
+- **Error Responses:** `403 Forbidden`, `404 Not Found`
+
+### 2.10 Search Categories
 - **Method:** `GET`
 - **Path:** `/api/categories/search`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<CategoryResponse>`
+- **Access Level:** `Public`
+- **Query Parameters:** `query` (required), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
 
-### 2.10 Toggle category status
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.11 Admin Search Categories
+- **Method:** `GET`
+- **Path:** `/api/categories/admin/search`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `query` (required), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "categoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+          "name": "Cakes",
+          "description": "Delicious freshly baked cakes",
+          "displayOrder": 1,
+          "active": true,
+          "isTopCategory": false,
+          "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+          "iconClass": "fa-cake",
+          "productCount": 15,
+          "activeProductCount": 12,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 2.12 Toggle Category Active Status
 - **Method:** `POST`
 - **Path:** `/api/categories/{categoryId}/toggle-status`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `CategoryResponse`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — [`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)
 
-### 2.11 Reorder categories
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "name": "Cakes",
+    "description": "Delicious freshly baked cakes",
+    "displayOrder": 1,
+    "active": true,
+    "isTopCategory": false,
+    "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+    "iconClass": "fa-cake",
+    "productCount": 15,
+    "activeProductCount": 12,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00"
+  }
+  ```
+- **Error Responses:** `403 Forbidden`, `404 Not Found`
+
+### 2.13 Reorder Categories
 - **Method:** `POST`
 - **Path:** `/api/categories/reorder`
-- **Type of API:** `Admin`
-- **Request Body:**
-  ```json
-  {
-    "categoryId1": 1,
-    "categoryId2": 2
-  }
-  ```
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "message": "Categories reordered successfully"
-  }
-  ```
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** `Map<String, Integer>` (Mapping of categoryId -> new displayOrder)
 
-### 2.12 Category statistics
+  **Example Request Body:**
+  ```json
+  {
+    "id1": 10,
+    "id2": 20
+  }
+  ```
+- **Response:** `200 OK` — `MessageResponse`
+
+  **Example Response Body:**
+  ```json
+  {
+    "message": "Operation successful"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`
+
+### 2.14 Get Category Statistics
 - **Method:** `GET`
 - **Path:** `/api/categories/statistics`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Map<String, Object>`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — [`CategoryStatisticsResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryStatisticsResponse.java)
 
+  **Example Response Body:**
+  ```json
+  {
+    "totalCategories": 8,
+    "activeCategories": 7,
+    "inactiveCategories": 1,
+    "topCategories": 3,
+    "categoryStats": [
+      {
+        "categoryId": "64f1a2b3c4d5e6f7a8b9c0d1",
+        "categoryName": "Cakes",
+        "productCount": 15,
+        "activeProductCount": 12
+      }
+    ]
+  }
+  ```
 
 ---
 
-## 3. Products
-**Base Path:** `/api/products`
+## 3. Product Command API
+**Base Path:** `/api/products`  
+**Controller:** `ProductCommandController`
 
-### 3.1 Get all products
-- **Method:** `GET`
-- **Path:** `/api/products`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.2 Get active products
-- **Method:** `GET`
-- **Path:** `/api/products/active`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.3 Get available products
-- **Method:** `GET`
-- **Path:** `/api/products/available`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.4 Get featured products
-- **Method:** `GET`
-- **Path:** `/api/products/featured`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.5 Get products on sale
-- **Method:** `GET`
-- **Path:** `/api/products/on-sale`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.6 Get recently added products
-- **Method:** `GET`
-- **Path:** `/api/products/recent`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.7 Get product by ID
-- **Method:** `GET`
-- **Path:** `/api/products/{productId}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `ProductResponse`
-
-### 3.8 Get multiple products by IDs
-- **Method:** `GET`
-- **Path:** `/api/products/batch`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `List<ProductResponse>`
-
-### 3.9 Validate multiple products
-- **Method:** `POST`
-- **Path:** `/api/products/batch/validate`
-- **Type of API:** `Public`
-- **Request Body:**
-  ```json
-  [
-    "productId1",
-    "productId2"
-  ]
-  ```
-- **Response Body:** `200 OK`
-  `List<ProductResponse>`
-
-### 3.10 Get product by SKU
-- **Method:** `GET`
-- **Path:** `/api/products/sku/{sku}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `ProductResponse`
-
-### 3.11 Get products by category
-- **Method:** `GET`
-- **Path:** `/api/products/category/{categoryId}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.12 Search products by query
-- **Method:** `GET`
-- **Path:** `/api/products/search`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.13 Get products by price range
-- **Method:** `GET`
-- **Path:** `/api/products/price-range`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.14 Get products by tag
-- **Method:** `GET`
-- **Path:** `/api/products/tag/{tag}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.15 Get products without allergen
-- **Method:** `GET`
-- **Path:** `/api/products/without-allergen/{allergen}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.16 Advanced search with filters
-- **Method:** `GET`
-- **Path:** `/api/products/filter`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<ProductResponse>`
-
-### 3.17 Create new product
+### 3.1 Create Product
 - **Method:** `POST`
 - **Path:** `/api/products`
-- **Type of API:** `Admin`
-- **Request Body:**
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`ProductRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductRequest.java)
+
+  **Example Request Body:**
   ```json
   {
-    "sku": "string",
-    "name": "string",
-    "description": "string",
-    "categoryId": "string",
-    "price": 0.00
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "categoryId": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "initialStock": 50,
+    "minimumStock": 5,
+    "reorderLevel": 10
   }
   ```
-- **Response Body:** `201 Created`
-  `ProductResponse`
+- **Response:** `201 Created` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
 
-### 3.18 Update product
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `400 Bad Request` (Validation Failed), `403 Forbidden`
+
+### 3.2 Update Product
 - **Method:** `PUT`
 - **Path:** `/api/products/{productId}`
-- **Type of API:** `Admin`
-- **Request Body:**
-  *(Same as Create new product)*
-- **Response Body:** `200 OK`
-  `ProductResponse`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`ProductRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductRequest.java)
 
-### 3.19 Update product status
+  **Example Request Body:**
+  ```json
+  {
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "categoryId": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "initialStock": 50,
+    "minimumStock": 5,
+    "reorderLevel": 10
+  }
+  ```
+- **Response:** `200 OK` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 3.3 Update Product Status
 - **Method:** `PATCH`
 - **Path:** `/api/products/{productId}/status`
-- **Type of API:** `Admin`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
 - **Request Body:**
   ```json
   {
-    "status": "INACTIVE"
+    "status": "ACTIVE"
   }
   ```
-- **Response Body:** `200 OK`
-  `ProductResponse`
+  *(Status options: `ACTIVE`, `INACTIVE`, `DISCONTINUED`, `OUT_OF_STOCK`)*
+- **Response:** `200 OK` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
 
-### 3.20 Toggle featured status
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 3.4 Toggle Featured Product Status
 - **Method:** `POST`
 - **Path:** `/api/products/{productId}/toggle-featured`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `ProductResponse`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
 
-### 3.21 Delete product
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `403 Forbidden`, `404 Not Found`
+
+### 3.5 Delete Product
 - **Method:** `DELETE`
 - **Path:** `/api/products/{productId}`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — `MessageResponse`
+
+  **Example Response Body:**
   ```json
   {
-    "message": "Product deleted successfully",
-    "productId": "string"
+    "message": "Operation successful"
   }
   ```
-
-### 3.22 Check product availability
-- **Method:** `GET`
-- **Path:** `/api/products/{productId}/availability`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "productId": "string",
-    "available": true
-  }
-  ```
-
-### 3.23 Get product statistics
-- **Method:** `GET`
-- **Path:** `/api/products/statistics`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Map<String, Object>`
-
+- **Error Responses:** `403 Forbidden`, `404 Not Found`
 
 ---
 
-## 4. Inventory
-**Base Path:** `/api/inventory`
+## 4. Product Query API
+**Base Path:** `/api/products`  
+**Controller:** `ProductQueryController`
 
-### 4.1 Get all inventory items
+### 4.1 Get All Products
 - **Method:** `GET`
-- **Path:** `/api/inventory`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
+- **Path:** `/api/products`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy` (default: `name`), `sortDir` (default: `ASC`)
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
 
-### 4.2 Get inventory for specific product
-- **Method:** `GET`
-- **Path:** `/api/inventory/product/{productId}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `InventoryResponse`
-
-### 4.3 Get inventory by SKU
-- **Method:** `GET`
-- **Path:** `/api/inventory/sku/{sku}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `InventoryResponse`
-
-### 4.4 Get low stock
-- **Method:** `GET`
-- **Path:** `/api/inventory/low-stock`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
-
-### 4.5 Get out of stock
-- **Method:** `GET`
-- **Path:** `/api/inventory/out-of-stock`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
-
-### 4.6 Get items needing reorder
-- **Method:** `GET`
-- **Path:** `/api/inventory/needs-reorder`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
-
-### 4.7 Get expired
-- **Method:** `GET`
-- **Path:** `/api/inventory/expired`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
-
-### 4.8 Get expiring soon
-- **Method:** `GET`
-- **Path:** `/api/inventory/expiring-soon`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Page<InventoryResponse>`
-
-### 4.9 Update inventory details
-- **Method:** `PUT`
-- **Path:** `/api/inventory/product/{productId}`
-- **Type of API:** `Admin`
-- **Request Body:**
+  **Example Response Body:**
   ```json
   {
-    "currentStock": 0,
-    "reservedStock": 0,
-    "minimumStock": 0
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
   }
   ```
-- **Response Body:** `200 OK`
-  `InventoryResponse`
 
-### 4.10 Add stock
+### 4.2 Get Active Products
+- **Method:** `GET`
+- **Path:** `/api/products/active`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.3 Get Available Products
+- **Method:** `GET`
+- **Path:** `/api/products/available`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.4 Get Featured Products
+- **Method:** `GET`
+- **Path:** `/api/products/featured`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy` (default: `createdAt`), `sortDir` (default: `DESC`)
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.5 Get Products On Sale
+- **Method:** `GET`
+- **Path:** `/api/products/on-sale`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.6 Get Recently Added Products
+- **Method:** `GET`
+- **Path:** `/api/products/recent`
+- **Access Level:** `Public`
+- **Query Parameters:** `days` (default: `7`), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.7 Get Product by ID
+- **Method:** `GET`
+- **Path:** `/api/products/{productId}`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `404 Not Found`
+
+### 4.8 Get Products by Batch of IDs
+- **Method:** `POST`
+- **Path:** `/api/products/batch`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Request Body:** `List<String>` (array of product IDs)
+
+  **Example Request Body:**
+  ```json
+  [
+    "id1",
+    "id2"
+  ]
+  ```
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.9 Get Product by SKU
+- **Method:** `GET`
+- **Path:** `/api/products/sku/{sku}`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "sku": "CAKE-CHOCO-001",
+    "name": "Chocolate Fudge Cake",
+    "description": "Rich dark chocolate layer cake",
+    "shortDescription": "Rich chocolate cake",
+    "category": {
+      "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "name": "Cakes",
+      "iconClass": "fa-cake"
+    },
+    "price": 25.99,
+    "discountPrice": 22.99,
+    "costPrice": 12.00,
+    "effectivePrice": 22.99,
+    "taxClass": "STANDARD",
+    "taxRate": 5.0,
+    "metaTitle": "Buy Chocolate Fudge Cake",
+    "metaDescription": "Order fresh chocolate fudge cake online",
+    "maxOrderQuantity": 5,
+    "status": "ACTIVE",
+    "isFeatured": true,
+    "isActive": true,
+    "preparationTimeMinutes": 60,
+    "shelfLifeHours": 72,
+    "unit": "piece",
+    "calories": "450 kcal",
+    "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+    "allergens": ["Dairy", "Eggs", "Gluten"],
+    "tags": ["chocolate", "cake", "bestseller"],
+    "inventory": {
+      "currentStock": 45,
+      "availableStock": 40,
+      "isLowStock": false,
+      "isOutOfStock": false,
+      "status": "IN_STOCK"
+    },
+    "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+    "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+    "isAvailable": true,
+    "isOnSale": true,
+    "createdAt": "2026-01-15T10:30:00",
+    "updatedAt": "2026-02-01T14:20:00",
+    "averageRating": 4.8,
+    "totalReviews": 24
+  }
+  ```
+- **Error Responses:** `404 Not Found`
+
+### 4.10 Get Products by Category
+- **Method:** `GET`
+- **Path:** `/api/products/category/{categoryId}`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.11 Search Products
+- **Method:** `GET`
+- **Path:** `/api/products/search`
+- **Access Level:** `Public`
+- **Query Parameters:** `query` (required), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.12 Get Products by Price Range
+- **Method:** `GET`
+- **Path:** `/api/products/price-range`
+- **Access Level:** `Public`
+- **Query Parameters:** `minPrice` (required), `maxPrice` (required), `page`, `size`, `sortBy` (default: `price`), `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `400 Bad Request`
+
+### 4.13 Get Products by Tag
+- **Method:** `GET`
+- **Path:** `/api/products/tag/{tag}`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+### 4.14 Get Products Without Allergen
+- **Method:** `GET`
+- **Path:** `/api/products/without-allergen/{allergen}`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "productresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "sku": "CAKE-CHOCO-001",
+          "name": "Chocolate Fudge Cake",
+          "description": "Rich dark chocolate layer cake",
+          "shortDescription": "Rich chocolate cake",
+          "category": {
+            "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+            "name": "Cakes",
+            "iconClass": "fa-cake"
+          },
+          "price": 25.99,
+          "discountPrice": 22.99,
+          "costPrice": 12.00,
+          "effectivePrice": 22.99,
+          "taxClass": "STANDARD",
+          "taxRate": 5.0,
+          "metaTitle": "Buy Chocolate Fudge Cake",
+          "metaDescription": "Order fresh chocolate fudge cake online",
+          "maxOrderQuantity": 5,
+          "status": "ACTIVE",
+          "isFeatured": true,
+          "isActive": true,
+          "preparationTimeMinutes": 60,
+          "shelfLifeHours": 72,
+          "unit": "piece",
+          "calories": "450 kcal",
+          "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+          "allergens": ["Dairy", "Eggs", "Gluten"],
+          "tags": ["chocolate", "cake", "bestseller"],
+          "inventory": {
+            "currentStock": 45,
+            "availableStock": 40,
+            "isLowStock": false,
+            "isOutOfStock": false,
+            "status": "IN_STOCK"
+          },
+          "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+          "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+          "isAvailable": true,
+          "isOnSale": true,
+          "createdAt": "2026-01-15T10:30:00",
+          "updatedAt": "2026-02-01T14:20:00",
+          "averageRating": 4.8,
+          "totalReviews": 24
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+
+---
+
+## 5. Inventory API
+**Base Path:** `/api/inventory`  
+**Controller:** `InventoryController`
+
+### 5.1 Get All Inventory Items
+- **Method:** `GET`
+- **Path:** `/api/inventory`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `page`, `size`, `sortBy` (default: `id`), `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.2 Admin Search Inventory
+- **Method:** `GET`
+- **Path:** `/api/inventory/admin/search`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `query` (required), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.3 Get Inventory by Product ID
+- **Method:** `GET`
+- **Path:** `/api/inventory/product/{productId}`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "productName": "Chocolate Fudge Cake",
+    "currentStock": 45,
+    "reservedStock": 5,
+    "availableStock": 40,
+    "minimumStock": 5,
+    "status": "IN_STOCK"
+  }
+  ```
+- **Error Responses:** `404 Not Found`
+
+### 5.4 Get Inventory by Product SKU
+- **Method:** `GET`
+- **Path:** `/api/inventory/sku/{sku}`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "productName": "Chocolate Fudge Cake",
+    "currentStock": 45,
+    "reservedStock": 5,
+    "availableStock": 40,
+    "minimumStock": 5,
+    "status": "IN_STOCK"
+  }
+  ```
+- **Error Responses:** `404 Not Found`
+
+### 5.5 Get Low Stock Items
+- **Method:** `GET`
+- **Path:** `/api/inventory/low-stock`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.6 Get Out of Stock Items
+- **Method:** `GET`
+- **Path:** `/api/inventory/out-of-stock`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.7 Get Items Needing Reorder
+- **Method:** `GET`
+- **Path:** `/api/inventory/needs-reorder`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.8 Get Expired Items
+- **Method:** `GET`
+- **Path:** `/api/inventory/expired`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.9 Get Items Expiring Soon
+- **Method:** `GET`
+- **Path:** `/api/inventory/expiring-soon`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Query Parameters:** `hours` (default: `24`), `page`, `size`, `sortBy`, `sortDir`
+- **Response:** `200 OK` — `PagedModel<[`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)>`
+
+  **Example Response Body:**
+  ```json
+  {
+    "_embedded": {
+      "inventoryresponseList": [
+        {
+          "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+          "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+          "productName": "Chocolate Fudge Cake",
+          "currentStock": 45,
+          "reservedStock": 5,
+          "availableStock": 40,
+          "minimumStock": 5,
+          "status": "IN_STOCK"
+        }
+      ]
+    },
+    "page": {
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "number": 0
+    }
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
+
+### 5.10 Update Inventory
+- **Method:** `PUT`
+- **Path:** `/api/inventory/product/{productId}`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`InventoryUpdateRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryUpdateRequest.java)
+
+  **Example Request Body:**
+  ```json
+  {
+    "currentStock": 50,
+    "reservedStock": 5,
+    "minimumStock": 10,
+    "maximumStock": 100,
+    "reorderLevel": 15,
+    "reorderQuantity": 50,
+    "autoReorderEnabled": true,
+    "trackExpiry": true,
+    "expiryDate": "2026-12-31T23:59:59",
+    "supplierInfo": "Supplier A",
+    "storageLocation": "Aisle 4, Shelf 2",
+    "notes": "Regular update"
+  }
+  ```
+- **Response:** `200 OK` — [`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "productName": "Chocolate Fudge Cake",
+    "currentStock": 45,
+    "reservedStock": 5,
+    "availableStock": 40,
+    "minimumStock": 5,
+    "status": "IN_STOCK"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 5.11 Add Stock (Restock)
 - **Method:** `POST`
 - **Path:** `/api/inventory/product/{productId}/add-stock`
-- **Type of API:** `Admin`
-- **Request Body:**
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** [`StockAdjustmentRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAdjustmentRequest.java)
+
+  **Example Request Body:**
   ```json
   {
     "quantity": 10,
-    "notes": "Restock supply"
+    "notes": "Restock from bakery kitchen batch #42"
   }
   ```
-- **Response Body:** `200 OK`
-  `InventoryResponse`
+- **Response:** `200 OK` — [`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)
 
-### 4.11 Reserve stock
-- **Method:** `POST`
-- **Path:** `/api/inventory/product/{productId}/reserve`
-- **Type of API:** `Internal/Admin`
-- **Request Body:**
+  **Example Response Body:**
   ```json
   {
-    "quantity": 5
+    "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "productName": "Chocolate Fudge Cake",
+    "currentStock": 45,
+    "reservedStock": 5,
+    "availableStock": 40,
+    "minimumStock": 5,
+    "status": "IN_STOCK"
   }
   ```
-- **Response Body:** `200 OK`
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 5.12 Reserve Stock
+- **Method:** `POST`
+- **Path:** `/api/inventory/product/{productId}/reserve`
+- **Access Level:** `ADMIN` or `SYSTEM` (`@PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")`)
+- **Request Body:** [`StockAdjustmentRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAdjustmentRequest.java)
+
+  **Example Request Body:**
+  ```json
+  {
+    "quantity": 10,
+    "notes": "Restock from bakery kitchen batch #42"
+  }
+  ```
+- **Response:** `200 OK` — [`StockOperationResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockOperationResponse.java)
+
+  **Example Response Body:**
   ```json
   {
     "success": true,
-    "productId": "string",
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
     "quantity": 5,
     "message": "Stock reserved successfully"
   }
   ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`, `409 Conflict` (Insufficient Stock)
 
-### 4.12 Release reserved stock
+### 5.13 Release Reserved Stock
 - **Method:** `POST`
 - **Path:** `/api/inventory/product/{productId}/release-reserved`
-- **Type of API:** `Internal/Admin`
-- **Request Body:**
-  ```json
-  {
-    "quantity": 5
-  }
-  ```
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "message": "Reserved stock released successfully",
-    "productId": "string",
-    "quantity": "5"
-  }
-  ```
+- **Access Level:** `ADMIN` or `SYSTEM` (`@PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")`)
+- **Request Body:** [`StockAdjustmentRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAdjustmentRequest.java)
 
-### 4.13 Consume stock
+  **Example Request Body:**
+  ```json
+  {
+    "quantity": 10,
+    "notes": "Restock from bakery kitchen batch #42"
+  }
+  ```
+- **Response:** `200 OK` — [`StockOperationResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockOperationResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "success": true,
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "quantity": 5,
+    "message": "Stock reserved successfully"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`
+
+### 5.14 Consume Stock
 - **Method:** `POST`
 - **Path:** `/api/inventory/product/{productId}/consume`
-- **Type of API:** `Internal/Admin`
-- **Request Body:**
-  ```json
-  {
-    "quantity": 5
-  }
-  ```
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "message": "Stock consumed successfully",
-    "productId": "string",
-    "quantity": "5"
-  }
-  ```
+- **Access Level:** `ADMIN` or `SYSTEM` (`@PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")`)
+- **Request Body:** [`StockAdjustmentRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAdjustmentRequest.java)
 
-### 4.14 Check available quantity
+  **Example Request Body:**
+  ```json
+  {
+    "quantity": 10,
+    "notes": "Restock from bakery kitchen batch #42"
+  }
+  ```
+- **Response:** `200 OK` — [`StockOperationResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockOperationResponse.java)
+
+  **Example Response Body:**
+  ```json
+  {
+    "success": true,
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "quantity": 5,
+    "message": "Stock reserved successfully"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`, `404 Not Found`, `409 Conflict` (Insufficient Stock)
+
+### 5.15 Check Stock Availability
 - **Method:** `GET`
 - **Path:** `/api/inventory/product/{productId}/availability`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
+- **Access Level:** `Public`
+- **Query Parameters:** `quantity` (int, required)
+- **Response:** `200 OK` — [`StockAvailabilityResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAvailabilityResponse.java)
+
+  **Example Response Body:**
   ```json
   {
-    "productId": "string",
-    "requestedQuantity": 5,
-    "availableStock": 10,
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "requestedQuantity": 2,
+    "availableStock": 40,
     "sufficient": true
   }
   ```
 
-### 4.15 Get available stock number
+### 5.16 Get Available Stock
 - **Method:** `GET`
 - **Path:** `/api/inventory/product/{productId}/available-stock`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — [`StockAvailabilityResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAvailabilityResponse.java)
+
+  **Example Response Body:**
   ```json
   {
-    "productId": "string",
-    "availableStock": 10
+    "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "requestedQuantity": 2,
+    "availableStock": 40,
+    "sufficient": true
   }
   ```
 
-### 4.16 Bulk update minimum stock
+### 5.17 Bulk Update Minimum Stock
 - **Method:** `POST`
 - **Path:** `/api/inventory/bulk-update-minimum-stock`
-- **Type of API:** `Admin`
-- **Request Body:**
-  ```json
-  {
-    "productId1": 10,
-    "productId2": 20
-  }
-  ```
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "message": "Minimum stock levels updated successfully",
-    "updatedProducts": "2"
-  }
-  ```
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Request Body:** `Map<String, Integer>` (Map of productId -> minimumStock)
 
-### 4.17 Inventory statistics
+  **Example Request Body:**
+  ```json
+  {
+    "id1": 10,
+    "id2": 20
+  }
+  ```
+- **Response:** `200 OK` — `MessageResponse`
+
+  **Example Response Body:**
+  ```json
+  {
+    "message": "Operation successful"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `403 Forbidden`
+
+### 5.18 Get Inventory Statistics
 - **Method:** `GET`
 - **Path:** `/api/inventory/statistics`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Map<String, Object>`
+- **Access Level:** `ADMIN` (`@PreAuthorize("hasRole('ADMIN')")`)
+- **Response:** `200 OK` — [`InventoryStatisticsResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryStatisticsResponse.java)
 
+  **Example Response Body:**
+  ```json
+  {
+    "totalItems": 120,
+    "inStockItems": 105,
+    "lowStockItems": 10,
+    "outOfStockItems": 5,
+    "totalReservedStock": 25,
+    "totalStockValue": 4550.00
+  }
+  ```
+- **Error Responses:** `403 Forbidden`
 
 ---
 
-## 5. Storefront
-**Base Path:** `/api/storefront`
+## 6. Storefront API
+**Base Path:** `/api/storefront`  
+**Controller:** `StorefrontController`
 
-### 5.1 Fetch storefront config
+### 6.1 Get Frontpage Storefront Config
 - **Method:** `GET`
 - **Path:** `/api/storefront/frontpage`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `Storefront`
+- **Access Level:** `Public`
+- **Response:** `200 OK` — `Storefront`
 
-### 5.2 Update storefront config
+  **Example Response Body:**
+  ```json
+  {
+    "heroSection": {
+      "heroBanners": [
+        {
+          "imageUrl": "https://cdn.example.com/banner.jpg",
+          "title": "Welcome to Bakery",
+          "description": "Fresh baked goods"
+        }
+      ]
+    },
+    "aboutSection": {
+      "tag": "About Us",
+      "title": "Our Story",
+      "description": "Since 1990...",
+      "image1Url": "url1",
+      "image2Url": "url2",
+      "image3Url": "url3"
+    },
+    "howWeWorkSection": [
+      {
+        "title": "Bake",
+        "description": "Fresh daily",
+        "iconName": "CookingPot"
+      }
+    ],
+    "specialOfferSection": {
+      "offers": [
+        {
+          "imageUrl": "https://cdn.example.com/offer.jpg",
+          "title": "Summer Sale",
+          "description": "20% off",
+          "couponCode": "SUMMER20",
+          "discountType": "PERCENTAGE",
+          "discountValue": 20.0,
+          "expiryDate": "2026-12-31",
+          "minCartValue": 50.0
+        }
+      ]
+    },
+    "testimonialSection": {
+      "quote": "Best cakes!",
+      "author": "Jane Doe",
+      "rating": 5,
+      "authorImageUrl": "url"
+    }
+  }
+  ```
+
+### 6.2 Update Frontpage Storefront Config
 - **Method:** `PUT`
 - **Path:** `/api/storefront/frontpage`
-- **Type of API:** `Public`
+- **Access Level:** `Public`
 - **Request Body:** `Storefront`
-- **Response Body:** `200 OK`
-  `Storefront`
 
-### 5.3 Validate coupon
+  **Example Request Body:**
+  ```json
+  {
+    "heroSection": {
+      "heroBanners": [
+        {
+          "imageUrl": "https://cdn.example.com/banner.jpg",
+          "title": "Welcome to Bakery",
+          "description": "Fresh baked goods"
+        }
+      ]
+    },
+    "aboutSection": {
+      "tag": "About Us",
+      "title": "Our Story",
+      "description": "Since 1990...",
+      "image1Url": "url1",
+      "image2Url": "url2",
+      "image3Url": "url3"
+    },
+    "howWeWorkSection": [
+      {
+        "title": "Bake",
+        "description": "Fresh daily",
+        "iconName": "CookingPot"
+      }
+    ],
+    "specialOfferSection": {
+      "offers": [
+        {
+          "imageUrl": "https://cdn.example.com/offer.jpg",
+          "title": "Summer Sale",
+          "description": "20% off",
+          "couponCode": "SUMMER20",
+          "discountType": "PERCENTAGE",
+          "discountValue": 20.0,
+          "expiryDate": "2026-12-31",
+          "minCartValue": 50.0
+        }
+      ]
+    },
+    "testimonialSection": {
+      "quote": "Best cakes!",
+      "author": "Jane Doe",
+      "rating": 5,
+      "authorImageUrl": "url"
+    }
+  }
+  ```
+- **Response:** `200 OK` — `Storefront`
+
+  **Example Response Body:**
+  ```json
+  {
+    "heroSection": {
+      "heroBanners": [
+        {
+          "imageUrl": "https://cdn.example.com/banner.jpg",
+          "title": "Welcome to Bakery",
+          "description": "Fresh baked goods"
+        }
+      ]
+    },
+    "aboutSection": {
+      "tag": "About Us",
+      "title": "Our Story",
+      "description": "Since 1990...",
+      "image1Url": "url1",
+      "image2Url": "url2",
+      "image3Url": "url3"
+    },
+    "howWeWorkSection": [
+      {
+        "title": "Bake",
+        "description": "Fresh daily",
+        "iconName": "CookingPot"
+      }
+    ],
+    "specialOfferSection": {
+      "offers": [
+        {
+          "imageUrl": "https://cdn.example.com/offer.jpg",
+          "title": "Summer Sale",
+          "description": "20% off",
+          "couponCode": "SUMMER20",
+          "discountType": "PERCENTAGE",
+          "discountValue": 20.0,
+          "expiryDate": "2026-12-31",
+          "minCartValue": 50.0
+        }
+      ]
+    },
+    "testimonialSection": {
+      "quote": "Best cakes!",
+      "author": "Jane Doe",
+      "rating": 5,
+      "authorImageUrl": "url"
+    }
+  }
+  ```
+
+### 6.3 Validate Coupon Code
 - **Method:** `GET`
-- **Path:** `/api/storefront/validate-coupon?code={string}&cartTotal={double}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK` (Validation result JSON)
+- **Path:** `/api/storefront/validate-coupon`
+- **Access Level:** `Public`
+- **Query Parameters:**
+  - `code` (string, required)
+  - `cartTotal` (double, optional)
+- **Response:** `200 OK` — Coupon details/validation result JSON
+- **Error Responses:** `400 Bad Request`
 
 ---
 
-## 6. Tax Rates
-**Base Path:** `/api/taxes`
+## 7. Tax Rates API
+**Base Path:** `/api/taxes`  
+**Controller:** `TaxRateController`
 
-### 6.1 Get all tax rates
+### 7.1 Get All Tax Rates
 - **Method:** `GET`
 - **Path:** `/api/taxes`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  `List<TaxRate>`
+- **Access Level:** `Public`
+- **Query Parameters:** `page`, `size`, `sortBy` (default: `createdAt`), `sortDir` (default: `DESC`)
+- **Response:** `200 OK` — `PagedModel<TaxRate>`
 
-### 6.2 Create tax rate
+### 7.2 Create Tax Rate
 - **Method:** `POST`
 - **Path:** `/api/taxes`
-- **Type of API:** `Admin`
+- **Access Level:** `Public`
 - **Request Body:** `TaxRate`
-- **Response Body:** `201 Created`
-  `TaxRate`
 
-### 6.3 Update tax rate
+  **Example Request Body:**
+  ```json
+  {
+    "id": "...",
+    "type": "Standard",
+    "rate": 0.08,
+    "description": "Standard 8% tax",
+    "createdAt": "2026-08-05T20:13:59",
+    "updatedAt": "2026-08-05T20:13:59"
+  }
+  ```
+- **Response:** `201 Created` — `TaxRate`
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "...",
+    "type": "Standard",
+    "rate": 0.08,
+    "description": "Standard 8% tax",
+    "createdAt": "2026-08-05T20:13:59",
+    "updatedAt": "2026-08-05T20:13:59"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`
+
+### 7.3 Update Tax Rate
 - **Method:** `PUT`
 - **Path:** `/api/taxes/{id}`
-- **Type of API:** `Admin`
+- **Access Level:** `Public`
 - **Request Body:** `TaxRate`
-- **Response Body:** `200 OK`
-  `TaxRate`
 
-### 6.4 Delete tax rate
+  **Example Request Body:**
+  ```json
+  {
+    "id": "...",
+    "type": "Standard",
+    "rate": 0.08,
+    "description": "Standard 8% tax",
+    "createdAt": "2026-08-05T20:13:59",
+    "updatedAt": "2026-08-05T20:13:59"
+  }
+  ```
+- **Response:** `200 OK` — `TaxRate`
+
+  **Example Response Body:**
+  ```json
+  {
+    "id": "...",
+    "type": "Standard",
+    "rate": 0.08,
+    "description": "Standard 8% tax",
+    "createdAt": "2026-08-05T20:13:59",
+    "updatedAt": "2026-08-05T20:13:59"
+  }
+  ```
+- **Error Responses:** `400 Bad Request`, `404 Not Found`
+
+### 7.4 Delete Tax Rate
 - **Method:** `DELETE`
 - **Path:** `/api/taxes/{id}`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `204 No Content`
+- **Access Level:** `Public`
+- **Response:** `204 No Content`
+- **Error Responses:** `404 Not Found`
 
 ---
 
-## 7. Uploads
-**Base Path:** `/api/uploads`
+## 8. Uploads API
+**Base Path:** `/api/uploads`  
+**Controller:** `UploadController`
 
-### 7.1 Upload media
+### 8.1 Upload Media Files
 - **Method:** `POST`
 - **Path:** `/api/uploads/media`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
+- **Content-Type:** `multipart/form-data`
+- **Access Level:** `Public`
+- **Request Part:** `media` (List of `MultipartFile`)
+- **Response:** `200 OK` — [`MediaUploadResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/media/MediaUploadResponse.java)
   ```json
   {
     "message": "Files uploaded successfully",
-    "urls": ["string", "string"]
+    "urls": [
+      "https://cdn.example.com/media/file1.png"
+    ]
   }
   ```
+- **Error Responses:** `400 Bad Request` (MultipartError), `413 Payload Too Large` (MaxUploadSizeExceeded)
 
-### 7.2 Get uploaded media
+### 8.2 Get Uploaded Media File
 - **Method:** `GET`
 - **Path:** `/api/uploads/media/{fileName}`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  *(Binary file content, byte[] with correct content type)*
+- **Access Level:** `Public`
+- **Response:** `200 OK` — Binary byte stream with dynamic `Content-Type`
 
 ---
 
-## Common DTOs
+## Data Transfer Objects (DTOs)
 
-### CategoryResponse
+### [`CategoryRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryRequest.java)
 ```json
 {
-  "id": "string",
-  "name": "string",
-  "description": "string",
-  "displayOrder": 0,
+  "name": "Cakes",
+  "description": "Delicious freshly baked cakes",
+  "displayOrder": 1,
   "active": true,
-  "mediaUrls": ["string"],
-  "iconClass": "string",
-  "productCount": 0,
-  "activeProductCount": 0,
-  "createdAt": "2023-10-10T12:00:00",
-  "updatedAt": "2023-10-10T12:00:00"
+  "isTopCategory": false,
+  "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+  "iconClass": "fa-cake"
 }
 ```
 
-### ProductResponse
+### [`CategoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/category/CategoryResponse.java)
 ```json
 {
-  "id": "string",
-  "sku": "string",
-  "name": "string",
-  "description": "string",
-  "category": {
-    "id": "string",
-    "name": "string"
-  },
-  "price": 0.00,
+  "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+  "name": "Cakes",
+  "description": "Delicious freshly baked cakes",
+  "displayOrder": 1,
+  "active": true,
+  "isTopCategory": false,
+  "mediaUrls": ["https://cdn.example.com/cake.jpg"],
+  "iconClass": "fa-cake",
+  "productCount": 15,
+  "activeProductCount": 12,
+  "createdAt": "2026-01-15T10:30:00",
+  "updatedAt": "2026-02-01T14:20:00"
+}
+```
+
+### [`ProductRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductRequest.java)
+```json
+{
+  "sku": "CAKE-CHOCO-001",
+  "name": "Chocolate Fudge Cake",
+  "description": "Rich dark chocolate layer cake",
+  "shortDescription": "Rich chocolate cake",
+  "categoryId": "64f1a2b3c4d5e6f7a8b9c0d1",
+  "price": 25.99,
+  "discountPrice": 22.99,
+  "costPrice": 12.00,
+  "taxClass": "STANDARD",
+  "taxRate": 5.0,
+  "metaTitle": "Buy Chocolate Fudge Cake",
+  "metaDescription": "Order fresh chocolate fudge cake online",
+  "maxOrderQuantity": 5,
   "status": "ACTIVE",
+  "isFeatured": true,
+  "preparationTimeMinutes": 60,
+  "shelfLifeHours": 72,
+  "unit": "piece",
+  "calories": "450 kcal",
+  "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+  "allergens": ["Dairy", "Eggs", "Gluten"],
+  "tags": ["chocolate", "cake", "bestseller"],
+  "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+  "initialStock": 50,
+  "minimumStock": 5,
+  "reorderLevel": 10
+}
+```
+
+### [`ProductResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/product/ProductResponse.java)
+```json
+{
+  "id": "64f1a2b3c4d5e6f7a8b9c0d2",
+  "sku": "CAKE-CHOCO-001",
+  "name": "Chocolate Fudge Cake",
+  "description": "Rich dark chocolate layer cake",
+  "shortDescription": "Rich chocolate cake",
+  "category": {
+    "id": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "name": "Cakes",
+    "iconClass": "fa-cake"
+  },
+  "price": 25.99,
+  "discountPrice": 22.99,
+  "costPrice": 12.00,
+  "effectivePrice": 22.99,
+  "taxClass": "STANDARD",
+  "taxRate": 5.0,
+  "metaTitle": "Buy Chocolate Fudge Cake",
+  "metaDescription": "Order fresh chocolate fudge cake online",
+  "maxOrderQuantity": 5,
+  "status": "ACTIVE",
+  "isFeatured": true,
+  "isActive": true,
+  "preparationTimeMinutes": 60,
+  "shelfLifeHours": 72,
+  "unit": "piece",
+  "calories": "450 kcal",
+  "ingredients": ["Flour", "Sugar", "Cocoa Powder", "Eggs", "Butter"],
+  "allergens": ["Dairy", "Eggs", "Gluten"],
+  "tags": ["chocolate", "cake", "bestseller"],
   "inventory": {
-    "currentStock": 0,
-    "availableStock": 0,
+    "currentStock": 45,
+    "availableStock": 40,
+    "isLowStock": false,
+    "isOutOfStock": false,
     "status": "IN_STOCK"
   },
-  "mediaUrls": ["string"],
-  "primaryImageUrl": "string"
+  "mediaUrls": ["https://cdn.example.com/choco-cake.jpg"],
+  "primaryImageUrl": "https://cdn.example.com/choco-cake.jpg",
+  "isAvailable": true,
+  "isOnSale": true,
+  "createdAt": "2026-01-15T10:30:00",
+  "updatedAt": "2026-02-01T14:20:00",
+  "averageRating": 4.8,
+  "totalReviews": 24
 }
 ```
 
-### InventoryResponse
+### [`InventoryResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/InventoryResponse.java)
 ```json
 {
-  "id": "string",
-  "productId": "string",
-  "productName": "string",
-  "currentStock": 0,
-  "reservedStock": 0,
-  "availableStock": 0,
-  "minimumStock": 0,
+  "id": "64f1a2b3c4d5e6f7a8b9c0d3",
+  "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+  "productName": "Chocolate Fudge Cake",
+  "currentStock": 45,
+  "reservedStock": 5,
+  "availableStock": 40,
+  "minimumStock": 5,
   "status": "IN_STOCK"
 }
 ```
 
-### Storefront
+### [`StockAdjustmentRequest`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAdjustmentRequest.java)
 ```json
 {
-  "id": "string",
-  "heroSection": {
-    "campaigns": [
-      {
-        "imageUrl": "string",
-        "title": "string",
-        "description": "string"
-      }
-    ]
-  },
-  "aboutSection": {
-    "tag": "string",
-    "title": "string",
-    "description": "string",
-    "image1Url": "string",
-    "image2Url": "string",
-    "image3Url": "string"
-  },
-  "howWeWorkSection": [
+  "quantity": 10,
+  "notes": "Restock from bakery kitchen batch #42"
+}
+```
+
+### [`StockOperationResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockOperationResponse.java)
+```json
+{
+  "success": true,
+  "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+  "quantity": 5,
+  "message": "Stock reserved successfully"
+}
+```
+
+### [`StockAvailabilityResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/inventory/StockAvailabilityResponse.java)
+```json
+{
+  "productId": "64f1a2b3c4d5e6f7a8b9c0d2",
+  "requestedQuantity": 2,
+  "availableStock": 40,
+  "sufficient": true
+}
+```
+
+### [`CategoryStatisticsResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/CategoryStatisticsResponse.java)
+```json
+{
+  "totalCategories": 8,
+  "activeCategories": 7,
+  "inactiveCategories": 1,
+  "topCategories": 3,
+  "categoryStats": [
     {
-      "title": "string",
-      "description": "string",
-      "iconName": "string"
+      "categoryId": "64f1a2b3c4d5e6f7a8b9c0d1",
+      "categoryName": "Cakes",
+      "productCount": 15,
+      "activeProductCount": 12
     }
-  ],
-  "specialOfferSection": {
-    "offers": [
-      {
-        "imageUrl": "string",
-        "title": "string",
-        "description": "string",
-        "couponCode": "string",
-        "discountType": "string",
-        "discountValue": 0.0,
-        "expiryDate": "string",
-        "minCartValue": 0.0
-      }
-    ]
-  },
-  "testimonialSection": {
-    "quote": "string",
-    "author": "string",
-    "rating": 0,
-    "authorImageUrl": "string"
+  ]
+}
+```
+
+### [`InventoryStatisticsResponse`](./src/main/java/com/blubugtech/bakery_product_service/dto/InventoryStatisticsResponse.java)
+```json
+{
+  "totalItems": 120,
+  "inStockItems": 105,
+  "lowStockItems": 10,
+  "outOfStockItems": 5,
+  "totalReservedStock": 25,
+  "totalStockValue": 4550.00
+}
+```
+
+## Error Responses
+The API uses a standardized `ErrorResponse` structure for all exceptions:
+
+```json
+{
+  "code": "ERROR_CODE",
+  "message": "Human-readable error description",
+  "timestamp": "2026-08-05T20:13:59",
+  "path": "/api/...",
+  "details": {
+    "key": "value"
   }
 }
 ```
 
-### TaxRate
-```json
-{
-  "id": "string",
-  "type": "string",
-  "rate": 0.0,
-  "description": "string",
-  "createdAt": "2023-10-10T12:00:00",
-  "updatedAt": "2023-10-10T12:00:00"
-}
-```
+### Common Error Codes
+| Code | HTTP Status | Description |
+| :--- | :--- | :--- |
+| `PRODUCT_SERVICE_ERROR` | 400 | Generic product service business logic error |
+| `INSUFFICIENT_STOCK` | 409 | Requested stock exceeds available inventory |
+| `INVALID_QUANTITY` | 400 | The requested quantity is not valid |
+| `PAYLOAD_TOO_LARGE` | 413 | The uploaded file exceeds the maximum size limit |
+| `MULTIPART_ERROR` | 400 | Failed to parse multipart request |

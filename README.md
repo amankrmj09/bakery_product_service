@@ -4,7 +4,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.x-brightgreen.svg)
 ![Database](https://img.shields.io/badge/Database-MongoDB%20%7C%20Elasticsearch-blue.svg)
 
-The **Product Service** is a core component of the Shah's Bakery Microservice Platform, handling the product catalog, inventory management, and fast fuzzy searching capabilities.
+The **Product Service** is a core microservice of the Shah's Bakery Platform, managing the product catalogue, categories, inventory, storefront configurations, tax rates, file media uploads, and fast search indexing via Elasticsearch.
 
 ## 📑 Table of Contents
 - [Architecture & Design](#-architecture--design)
@@ -18,49 +18,102 @@ The **Product Service** is a core component of the Shah's Bakery Microservice Pl
 - [Related Links](#-related-links)
 
 ## 🏗️ Architecture & Design
-Provide a brief overview of the architecture of this service.
-- **Data Storage**: MongoDB for primary data storage, Elasticsearch for fast search indexing, Redis for caching.
-- **Communication**: REST API for synchronous communication, Kafka for async event driven architecture, Eureka for service discovery.
-- **Key Design Patterns**: MVC, Repository Pattern, DTO pattern, Feign clients for inter-service communication.
-- **Object Storage**: Direct Cloudflare R2 / S3 integrations for image storage.
+- **Data Storage**: MongoDB for primary document persistence, Elasticsearch for fuzzy search indexing, Redis for caching.
+- **Communication**: REST API for synchronous communication, Kafka for asynchronous event publishing (e.g., product updates, review processing), Eureka for service discovery.
+- **Key Design Patterns**: CQRS (Command/Query separation for products), Strategy Pattern (Coupon Validation), DTO & MapStruct Mappers, Repository Pattern.
+- **Object Storage**: Direct Cloudflare R2 / S3 integrations for media upload and storage.
 
 ## ✨ Features
-List the core capabilities and features of this service.
-- Complete CRUD operations for bakery products.
-- Stock and inventory level tracking.
-- Fast fuzzy search and category filtering via Elasticsearch.
-- Direct Cloudflare R2 / S3 integrations for image storage.
-- Dynamic Site Configuration tracking.
+- **Product Management**: Full CQRS product commands (create, update, patch status, toggle featured, delete) and queries (filtering by category, price range, tags, allergens, sales, batch fetching).
+- **Category Management**: Hierarchical bakery product categories, active filtering, reordering, status toggling, and category statistics.
+- **Inventory Tracking**: Stock level tracking, stock reservation/release/consumption, low-stock/out-of-stock/expired item alerts, and minimum stock level management.
+- **Storefront Configuration**: Dynamic frontpage campaign, hero banner, special offers, and coupon validation strategies.
+- **Tax Rate Configuration**: Dynamic tax rate management.
+- **Media Uploads**: Multipart media upload integration with Cloudflare R2 / S3 storage.
+- **Fuzzy Search**: High-performance search powered by Elasticsearch for products and categories.
 
 ## 📁 Folder Structure
-The source code under `src/main/java` is organized as follows:
+
 ```text
-src/
-└── main/
-    └── java/.../bakery_product_service/
-        ├── controller/ # REST endpoints for products, categories, inventory, and uploads
-        ├── document/   # Elasticsearch document models for fast search indexing
-        ├── dto/        # Data Transfer Objects
-        ├── entity/     # Database entities mapping to MongoDB
-        ├── exception/  # Custom exceptions and global exception handler
-        ├── model/      # Non-persistent or supporting domain models
-        ├── repository/ # Interfaces for MongoDB and Elasticsearch access
-        └── service/    # Core logic including Product management, R2 storage uploads, and Site Config
+bakery_product_service/
+├── .env
+├── .env.example
+├── Dockerfile
+├── build.gradle.kts
+├── settings.gradle.kts
+├── gradlew
+├── gradlew.bat
+├── gradle/
+│   └── wrapper/
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── src/
+│   ├── main/
+│   │   ├── java/com/blubugtech/bakery_product_service/
+│   │   │   ├── BakeryProductServiceApplication.java
+│   │   │   ├── cache/                  # Redis caching managers & implementations
+│   │   │   │   ├── ProductCacheManager.java
+│   │   │   │   └── ProductCacheManagerImpl.java
+│   │   │   ├── constants/              # Application-wide constants
+│   │   │   │   └── ProductConstants.java
+│   │   │   ├── controller/             # REST API Controllers
+│   │   │   │   ├── CategoryController.java
+│   │   │   │   ├── InventoryController.java
+│   │   │   │   ├── ProductCommandController.java
+│   │   │   │   ├── ProductQueryController.java
+│   │   │   │   ├── StorefrontController.java
+│   │   │   │   ├── TaxRateController.java
+│   │   │   │   └── UploadController.java
+│   │   │   ├── dto/                    # Data Transfer Objects
+│   │   │   │   ├── CategoryStatResponse.java
+│   │   │   │   ├── CategoryStatisticsResponse.java
+│   │   │   │   ├── InventoryStatisticsResponse.java
+│   │   │   │   ├── category/           # Request/Response DTOs for categories
+│   │   │   │   ├── inventory/          # Request/Response DTOs for inventory
+│   │   │   │   ├── media/              # Request/Response DTOs for media uploads
+│   │   │   │   └── product/            # Request/Response DTOs for products
+│   │   │   ├── entity/                 # MongoDB Entities (Category, Inventory, Product, TaxRate)
+│   │   │   ├── exception/              # Exceptions & Global Exception Handler
+│   │   │   ├── integration/            # Messaging & External Storage Integrations
+│   │   │   │   ├── EventPublisher.java
+│   │   │   │   ├── kafka/              # Kafka producers & event consumers
+│   │   │   │   └── storage/            # Cloudflare R2 / S3 storage services
+│   │   │   ├── mapper/                 # MapStruct Mappers (Category, Inventory, Product)
+│   │   │   ├── model/                  # Domain Models (Storefront)
+│   │   │   ├── repository/             # Spring Data MongoDB Repositories
+│   │   │   ├── search/                 # Elasticsearch Integration
+│   │   │   │   ├── document/           # Category & Product Search Documents
+│   │   │   │   ├── repository/         # Elasticsearch Repositories
+│   │   │   │   └── service/            # Category & Product Search Services
+│   │   │   └── service/                # Business Logic Services & Implementations
+│   │   │       ├── impl/               # Service Implementations
+│   │   │       └── strategy/           # Coupon & Offer Validation Strategies
+│   │   └── resources/
+│   │       ├── application.yml         # Base Configuration
+│   │       ├── application-dev.yml     # Development Profile
+│   │       ├── application-docker.yml  # Docker Profile
+│   │       ├── application-prod.yml    # Production Profile
+│   │       ├── application-test.yml    # Test Profile
+│   │       └── logback-spring.xml      # Logback Configuration
+│   └── test/
+│       ├── java/                       # Unit & Integration Tests
+│       └── resources/                  # Test Configuration Files
 ```
 
 ## 🌐 API Reference
-> [!NOTE]
-> For detailed API definitions, request/response bodies, and schemas, please refer to the OpenAPI Reference available via the API Gateway's Swagger UI.
+For detailed API request/response schemas, endpoints, query parameters, and authentication requirements, refer to [API_REFERENCE.md](API_REFERENCE.md).
 
-**Key Endpoints:**
-- `GET /api/categories` - Retrieves a list of all active categories.
-- `GET /api/products` - Retrieves a paginated list of all products.
-- `GET /api/products/{id}` - Fetches details for a specific product.
-- `POST /api/products` - Adds a new product to the catalogue (Admin only).
+**Key Controller Base Paths:**
+- Categories: `/api/categories`
+- Products (Command): `/api/products`
+- Products (Query): `/api/products`
+- Inventory: `/api/inventory`
+- Storefront: `/api/storefront`
+- Tax Rates: `/api/taxes`
+- File Uploads: `/api/uploads`
 
 ## ⚙️ Configuration
-List required environment variables and configurations.
-You can copy `.env.example` to `.env` and fill in the values.
+Environment configurations are loaded via environment variables or `.env` file (copied from `.env.example`).
 
 | Variable | Description | Default / Example |
 |----------|-------------|-------------------|
@@ -73,9 +126,9 @@ You can copy `.env.example` to `.env` and fill in the values.
 | `PRODUCT_DB_PASSWORD` | MongoDB Password | `password` |
 | `ELASTICSEARCH_URIS` | Elasticsearch cluster URIs | `http://localhost:9200` |
 | `ELASTIC_PASSWORD` | Elasticsearch Password | |
-| `KAFKA_BOOTSTRAP_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
 | `REDIS_HOST` | Redis Host | `localhost` |
 | `REDIS_PORT_PRODUCT` | Redis Port | `6379` |
+| `KAFKA_BOOTSTRAP_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
 | `R2_ACCESS_KEY` | Cloudflare R2 Access Key | |
 | `R2_SECRET_KEY` | Cloudflare R2 Secret Key | |
 | `R2_BUCKET` | Cloudflare R2 Bucket Name | |
@@ -100,12 +153,7 @@ You can copy `.env.example` to `.env` and fill in the values.
    ```
 
 2. **Configure Environment:**
-   Set up your `.env` file based on `.env.example`. Make sure backing services (like MongoDB, Elasticsearch, Redis, and Kafka) are running.
-   You can use the provided Docker Compose file:
-   ```bash
-   docker-compose -f docker-compose.yml up -d
-   ```
-   *(Ensure to use the correct compose file if you have a specific one for this service)*
+   Set up your `.env` file based on `.env.example`. Make sure backing services are running.
 
 3. **Run the application:**
    ```bash
@@ -113,16 +161,18 @@ You can copy `.env.example` to `.env` and fill in the values.
    ```
 
 ## 🧪 Testing
-To run the test suite:
+To execute unit and integration tests:
 ```bash
 ./gradlew test
 ```
 
 ## 🛠️ Dependencies
-- **Framework:** Spring Boot 3.5.15
-- **Database & Search:** MongoDB (Primary DB), Elasticsearch (Search Index)
-- **Key Modules:** Spring Web, Spring Data MongoDB, Spring Data Elasticsearch, Spring Kafka, Eureka Client
-- **Other Utilities:** AWS SDK S3 (for R2 integration), MapStruct, Lombok
+- **Framework:** Spring Boot 3.5.x
+- **Database & Search:** MongoDB (Primary DB), Elasticsearch (Search Index), Redis (Cache)
+- **Messaging:** Spring Kafka
+- **Object Storage:** AWS SDK S3 (Cloudflare R2 Integration)
+- **Utilities:** MapStruct, Lombok, Spring Security
 
 ## 🔗 Related Links
-- [Main Platform README](../README.md)
+- [Parent Repository](https://github.com/amankrmj09/Blu_s_Bakery)
+- [API Reference](./API_REFERENCE.md)
