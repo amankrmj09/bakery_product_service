@@ -3,7 +3,7 @@ package com.blubugtech.bakery_product_service.integration.kafka;
 import com.blubugtech.bakery_product_service.entity.Product;
 import com.blubugtech.bakery_product_service.integration.EventPublisher;
 import lombok.extern.slf4j.Slf4j;
-import org.blubakery.common.messaging.event.ProductEvent;
+import org.blubakery.common.messaging.product.ProductEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class ProductEventPublisher implements EventPublisher {
     @Override
     public void publishProductEvent(Product product, String action) {
         try {
-            org.blubakery.common.messaging.contract.messaging.ProductPayload payload = org.blubakery.common.messaging.contract.messaging.ProductPayload.builder()
+            org.blubakery.common.messaging.product.ProductPayload payload = org.blubakery.common.messaging.product.ProductPayload.builder()
                     .productId(UUID.fromString(product.getId()))
                     .name(product.getName())
                     .price(product.getPrice())
@@ -45,7 +45,7 @@ public class ProductEventPublisher implements EventPublisher {
     @Override
     public void publishProductDeletedEvent(String productId) {
         try {
-            org.blubakery.common.messaging.contract.messaging.ProductPayload payload = org.blubakery.common.messaging.contract.messaging.ProductPayload.builder()
+            org.blubakery.common.messaging.product.ProductPayload payload = org.blubakery.common.messaging.product.ProductPayload.builder()
                     .productId(UUID.fromString(productId))
                     .action("DELETED")
                     .timestamp(LocalDateTime.now())
