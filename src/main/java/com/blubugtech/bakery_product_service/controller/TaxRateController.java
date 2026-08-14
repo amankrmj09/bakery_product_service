@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.blubakery.common.core.dto.RestPageResponse;
 
 @RestController
 @RequestMapping("/api/taxes")
@@ -18,7 +19,7 @@ public class TaxRateController {
     private TaxRateService taxRateService;
 
     @GetMapping
-    public ResponseEntity<org.springframework.data.web.PagedModel<TaxRate>> getAllTaxRates(
+    public ResponseEntity<RestPageResponse<TaxRate>> getAllTaxRates(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,

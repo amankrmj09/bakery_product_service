@@ -15,7 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PagedModel;
+import org.blubakery.common.core.dto.RestPageResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<PagedModel<CategoryResponse>> getAllCategories(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -49,12 +49,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getAllCategories(pageable);
 
         log.info("Retrieved {} categories", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     // Get active categories only
     @GetMapping("/active")
-    public ResponseEntity<PagedModel<CategoryResponse>> getActiveCategories(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> getActiveCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -67,12 +67,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getActiveCategories(pageable);
 
         log.info("Retrieved {} active categories", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     // Get categories with products
     @GetMapping("/with-products")
-    public ResponseEntity<PagedModel<CategoryResponse>> getCategoriesWithProducts(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> getCategoriesWithProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -85,12 +85,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getCategoriesWithProducts(pageable);
 
         log.info("Retrieved {} categories with products", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     // Get categories with active products
     @GetMapping("/with-active-products")
-    public ResponseEntity<PagedModel<CategoryResponse>> getCategoriesWithActiveProducts(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> getCategoriesWithActiveProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
@@ -103,12 +103,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.getCategoriesWithActiveProducts(pageable);
 
         log.info("Retrieved {} categories with active products", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     // Get top categories with top products
     @GetMapping("/top-with-products")
-    public ResponseEntity<org.springframework.data.web.PagedModel<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
+    public ResponseEntity<RestPageResponse<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse>> getTopCategoriesWithTopProducts(
             @RequestParam(defaultValue = "5") int productLimit,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -119,7 +119,7 @@ public class CategoryController {
         org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.fromString(sortDir), sortBy);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
 
-        org.springframework.data.web.PagedModel<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit, pageable);
+        RestPageResponse<com.blubugtech.bakery_product_service.dto.category.CategoryWithTopProductsResponse> categories = categoryService.getTopCategoriesWithTopProducts(productLimit, pageable);
 
         log.info("Retrieved top categories with products");
         return ResponseEntity.ok(categories);
@@ -177,7 +177,7 @@ public class CategoryController {
 
     // Search categories
     @GetMapping("/search")
-    public ResponseEntity<PagedModel<CategoryResponse>> searchCategories(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> searchCategories(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -191,12 +191,12 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
         log.info("Search returned {} categories", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     @GetMapping("/admin/search")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PagedModel<CategoryResponse>> searchCategoriesAdmin(
+    public ResponseEntity<RestPageResponse<CategoryResponse>> searchCategoriesAdmin(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -210,7 +210,7 @@ public class CategoryController {
         Page<CategoryResponse> categories = categoryService.searchCategories(query, pageable);
 
         log.info("Admin search returned {} categories", categories.getContent().size());
-        return ResponseEntity.ok(new PagedModel<>(categories));
+        return ResponseEntity.ok(new RestPageResponse<>(categories));
     }
 
     // Toggle category status

@@ -5,7 +5,7 @@ import com.blubugtech.bakery_product_service.service.CategoryService;
 
 import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
 import com.blubugtech.bakery_product_service.dto.category.CategoryResponse;
-import com.blubugtech.bakery_product_service.dto.common.RestPageImpl;
+import org.blubakery.common.core.dto.RestPageResponse;
 import com.blubugtech.bakery_product_service.entity.Category;
 import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
 import com.blubugtech.bakery_product_service.mapper.ProductMapper;
@@ -78,13 +78,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Cacheable(value = "categories", key = "'all:' + #pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
-        return new RestPageImpl<>(categoryRepository.findAll(pageable)
+        return new RestPageResponse<>(categoryRepository.findAll(pageable)
                 .map(categoryMapper::toResponse));
     }
 
     @Cacheable(value = "active-categories", key = "#pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
-        return new RestPageImpl<>(categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
+        return new RestPageResponse<>(categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
                 .map(categoryMapper::toResponse));
     }
 
@@ -96,7 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
         return getActiveCategories(pageable);
     }
 
-    public org.springframework.data.web.PagedModel<CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit, Pageable pageable) {
+    public RestPageResponse<CategoryWithTopProductsResponse> getTopCategoriesWithTopProducts(int productLimit, Pageable pageable) {
         Page<Category> topCategoriesPage = categoryRepository.findByIsTopCategoryTrueAndActiveTrue(pageable);
         if (topCategoriesPage == null || topCategoriesPage.isEmpty()) {
             topCategoriesPage = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable);
@@ -120,7 +120,7 @@ public class CategoryServiceImpl implements CategoryService {
             return new CategoryWithTopProductsResponse(categoryMapper.toResponse(category), productResponses);
         });
         
-        return new org.springframework.data.web.PagedModel<>(page);
+        return new RestPageResponse<>(page);
     }
 
     @Cacheable(value = "categories", key = "#categoryId")

@@ -23,5 +23,5 @@ public interface ProductQueryService {
     Page<ProductResponse> getProductsWithoutAllergen(String allergen, Pageable pageable);
     Page<ProductResponse> getRecentlyAddedProducts(int days, Pageable pageable);
     Page<ProductResponse> getProductsByPreparationTime(Integer minMinutes, Integer maxMinutes, Pageable pageable);
-    org.springframework.data.web.PagedModel<ProductResponse> getProductsByIds(List<String> productIds, Pageable pageable);
+    org.blubakery.common.core.dto.RestPageResponse<ProductResponse> getProductsByIds(List<String> productIds, Pageable pageable);
 }

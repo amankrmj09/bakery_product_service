@@ -17,9 +17,9 @@ public class TaxRateServiceImpl implements TaxRateService {
     private TaxRateRepository taxRateRepository;
 
     @Override
-    public org.springframework.data.web.PagedModel<TaxRate> getAllTaxRates(org.springframework.data.domain.Pageable pageable) {
+    public org.blubakery.common.core.dto.RestPageResponse<TaxRate> getAllTaxRates(org.springframework.data.domain.Pageable pageable) {
         org.springframework.data.domain.Page<TaxRate> page = taxRateRepository.findAll(pageable);
-        return new org.springframework.data.web.PagedModel<>(page);
+        return new org.blubakery.common.core.dto.RestPageResponse<>(page);
     }
 
     @Override

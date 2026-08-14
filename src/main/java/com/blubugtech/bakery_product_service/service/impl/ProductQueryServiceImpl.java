@@ -126,10 +126,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public org.springframework.data.web.PagedModel<ProductResponse> getProductsByIds(List<String> productIds, Pageable pageable) {
+    public org.blubakery.common.core.dto.RestPageResponse<ProductResponse> getProductsByIds(List<String> productIds, Pageable pageable) {
         log.debug("Fetching products by IDs: {}", productIds);
         Page<Product> page = productRepository.findByIdIn(productIds, pageable);
         Page<ProductResponse> responsePage = page.map(productMapper::toResponse);
-        return new org.springframework.data.web.PagedModel<>(responsePage);
+        return new org.blubakery.common.core.dto.RestPageResponse<>(responsePage);
     }
 }
