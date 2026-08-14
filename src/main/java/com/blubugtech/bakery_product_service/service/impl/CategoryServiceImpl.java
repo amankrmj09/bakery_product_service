@@ -5,6 +5,7 @@ import com.blubugtech.bakery_product_service.service.CategoryService;
 
 import com.blubugtech.bakery_product_service.dto.category.CategoryRequest;
 import com.blubugtech.bakery_product_service.dto.category.CategoryResponse;
+import com.blubugtech.bakery_product_service.dto.common.RestPageImpl;
 import com.blubugtech.bakery_product_service.entity.Category;
 import com.blubugtech.bakery_product_service.mapper.CategoryMapper;
 import com.blubugtech.bakery_product_service.mapper.ProductMapper;
@@ -77,14 +78,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Cacheable(value = "categories", key = "'all:' + #pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
-        return categoryRepository.findAll(pageable)
-                .map(categoryMapper::toResponse);
+        return new RestPageImpl<>(categoryRepository.findAll(pageable)
+                .map(categoryMapper::toResponse));
     }
 
     @Cacheable(value = "active-categories", key = "#pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
-        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
-                .map(categoryMapper::toResponse);
+        return new RestPageImpl<>(categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
+                .map(categoryMapper::toResponse));
     }
 
     public Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable) {
