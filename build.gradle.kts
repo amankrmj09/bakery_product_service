@@ -71,6 +71,7 @@ dependencies {
 	// 4. Data & Persistence
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
 	// 5. Messaging & Event Driven
 	implementation("org.springframework.kafka:spring-kafka")

@@ -11,6 +11,9 @@ import com.blubugtech.bakery_product_service.mapper.ProductMapper;
 import com.blubugtech.bakery_product_service.exception.ProductServiceException;
 import com.blubugtech.bakery_product_service.repository.CategoryRepository;
 import com.blubugtech.bakery_product_service.repository.ProductQueryRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.blubakery.common.core.exception.common.DuplicateResourceException;
 import org.springframework.data.domain.Page;
@@ -44,6 +47,10 @@ public class CategoryServiceImpl implements CategoryService {
         this.categorySearchService = categorySearchService;
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "categories", allEntries = true),
+            @CacheEvict(value = "active-categories", allEntries = true)
+    })
     public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists");
@@ -68,11 +75,13 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toResponse(savedCategory);
     }
 
+    @Cacheable(value = "categories", key = "'all:' + #pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
         return categoryRepository.findAll(pageable)
                 .map(categoryMapper::toResponse);
     }
 
+    @Cacheable(value = "active-categories", key = "#pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
         return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
                 .map(categoryMapper::toResponse);
@@ -113,6 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new org.springframework.data.web.PagedModel<>(page);
     }
 
+    @Cacheable(value = "categories", key = "#categoryId")
     public CategoryResponse getCategoryById(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
@@ -124,6 +134,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(categoryMapper::toResponse);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "categories", key = "#categoryId"),
+            @CacheEvict(value = "categories", allEntries = true),
+            @CacheEvict(value = "active-categories", allEntries = true)
+    })
     public CategoryResponse updateCategory(String categoryId, CategoryRequest request) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
@@ -146,6 +161,11 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toResponse(updatedCategory);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "categories", key = "#categoryId"),
+            @CacheEvict(value = "categories", allEntries = true),
+            @CacheEvict(value = "active-categories", allEntries = true)
+    })
     public void deleteCategory(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
@@ -163,6 +183,10 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(categoryMapper::toResponse);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "categories", key = "#categoryId"),
+            @CacheEvict(value = "active-categories", allEntries = true)
+    })
     public CategoryResponse toggleCategoryStatus(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));

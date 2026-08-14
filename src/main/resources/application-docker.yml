@@ -3,6 +3,9 @@ spring:
   data:
     mongodb:
       uri: mongodb://product_user:product_password@mongodb:27017/bakery_products?authSource=admin
+    redis:
+      host: ${REDIS_HOST:redis-gateway}
+      port: ${REDIS_PORT:6379}
 
 # Eureka Configuration for Docker
 eureka:
