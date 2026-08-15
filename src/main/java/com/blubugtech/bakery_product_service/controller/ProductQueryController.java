@@ -114,6 +114,27 @@ public class ProductQueryController {
         return ResponseEntity.ok(productService.getProductsByIds(productIds, pageable));
     }
 
+    @PostMapping("/validate")
+    public ResponseEntity<List<org.blubakery.common.feign.contract.feign.ProductValidation>> validateProducts(
+            @RequestBody List<java.util.UUID> productIds) {
+        
+        List<String> stringIds = productIds.stream().map(java.util.UUID::toString).toList();
+        List<ProductResponse> products = productService.getProductsByIds(stringIds, PageRequest.of(0, 1000)).getContent();
+        
+        List<org.blubakery.common.feign.contract.feign.ProductValidation> validations = products.stream().map(p -> 
+            org.blubakery.common.feign.contract.feign.ProductValidation.builder()
+                .productId(java.util.UUID.fromString(p.getId()))
+                .available(p.getIsAvailable())
+                .stockQuantity(p.getInventory() != null ? p.getInventory().getAvailableStock() : 0)
+                .currentPrice(p.getEffectivePrice())
+                .taxClass(p.getTaxClass())
+                .taxRate(p.getTaxRate())
+                .build()
+        ).toList();
+        
+        return ResponseEntity.ok(validations);
+    }
+
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponse> getProductBySku(@PathVariable String sku) {
         return productService.getProductBySku(sku)
