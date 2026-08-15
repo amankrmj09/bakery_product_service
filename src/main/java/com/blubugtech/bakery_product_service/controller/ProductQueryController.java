@@ -36,7 +36,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getAllProducts(PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -47,7 +47,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getActiveProducts(PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -58,7 +58,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getAvailableProducts(PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -69,7 +69,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getFeaturedProducts(PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -80,7 +80,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getProductsOnSale(PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -92,7 +92,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getRecentlyAddedProducts(days, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -109,7 +109,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity.ok(productService.getProductsByIds(productIds, pageable));
     }
@@ -128,7 +128,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getProductsByCategory(categoryId, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -140,7 +140,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.searchProducts(query, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -153,7 +153,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "price") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getProductsByPriceRange(minPrice, maxPrice, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -165,7 +165,7 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getProductsByTag(tag, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
@@ -177,9 +177,16 @@ public class ProductQueryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = getSort(sortBy, sortDir);
         Page<ProductResponse> products = productService.getProductsWithoutAllergen(allergen, PageRequest.of(page, size, sort));
         return ResponseEntity.ok(new RestPageResponse<>(products));
+    }
+
+    private Sort getSort(String sortBy, String sortDir) {
+        if ("popular".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.DESC, "averageRating").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        }
+        return Sort.by(Sort.Direction.fromString(sortDir), sortBy);
     }
 
 }
