@@ -33,8 +33,8 @@ public class ProductResponse {
     private String metaDescription;
     private Integer maxOrderQuantity;
     private Product.ProductStatus status;
-    @Builder.Default private boolean isFeatured = false;
-    @Builder.Default private boolean isActive = true;
+    @Builder.Default private Boolean isFeatured = false;
+    @Builder.Default private Boolean isActive = true;
     private Integer preparationTimeMinutes;
     private Integer shelfLifeHours;
     private String unit;
