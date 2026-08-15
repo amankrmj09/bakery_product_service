@@ -202,6 +202,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Caching(evict = {
             @CacheEvict(value = "categories", key = "#categoryId"),
+            @CacheEvict(value = "categories", allEntries = true),
             @CacheEvict(value = "active-categories", allEntries = true)
     })
     public CategoryResponse toggleCategoryStatus(String categoryId) {
