@@ -86,9 +86,11 @@ public class ProductCommandServiceImpl implements ProductCommandService {
         inventoryService.createInventoryForProduct(savedProduct, request.getInitialStock(),
                 request.getMinimumStock(), request.getReorderLevel());
 
-        syncToElasticsearch(savedProduct);
-        publishProductEvent(savedProduct, "CREATED");
-        productCacheManager.putProduct(savedProduct);
+        executeAfterCommit(() -> {
+            syncToElasticsearch(savedProduct);
+            publishProductEvent(savedProduct, "CREATED");
+            productCacheManager.putProduct(savedProduct);
+        });
 
         log.info("Product created successfully with ID: {}", savedProduct.getId());
         return productMapper.toResponse(savedProduct);
@@ -133,9 +135,11 @@ public class ProductCommandServiceImpl implements ProductCommandService {
 
         Product updatedProduct = productRepository.save(product);
         
-        syncToElasticsearch(updatedProduct);
-        publishProductEvent(updatedProduct, "UPDATED");
-        productCacheManager.putProduct(updatedProduct);
+        executeAfterCommit(() -> {
+            syncToElasticsearch(updatedProduct);
+            publishProductEvent(updatedProduct, "UPDATED");
+            productCacheManager.putProduct(updatedProduct);
+        });
         
         log.info("Product updated successfully: {}", productId);
 
@@ -152,9 +156,11 @@ public class ProductCommandServiceImpl implements ProductCommandService {
         product.setStatus(status);
         Product updatedProduct = productRepository.save(product);
         
-        syncToElasticsearch(updatedProduct);
-        publishProductEvent(updatedProduct, "STATUS_UPDATED");
-        productCacheManager.putProduct(updatedProduct);
+        executeAfterCommit(() -> {
+            syncToElasticsearch(updatedProduct);
+            publishProductEvent(updatedProduct, "STATUS_UPDATED");
+            productCacheManager.putProduct(updatedProduct);
+        });
 
         log.info("Product status updated successfully: {}", productId);
         return productMapper.toResponse(updatedProduct);
@@ -169,7 +175,9 @@ public class ProductCommandServiceImpl implements ProductCommandService {
 
         product.setIsFeatured(!product.getIsFeatured());
         Product updatedProduct = productRepository.save(product);
-        productCacheManager.putProduct(updatedProduct);
+        executeAfterCommit(() -> {
+            productCacheManager.putProduct(updatedProduct);
+        });
 
         log.info("Product featured status toggled to {} for product: {}",
                    updatedProduct.getIsFeatured(), productId);
@@ -185,10 +193,11 @@ public class ProductCommandServiceImpl implements ProductCommandService {
                 .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
 
         productRepository.delete(product);
-        deleteFromElasticsearch(productId);
-        
-        productEventPublisher.publishProductDeletedEvent(productId);
-        productCacheManager.evictProduct(productId);
+        executeAfterCommit(() -> {
+            deleteFromElasticsearch(productId);
+            productEventPublisher.publishProductDeletedEvent(productId);
+            productCacheManager.evictProduct(productId);
+        });
         
         log.info("Product deleted successfully: {}", productId);
     }
@@ -211,5 +220,20 @@ public class ProductCommandServiceImpl implements ProductCommandService {
 
     private void publishProductEvent(Product product, String action) {
         productEventPublisher.publishProductEvent(product, action);
+    }
+
+    private void executeAfterCommit(Runnable runnable) {
+        if (org.springframework.transaction.support.TransactionSynchronizationManager.isSynchronizationActive()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        runnable.run();
+                    }
+                }
+            );
+        } else {
+            runnable.run();
+        }
     }
 }

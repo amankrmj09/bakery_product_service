@@ -13,8 +13,8 @@ public class ProductCacheManagerImpl implements ProductCacheManager {
 
     @Override
     @CachePut(value = "products", key = "#product.id")
-    public void putProduct(Product product) {
-        // Cached by Spring
+    public Product putProduct(Product product) {
+        return product;
     }
 
     @Override
