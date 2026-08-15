@@ -41,7 +41,7 @@ public class Product {
     @Size(max = 255, message = "Short description must not exceed 255 characters")
     private String shortDescription;
 
-    @DocumentReference(lazy = true)
+    @DocumentReference
     @NotNull(message = "Product category is required")
     private Category category;
 
