@@ -63,7 +63,8 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         log.debug("Fetching product by ID: {}", productId);
         Product product = productCacheManager.getProduct(productId).orElseGet(() -> {
             Product p = productRepository.findById(productId)
-                    .orElseThrow(() -> new ProductServiceException("Product not found with ID: " + productId));
+                    .orElseGet(() -> productRepository.findBySku(productId)
+                            .orElseThrow(() -> new org.blubakery.common.core.exception.common.ResourceNotFoundException("Product not found with ID or SKU: " + productId)));
             productCacheManager.putProduct(p);
             return p;
         });
