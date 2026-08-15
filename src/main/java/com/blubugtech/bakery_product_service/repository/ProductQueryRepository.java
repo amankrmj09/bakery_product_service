@@ -24,6 +24,8 @@ public interface ProductQueryRepository extends Repository<Product, String> {
     Page<Product> findByCategoryIdAndStatusOrderByAverageRatingDesc(String categoryId, Product.ProductStatus status, Pageable pageable);
     Page<Product> findByCategoryIdAndStatusAndAverageRatingGreaterThanOrderByAverageRatingDesc(String categoryId, Product.ProductStatus status, Double minRating, Pageable pageable);
     boolean existsByCategoryId(String categoryId);
+    long countByCategoryId(String categoryId);
+    long countByCategoryIdAndStatus(String categoryId, Product.ProductStatus status);
     Page<Product> findByIsFeaturedTrueAndStatus(Product.ProductStatus status, Pageable pageable);
     Page<Product> findByStatus(Product.ProductStatus status, Pageable pageable);
     long countByStatus(Product.ProductStatus status);

@@ -73,19 +73,25 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
         syncToElasticsearch(savedCategory);
-        return categoryMapper.toResponse(savedCategory);
+        CategoryResponse response = categoryMapper.toResponse(savedCategory);
+        populateProductCounts(response);
+        return response;
     }
 
     @Cacheable(value = "categories", key = "'all:' + #pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
-        return new RestPageResponse<>(categoryRepository.findAll(pageable)
-                .map(categoryMapper::toResponse));
+        Page<CategoryResponse> responses = categoryRepository.findAll(pageable)
+                .map(categoryMapper::toResponse);
+        responses.getContent().forEach(this::populateProductCounts);
+        return new RestPageResponse<>(responses);
     }
 
     @Cacheable(value = "active-categories", key = "#pageable.pageNumber + ':' + #pageable.pageSize")
     public Page<CategoryResponse> getActiveCategories(Pageable pageable) {
-        return new RestPageResponse<>(categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
-                .map(categoryMapper::toResponse));
+        Page<CategoryResponse> responses = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc(pageable)
+                .map(categoryMapper::toResponse);
+        responses.getContent().forEach(this::populateProductCounts);
+        return new RestPageResponse<>(responses);
     }
 
     public Page<CategoryResponse> getCategoriesWithProducts(Pageable pageable) {
@@ -127,12 +133,18 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryById(String categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
-        return categoryMapper.toResponse(category);
+        CategoryResponse response = categoryMapper.toResponse(category);
+        populateProductCounts(response);
+        return response;
     }
 
     public Optional<CategoryResponse> getCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .map(categoryMapper::toResponse);
+                .map(category -> {
+                    CategoryResponse response = categoryMapper.toResponse(category);
+                    populateProductCounts(response);
+                    return response;
+                });
     }
 
     @Caching(evict = {
@@ -159,7 +171,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category updatedCategory = categoryRepository.save(category);
         syncToElasticsearch(updatedCategory);
-        return categoryMapper.toResponse(updatedCategory);
+        CategoryResponse response = categoryMapper.toResponse(updatedCategory);
+        populateProductCounts(response);
+        return response;
     }
 
     @Caching(evict = {
@@ -180,8 +194,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public Page<CategoryResponse> searchCategories(String searchTerm, Pageable pageable) {
-        return categoryRepository.searchByName(searchTerm, pageable)
+        Page<CategoryResponse> responses = categoryRepository.searchByName(searchTerm, pageable)
                 .map(categoryMapper::toResponse);
+        responses.getContent().forEach(this::populateProductCounts);
+        return responses;
     }
 
     @Caching(evict = {
@@ -196,7 +212,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category updatedCategory = categoryRepository.save(category);
         syncToElasticsearch(updatedCategory);
 
-        return categoryMapper.toResponse(updatedCategory);
+        CategoryResponse response = categoryMapper.toResponse(updatedCategory);
+        populateProductCounts(response);
+        return response;
     }
 
     public void reorderCategories(Map<String, Integer> categoryOrders) {
@@ -247,5 +265,10 @@ public class CategoryServiceImpl implements CategoryService {
         } catch (Exception e) {
             log.error("Failed to delete category {} from Elasticsearch", categoryId, e);
         }
+    }
+
+    private void populateProductCounts(CategoryResponse response) {
+        response.setProductCount((int) productRepository.countByCategoryId(response.getId()));
+        response.setActiveProductCount((int) productRepository.countByCategoryIdAndStatus(response.getId(), Product.ProductStatus.ACTIVE));
     }
 }
