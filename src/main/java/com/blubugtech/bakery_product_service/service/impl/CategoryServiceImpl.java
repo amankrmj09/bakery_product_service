@@ -208,7 +208,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProductServiceException("Category not found with ID: " + categoryId));
 
-        category.setActive(!category.getActive());
+        boolean currentStatus = category.getActive() != null ? category.getActive() : true;
+        category.setActive(!currentStatus);
         Category updatedCategory = categoryRepository.save(category);
         syncToElasticsearch(updatedCategory);
 
