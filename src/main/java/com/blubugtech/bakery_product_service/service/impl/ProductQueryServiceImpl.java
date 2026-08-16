@@ -90,6 +90,12 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
+    public Page<ProductResponse> searchAdminProducts(String searchTerm, Pageable pageable) {
+        log.debug("Searching products for admin with pagination, term: {}", searchTerm);
+        return productRepository.searchAdminProducts(searchTerm, pageable).map(productMapper::toResponse);
+    }
+
+    @Override
     public Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         log.debug("Fetching products by price range: {} - {}", minPrice, maxPrice);
         return productRepository.findByPriceRange(minPrice, maxPrice, Product.ProductStatus.ACTIVE, pageable).map(productMapper::toResponse);

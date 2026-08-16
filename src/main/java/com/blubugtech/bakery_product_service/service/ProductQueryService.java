@@ -17,6 +17,7 @@ public interface ProductQueryService {
     Optional<ProductResponse> getProductBySku(String sku);
     Page<ProductResponse> getProductsByCategory(String categoryId, Pageable pageable);
     Page<ProductResponse> searchProducts(String searchTerm, Pageable pageable);
+    Page<ProductResponse> searchAdminProducts(String searchTerm, Pageable pageable);
     Page<ProductResponse> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
     Page<ProductResponse> getProductsOnSale(Pageable pageable);
     Page<ProductResponse> getProductsByTag(String tag, Pageable pageable);

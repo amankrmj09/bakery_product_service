@@ -166,6 +166,18 @@ public class ProductQueryController {
         return ResponseEntity.ok(new RestPageResponse<>(products));
     }
 
+    @GetMapping("/admin/search")
+    public ResponseEntity<RestPageResponse<ProductResponse>> searchAdminProducts(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        Sort sort = getSort(sortBy, sortDir);
+        Page<ProductResponse> products = productService.searchAdminProducts(query, PageRequest.of(page, size, sort));
+        return ResponseEntity.ok(new RestPageResponse<>(products));
+    }
+
     @GetMapping("/price-range")
     public ResponseEntity<RestPageResponse<ProductResponse>> getProductsByPriceRange(
             @RequestParam BigDecimal minPrice,
